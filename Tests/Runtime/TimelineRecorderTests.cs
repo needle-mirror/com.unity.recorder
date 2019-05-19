@@ -26,9 +26,9 @@ namespace UnityEngine.Recorder.Tests
 
 			var recorderSettings = ScriptableObject.CreateInstance<MovieRecorderSettings>();
 
-			var expectedOutputFile = Application.dataPath + "/RecordingTests/movie_test_from_timeline_001.mp4";
+			var expectedOutputFile = Application.dataPath + "/../RecordingTests/movie_test_from_timeline_001.mp4";
 
-			recorderSettings.outputFile = Application.dataPath + "/RecordingTests/movie_test_from_timeline_" + DefaultWildcard.Take;
+			recorderSettings.outputFile = Application.dataPath + "/../RecordingTests/movie_test_from_timeline_" + DefaultWildcard.Take;
 			
 			recorderSettings.imageInputSettings = new GameViewInputSettings
 			{

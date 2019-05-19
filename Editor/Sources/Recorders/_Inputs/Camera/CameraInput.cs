@@ -174,7 +174,7 @@ namespace UnityEditor.Recorder.Input
             get { return (CameraInputSettings)settings; }
         }
 
-        private Camera targetCamera
+        protected Camera targetCamera
         {
             get { return m_InputStrategy.targetCamera; }
             set { m_InputStrategy.targetCamera = value; }

@@ -47,11 +47,11 @@ RecorderItem.hasErrors.selected {
 }
 
 RecorderItem > EditableLabel > * {
-    text-color: #303030;
+    color: #303030;
 }
 
 RecorderItem.selected > EditableLabel > * {
-    text-color: #000000;
+    color: #000000;
 }
 
 PanelSplitter {

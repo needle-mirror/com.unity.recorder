@@ -62,6 +62,7 @@ namespace UnityEditor.Recorder
             foreach (var rp in m_RecorderPresets)
             {
                 var r = (RecorderSettings) CreateFromPreset(rp);
+                r.name = rp.name;
                 prefs.AddRecorderSettings(r);
             }
             

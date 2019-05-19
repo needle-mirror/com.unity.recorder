@@ -34,7 +34,7 @@ namespace UnityEditor.Recorder
             }
         }
         
-        static void DrawSeparator()
+        static internal void DrawSeparator()
         {
             EditorGUILayout.Separator();
             
@@ -63,6 +63,9 @@ namespace UnityEditor.Recorder
             FileTypeAndFormatGUI();
             
             DrawSeparator();
+            
+            AOVGUI();
+
             
             NameAndPathGUI();
 
@@ -164,6 +167,11 @@ namespace UnityEditor.Recorder
         protected virtual void OnEncodingGui()
         {
         }
+        
+        protected virtual void AOVGUI()
+        {
+        }
+
     }
 }
 

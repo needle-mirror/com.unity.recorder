@@ -76,6 +76,9 @@ namespace UnityEditor.Recorder
             Remove(m_Label);
             Add(m_TextField);
             UIElementHelper.SetFocusable(m_TextField);
+#if UNITY_2019_1_OR_NEWER
+            m_TextField.delegatesFocus = true;
+#endif
             m_PreviouslyFocused = focusController.focusedElement;    
             m_TextField.Focus();
         }
