@@ -351,7 +351,7 @@ namespace UnityEditor.Recorder
                     paddingRight = 0.0f,
 #if UNITY_2019_1_OR_NEWER
                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#elif UNITY_2018_3
+#elif UNITY_2018_3_OR_NEWER
                     backgroundScaleMode = ScaleMode.ScaleToFit,
 #else
                     backgroundSize = ScaleMode.ScaleToFit,

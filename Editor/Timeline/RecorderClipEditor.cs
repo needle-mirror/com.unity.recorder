@@ -43,8 +43,9 @@ namespace UnityEditor.Recorder.Timeline
 
                 using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
                 {
+                    var clip = (RecorderClip) target;
                     if (m_Timeline == null)
-                        m_Timeline = FindTimelineAsset();
+                        m_Timeline = clip.FindTimelineAsset();
 
                     if (m_Timeline != null)
                     {
@@ -58,8 +59,6 @@ namespace UnityEditor.Recorder.Timeline
                     }
 
                     EditorGUILayout.BeginHorizontal();
-                    
-                    var clip = (RecorderClip) target;
 
                     if (clip.needsDuplication)
                     {
@@ -94,8 +93,6 @@ namespace UnityEditor.Recorder.Timeline
 
                     if (m_Editor != null)
                     {
-                        PushTimelineIntoRecorder();
-
                         EditorGUILayout.Separator();
 
                         m_Editor.OnInspectorGUI();
@@ -153,32 +150,6 @@ namespace UnityEditor.Recorder.Timeline
 
             m_Editor = (RecorderEditor) CreateEditor(clip.settings);
             AssetDatabase.Refresh();
-        }
-
-        TimelineAsset FindTimelineAsset()
-        {
-            if (!AssetDatabase.Contains(target))
-                return null;
-
-            var path = AssetDatabase.GetAssetPath(target);
-            var objs = AssetDatabase.LoadAllAssetsAtPath(path);
-
-            foreach (var obj in objs)
-            {
-                if (obj != null && AssetDatabase.IsMainAsset(obj))
-                    return obj as TimelineAsset;
-            }
-            return null;
-        }
-
-        void PushTimelineIntoRecorder()
-        {
-            if (m_Timeline == null)
-                return;
-
-            // Time
-            var clip = (RecorderClip)target;
-            clip.PushTimelineIntoRecorder(m_Timeline);
         }
     }
 }

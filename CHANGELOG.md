@@ -4,6 +4,15 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.0.2-preview.3] - 2019-05-28
+### Fixes and Linux support
+- Add Gif and Legacy Recorders core library binaries for Linux
+- Fix build errors related to fccore
+- Fix a bug with Recorder Clip that would produce one frame movie if never displayed in the inspector
+- Warning clean-up in 2018.4
+- Remove ActiveCamera target when HDRP is available
+- Fixed "NullReferenceException" errors related to changes in GameView in 2019.3
+
 ## [2.0.1-preview.1] - 2019-05-20
 ### Audio Recorder and some bug fixes
 - Integrate AudioRecorder in the package

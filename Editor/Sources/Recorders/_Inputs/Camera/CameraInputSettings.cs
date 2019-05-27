@@ -13,8 +13,22 @@ namespace UnityEditor.Recorder.Input
         public bool flipFinalOutput;
         public bool captureUI;
 
+        internal static bool IsHDRPAvailable()
+        {
+            // For backward compatibility with unity version < 19.1
+            // Use reflection to determine if hdrp is available 
+            const string ClassName = "UnityEngine.Experimental.Rendering.HDPipeline.HDRenderPipeline";
+            const string editorDllName = "Unity.RenderPipelines.HighDefinition.Runtime";
+            var hdrpRenderPipeline = Type.GetType(ClassName + ", " + editorDllName );
+            return (hdrpRenderPipeline != null);
+        }
+        
         public CameraInputSettings()
         {
+            if (IsHDRPAvailable())
+            {
+                source = ImageSource.MainCamera;
+            }
             outputImageHeight = ImageHeight.Window;
         }
         

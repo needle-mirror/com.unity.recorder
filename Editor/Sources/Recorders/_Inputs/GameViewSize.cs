@@ -11,10 +11,16 @@ namespace UnityEditor.Recorder.Input
         public static int modifiedResolutionCount;
         const int miscSize = 1; // Used when no main GameView exists (ex: batchmode)
 
+#if UNITY_2019_3_OR_NEWER
+        static Type s_GameViewType = Type.GetType("UnityEditor.PreviewEditorWindow,UnityEditor");
+        static string s_GetGameViewFuncName = "GetMainPreviewWindow";
+#else
+        static Type s_GameViewType = Type.GetType("UnityEditor.GameView,UnityEditor");
+        static string s_GetGameViewFuncName = "GetMainGameView";
+#endif
         static EditorWindow GetMainGameView()
         {
-            var T = Type.GetType("UnityEditor.GameView,UnityEditor");
-            var getMainGameView = T.GetMethod("GetMainGameView", BindingFlags.NonPublic | BindingFlags.Static);
+            var getMainGameView = s_GameViewType.GetMethod(s_GetGameViewFuncName, BindingFlags.NonPublic | BindingFlags.Static);
             var res = getMainGameView.Invoke(null, null);
             return (EditorWindow)res;
         }
@@ -22,11 +28,13 @@ namespace UnityEditor.Recorder.Input
         public static void DisableMaxOnPlay()
         {
             var gameView = GetMainGameView();
+            if (gameView == null)
+                return;
 
-            if (gameView.GetType().GetField("m_MaximizeOnPlay", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(gameView)  as bool? == true)
+            if (s_GameViewType.GetField("m_MaximizeOnPlay", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(gameView)  as bool? == true)
             {
-                Debug.LogWarning("'Maximize on Play' not compatible wit recorder: disabling it!");
-                gameView.GetType().GetField("m_MaximizeOnPlay", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(gameView, false);
+                Debug.LogWarning("'Maximize on Play' not compatible with recorder: disabling it!");
+                s_GameViewType.GetField("m_MaximizeOnPlay", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(gameView, false);
             }
         }
 

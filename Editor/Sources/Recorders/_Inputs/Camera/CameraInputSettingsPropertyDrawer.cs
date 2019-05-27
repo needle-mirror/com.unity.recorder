@@ -30,8 +30,12 @@ namespace UnityEditor.Recorder.Input
             if (m_Initialized)
                 return;
 
+            if (CameraInputSettings.IsHDRPAvailable())
+            {
+                m_SupportedSources = ImageSource.MainCamera | ImageSource.TaggedCamera;
+            }
             base.Initialize(property);
-            
+           
             m_Source = property.FindPropertyRelative("source");
             m_CameraTag = property.FindPropertyRelative("cameraTag");
             m_OutputResolution = property.FindPropertyRelative("m_OutputResolution");

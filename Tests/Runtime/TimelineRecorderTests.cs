@@ -41,7 +41,6 @@ namespace UnityEngine.Recorder.Tests
 			
 			var recorderClip = (RecorderClip) clip.asset;
 			recorderClip.settings = recorderSettings;
-			recorderClip.PushTimelineIntoRecorder(timeline);
 
 			var director = new GameObject("director").AddComponent<PlayableDirector>();
 			director.playableAsset = timeline;

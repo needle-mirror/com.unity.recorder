@@ -171,7 +171,7 @@ namespace UnityEditor.Recorder
            
 #if UNITY_2019_1_OR_NEWER
             m_Toggle.RegisterValueChangedCallback(evt =>
-#elif UNITY_2018_3
+#elif UNITY_2018_3_OR_NEWER
             m_Toggle.OnValueChanged(evt =>
 #else
             m_Toggle.OnToggle(() =>

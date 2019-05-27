@@ -65,13 +65,34 @@ namespace UnityEditor.Recorder.Timeline
             }
         }
 
-        public void PushTimelineIntoRecorder(TimelineAsset timelineAsset)
+        internal TimelineAsset FindTimelineAsset()
         {
-            if (settings == null)
+            if (!AssetDatabase.Contains(this))
+                return null;
+
+            var path = AssetDatabase.GetAssetPath(this);
+            var objs = AssetDatabase.LoadAllAssetsAtPath(path);
+
+            foreach (var obj in objs)
+            {
+                if (obj != null && AssetDatabase.IsMainAsset(obj))
+                    return obj as TimelineAsset;
+            }
+            return null;
+        }
+
+        void PushTimelineIntoRecorder(TimelineAsset timelineAsset)
+        {
+            if (settings == null || timelineAsset == null)
                 return;
             settings.frameRate = timelineAsset.editorSettings.fps;
             settings.frameRatePlayback = FrameRatePlayback.Constant;
             settings.capFrameRate = true;
+        }
+
+        private void OnEnable()
+        {
+            PushTimelineIntoRecorder(FindTimelineAsset());
         }
 
         public void OnAfterDeserialize()
