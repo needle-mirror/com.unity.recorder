@@ -17,8 +17,13 @@ namespace UnityEditor.Recorder.Input
         {
             // For backward compatibility with unity version < 19.1
             // Use reflection to determine if hdrp is available 
+#if UNITY_2019_3_OR_NEWER
+            const string ClassName = "UnityEngine.Rendering.HighDefinition.HDRenderPipeline";
+#else
             const string ClassName = "UnityEngine.Experimental.Rendering.HDPipeline.HDRenderPipeline";
+#endif            
             const string editorDllName = "Unity.RenderPipelines.HighDefinition.Runtime";
+            
             var hdrpRenderPipeline = Type.GetType(ClassName + ", " + editorDllName );
             return (hdrpRenderPipeline != null);
         }

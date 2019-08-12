@@ -1,3 +1,4 @@
+using UnityEditor.Recorder.Input;
 using UnityEngine.Playables;
 
 namespace UnityEditor.Recorder.Timeline
@@ -56,6 +57,12 @@ namespace UnityEditor.Recorder.Timeline
 
             // Assumption: OnPlayStateChanged( PlayState.Playing ) ONLY EVER CALLED ONCE for this type of playable.
             m_PlayState = PlayState.Playing;
+            // case FTV-251 the Options.useCameraCaptureCallbacks is enabled 
+            // too late for the RecorderClip when recording from the timeline
+            // to workaround this problem also enable the
+            // CaptureCallbackInputStrategy if HDRP is available
+
+            Options.useCameraCaptureCallbacks = CameraInputSettings.IsHDRPAvailable();
             session.BeginRecording();                
         }
 

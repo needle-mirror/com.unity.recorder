@@ -86,7 +86,7 @@ namespace UnityEditor.Recorder
 
                 var errors = new List<string>();
 
-                if (recorderSetting.ValidityCheck(errors))
+                if (!recorderSetting.ValidityCheck(errors))
                 {
                     foreach (var error in errors)
                         Debug.LogWarning(recorderSetting.name + ": " + error);

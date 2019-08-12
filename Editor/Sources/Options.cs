@@ -64,6 +64,11 @@ namespace UnityEditor.Recorder
             set { EditorPrefs.SetInt(k_SelectedRecorderIndex, value); }
         }
 
+        // This variable is used to select how we capture the final image from the
+        // render pipeline, with the legacy render pipeline this variable is set to false
+        // with the scriptable render pipeline the CameraCaptureBride
+        // inside the SRP will reflection to set this variable to true, this will in turn
+        // enable using the CameraInput inputStrategy CaptureCallbackInputStrategy 
         public static bool useCameraCaptureCallbacks = false;
 
         [MenuItem(k_VerboseModeMenuItem, false, RecorderWindow.MenuRootIndex + 200)]
