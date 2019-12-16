@@ -14,7 +14,7 @@ namespace UnityEngine.Recorder.Tests
 			settings.AddRecorderSettings(recorder);
 			var recorderController = new RecorderController(settings);
 
-			Options.verboseMode = false; // Make sure visibility is not toggled on because of debugMode.
+			RecorderOptions.VerboseMode = false; // Make sure visibility is not toggled on because of debugMode.
 			
 			Assert.IsTrue(recorderController.StartRecording());
 			Assert.IsTrue(recorderController.IsRecording());

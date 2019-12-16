@@ -1,9 +1,11 @@
+using JetBrains.Annotations;
+
 namespace UnityEditor.Recorder
 {
     /// <summary>
     /// Options class for the Recorder
     /// </summary>
-    public static class Options
+    public static class RecorderOptions
     {
         const string k_VerboseModeMenuItem = RecorderWindow.MenuRoot + "Options/Verbose Mode";
         const string k_ShowRecorderGameObject = RecorderWindow.MenuRoot + "Options/Show Recorder GameObject";
@@ -16,7 +18,7 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// If true, the recorder will log additional recording steps into the Console.
         /// </summary>
-        public static bool verboseMode
+        public static bool VerboseMode
         {
             get { return EditorPrefs.GetBool(k_VerboseModeMenuItem, false); }
             set { EditorPrefs.SetBool(k_VerboseModeMenuItem, value); }
@@ -26,7 +28,7 @@ namespace UnityEditor.Recorder
         /// The recoder uses a "Unity-RecorderSessions" GameObject to store Scene references and manage recording sessions.
         /// If true, this GameObject will be visible in the Scene Hierarchy. 
         /// </summary>
-        public static bool showRecorderGameObject
+        public static bool ShowRecorderGameObject
         {
             get { return EditorPrefs.GetBool(k_ShowRecorderGameObject, false); }
             set
@@ -40,7 +42,7 @@ namespace UnityEditor.Recorder
         /// If true, legacy recorders will be displayed in the "Add New Recorder" menu.
         /// Legacy recorders are deprecated and will be removed from the Unity Recorder in future releases.
         /// </summary>
-        public static bool showLegacyRecorders
+        public static bool ShowLegacyRecorders
         {
             get { return EditorPrefs.GetBool(k_ShowLegacyModeMenuItem, false); }
             set { EditorPrefs.SetBool(k_ShowLegacyModeMenuItem, value); }
@@ -63,57 +65,64 @@ namespace UnityEditor.Recorder
             get { return EditorPrefs.GetInt(k_SelectedRecorderIndex, 0); }
             set { EditorPrefs.SetInt(k_SelectedRecorderIndex, value); }
         }
-
-        // This variable is used to select how we capture the final image from the
-        // render pipeline, with the legacy render pipeline this variable is set to false
-        // with the scriptable render pipeline the CameraCaptureBride
-        // inside the SRP will reflection to set this variable to true, this will in turn
-        // enable using the CameraInput inputStrategy CaptureCallbackInputStrategy 
-        public static bool useCameraCaptureCallbacks = false;
+        
 
         [MenuItem(k_VerboseModeMenuItem, false, RecorderWindow.MenuRootIndex + 200)]
         static void ToggleDebugMode()
         {
-            var value = !verboseMode;
+            var value = !VerboseMode;
             EditorPrefs.SetBool(k_VerboseModeMenuItem, value);
-            verboseMode = value;
+            VerboseMode = value;
         }
         
         [MenuItem(k_VerboseModeMenuItem, true)]
         static bool ToggleDebugModeValidate()
         {
-            Menu.SetChecked(k_VerboseModeMenuItem, verboseMode);
+            Menu.SetChecked(k_VerboseModeMenuItem, VerboseMode);
             return true;
         }
         
         [MenuItem(k_ShowRecorderGameObject, false, RecorderWindow.MenuRootIndex + 200)]
         static void ToggleShowRecorderGameObject()
         {
-            var value = !showRecorderGameObject;
+            var value = !ShowRecorderGameObject;
             EditorPrefs.SetBool(k_ShowRecorderGameObject, value);
-            showRecorderGameObject = value;
+            ShowRecorderGameObject = value;
         }
         
         [MenuItem(k_ShowRecorderGameObject, true)]
         static bool ToggleShowRecorderGameObjectValidate()
         {
-            Menu.SetChecked(k_ShowRecorderGameObject, showRecorderGameObject);
+            Menu.SetChecked(k_ShowRecorderGameObject, ShowRecorderGameObject);
             return true;
         }
 
         [MenuItem(k_ShowLegacyModeMenuItem, false, RecorderWindow.MenuRootIndex + 200)]
         static void ToggleShowLegacyRecorders()
         {
-            var value = !showLegacyRecorders;
+            var value = !ShowLegacyRecorders;
             EditorPrefs.SetBool(k_ShowLegacyModeMenuItem, value);
-            showLegacyRecorders = value;
+            ShowLegacyRecorders = value;
         }
         
         [MenuItem(k_ShowLegacyModeMenuItem, true)]
         static bool ToggleShowLegacyRecordersValidate()
         {
-            Menu.SetChecked(k_ShowLegacyModeMenuItem, showLegacyRecorders);
+            Menu.SetChecked(k_ShowLegacyModeMenuItem, ShowLegacyRecorders);
             return true;
         }
+    }
+
+    [UsedImplicitly]
+    static class Options
+    {
+        // This variable is used to select how we capture the final image from the
+        // render pipeline, with the legacy render pipeline this variable is set to false
+        // with the scriptable render pipeline the CameraCaptureBride
+        // inside the SRP will reflection to set this variable to true, this will in turn
+        // enable using the CameraInput inputStrategy CaptureCallbackInputStrategy 
+        //
+        // This variable is set through reflection by SRP. Everything is matching very strictly: all flags are mandatory as well as the name. 
+        public static bool useCameraCaptureCallbacks = false;
     }
 }

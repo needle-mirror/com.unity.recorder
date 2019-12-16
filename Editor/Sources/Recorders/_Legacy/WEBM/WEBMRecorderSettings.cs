@@ -8,11 +8,11 @@ namespace UnityEditor.Recorder.FrameCapturer
 
         public WEBMRecorderSettings()
         {
-            fileNameGenerator.fileName = "movie";
+            fileNameGenerator.FileName = "movie";
             m_AutoSelectBR = true;
         }
 
-        public override string extension
+        protected internal override string Extension
         {
             get { return "webm"; }
         }

@@ -30,10 +30,6 @@ namespace UnityEditor.Recorder.Input
             if (m_Initialized)
                 return;
 
-            if (CameraInputSettings.IsHDRPAvailable())
-            {
-                m_SupportedSources = ImageSource.MainCamera | ImageSource.TaggedCamera;
-            }
             base.Initialize(property);
            
             m_Source = property.FindPropertyRelative("source");
@@ -48,6 +44,11 @@ namespace UnityEditor.Recorder.Input
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Initialize(property);
+            if (CameraInputSettings.UsingHDRP())
+            {
+                m_SupportedSources = ImageSource.MainCamera | ImageSource.TaggedCamera;
+            }
+
             
             using (var check = new EditorGUI.ChangeCheckScope())
             {

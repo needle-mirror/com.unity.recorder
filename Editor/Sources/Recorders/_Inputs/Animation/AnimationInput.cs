@@ -6,12 +6,19 @@ using UnityEditor.Experimental.Animations;
 
 namespace UnityEditor.Recorder.Input
 {
-    class AnimationInput : RecorderInput
+    /// <summary>
+    /// Use this class to record animations in the scene in the Unity native format.
+    /// </summary>
+    public class AnimationInput : RecorderInput
     {
-        public GameObjectRecorder gameObjectRecorder { get; private set; }
+        /// <summary>
+        /// Indicates the internal GameObject Recorder to use for the capture.
+        /// </summary>
+        public GameObjectRecorder GameObjectRecorder { get; private set; }
         float m_Time;
 
-        public override void BeginRecording(RecordingSession session)
+        /// <inheritdoc/>
+        protected internal override void BeginRecording(RecordingSession session)
         {
             var aniSettings = (AnimationInputSettings) settings;
 
@@ -19,24 +26,25 @@ namespace UnityEditor.Recorder.Input
 
             if (srcGO == null)
                 return;
-            
-            gameObjectRecorder = new GameObjectRecorder(srcGO);
+
+            GameObjectRecorder = new GameObjectRecorder(srcGO);
 
             foreach (var binding in aniSettings.bindingType)
             {
-                gameObjectRecorder.BindComponentsOfType(srcGO, binding, aniSettings.recursive); 
+                GameObjectRecorder.BindComponentsOfType(srcGO, binding, aniSettings.Recursive);
             }
-            
+
             m_Time = session.recorderTime;
         }
 
-        public override void NewFrameReady(RecordingSession session)
+        /// <inheritdoc/>
+        protected internal override void NewFrameReady(RecordingSession session)
         {
-            if (gameObjectRecorder != null && session.isRecording)
+            if (GameObjectRecorder != null && session.isRecording)
             {
-                gameObjectRecorder.TakeSnapshot(session.recorderTime - m_Time);
+                GameObjectRecorder.TakeSnapshot(session.recorderTime - m_Time);
                 m_Time = session.recorderTime;
             }
-        }        
+        }
     }
 }

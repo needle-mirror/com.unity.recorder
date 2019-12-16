@@ -28,16 +28,16 @@ namespace UnityEngine.Recorder.Tests
 
 			var expectedOutputFile = Application.dataPath + "/../RecordingTests/movie_test_from_timeline_001.mp4";
 
-			recorderSettings.outputFile = Application.dataPath + "/../RecordingTests/movie_test_from_timeline_" + DefaultWildcard.Take;
+			recorderSettings.OutputFile = Application.dataPath + "/../RecordingTests/movie_test_from_timeline_" + DefaultWildcard.Take;
 			
-			recorderSettings.imageInputSettings = new GameViewInputSettings
+			recorderSettings.ImageInputSettings = new GameViewInputSettings
 			{
-				outputWidth = 640,
-				outputHeight = 480
+				OutputWidth = 640,
+				OutputHeight = 480
 			};
 				
-			recorderSettings.outputFormat = VideoRecorderOutputFormat.MP4;
-			recorderSettings.videoBitRateMode = VideoBitrateMode.Low;
+			recorderSettings.OutputFormat = MovieRecorderSettings.VideoRecorderOutputFormat.MP4;
+			recorderSettings.VideoBitRateMode = VideoBitrateMode.Low;
 			
 			var recorderClip = (RecorderClip) clip.asset;
 			recorderClip.settings = recorderSettings;

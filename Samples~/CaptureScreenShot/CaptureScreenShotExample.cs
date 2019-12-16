@@ -28,16 +28,16 @@ namespace UnityEngine.Recorder.Examples
            // Image
            var imageRecorder = ScriptableObject.CreateInstance<ImageRecorderSettings>();
            imageRecorder.name = "My Image Recorder";
-           imageRecorder.enabled = true;
-           imageRecorder.outputFormat = ImageRecorderOutputFormat.PNG;
-           imageRecorder.captureAlpha = false;
+           imageRecorder.Enabled = true;
+           imageRecorder.OutputFormat = ImageRecorderSettings.ImageRecorderOutputFormat.PNG;
+           imageRecorder.CaptureAlpha = false;
            
-           imageRecorder.outputFile = Path.Combine(mediaOutputFolder, "image_" + DefaultWildcard.Take);
+           imageRecorder.OutputFile = Path.Combine(mediaOutputFolder, "image_" + DefaultWildcard.Take);
     
            imageRecorder.imageInputSettings = new GameViewInputSettings
            {
-               outputWidth = 3840,
-               outputHeight = 2160,
+               OutputWidth = 3840,
+               OutputHeight = 2160,
            };
     
            // Setup Recording

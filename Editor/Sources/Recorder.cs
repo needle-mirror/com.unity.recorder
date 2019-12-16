@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
-    enum ERecordingSessionStage
+    internal enum ERecordingSessionStage
     {
         BeginRecording,
         NewFrameStarting,
@@ -14,27 +14,33 @@ namespace UnityEditor.Recorder
         SessionCreated
     }
 
-    abstract class Recorder : ScriptableObject
+    /// <summary>
+    /// Base class for all Recorders. To create a new Recorder, extend <see cref="GenericRecorder{T}"/>.
+    /// </summary>
+    public abstract class Recorder : ScriptableObject
     {
         static int sm_CaptureFrameRateCount;
         bool m_ModifiedCaptureFR;
 
-        public int recordedFramesCount { get; set; }
-        
+        /// <summary>
+        /// Indicates the number of frames of the current recording session.
+        /// </summary>
+        protected internal int RecordedFramesCount { get; internal set; }
+
         protected List<RecorderInput> m_Inputs;
 
-        public virtual void Awake()
+        void Awake()
         {
             sm_CaptureFrameRateCount = 0;
         }
 
-        public virtual void Reset()
+        protected internal virtual void Reset()
         {
-            recordedFramesCount = 0;
-            recording = false;
+            RecordedFramesCount = 0;
+            Recording = false;
         }
 
-        protected virtual void OnDestroy()
+        void OnDestroy()
         {
             if (m_ModifiedCaptureFR )
             {
@@ -42,27 +48,27 @@ namespace UnityEditor.Recorder
                 if (sm_CaptureFrameRateCount == 0)
                 {
                     Time.captureFramerate = 0;
-                    if (Options.verboseMode)
+                    if (RecorderOptions.VerboseMode)
                         Debug.Log("Recorder resetting 'CaptureFrameRate' to zero");
                 }
             }
         }
 
-        public abstract RecorderSettings settings { get; set; }
+        internal abstract RecorderSettings settings { get; set; }
 
-        public virtual void SessionCreated(RecordingSession session)
+        protected internal virtual void SessionCreated(RecordingSession session)
         {
-            if (Options.verboseMode)
+            if (RecorderOptions.VerboseMode)
                 Debug.Log(string.Format("Recorder {0} session created", GetType().Name));
 
             settings.SelfAdjustSettings(); // ignore return value.
 
-            var fixedRate = settings.frameRatePlayback == FrameRatePlayback.Constant ? (int)settings.frameRate : 0;
+            var fixedRate = settings.FrameRatePlayback == FrameRatePlayback.Constant ? (int)settings.FrameRate : 0;
             if (fixedRate > 0)
             {
                 if (Time.captureFramerate != 0 && fixedRate != Time.captureFramerate )
                     Debug.LogError(string.Format("Recorder {0} is set to record at a fixed rate and another component has already set a conflicting value for [Time.captureFramerate], new value being applied : {1}!", GetType().Name, fixedRate));
-                else if( Time.captureFramerate == 0 && Options.verboseMode )
+                else if( Time.captureFramerate == 0 && RecorderOptions.VerboseMode )
                     Debug.Log("Frame recorder set fixed frame rate to " + fixedRate);
 
                 Time.captureFramerate = fixedRate;
@@ -72,32 +78,42 @@ namespace UnityEditor.Recorder
             }
 
             m_Inputs = new List<RecorderInput>();
-            foreach (var inputSettings in settings.inputsSettings)
-            {               
-                var input = (RecorderInput)Activator.CreateInstance(inputSettings.inputType);
+            foreach (var inputSettings in settings.InputsSettings)
+            {
+                var input = (RecorderInput)Activator.CreateInstance(inputSettings.InputType);
                 input.settings = inputSettings;
                 m_Inputs.Add(input);
                 SignalInputsOfStage(ERecordingSessionStage.SessionCreated, session);
             }
         }
 
-        public virtual bool BeginRecording(RecordingSession session)
+        /// <summary>
+        /// Starts a new recording session. Callback is invoked once when the recording session starts.
+        /// </summary>
+        /// <param name="session">The newly created recording session.</param>
+        /// <returns>True if recording can start, False otherwise.</returns>
+        /// <exception cref="Exception">Throws if there is already a recording session running.</exception>
+        protected internal virtual bool BeginRecording(RecordingSession session)
         {
-            if (recording)
+            if (Recording)
                 throw new Exception("Already recording!");
 
-            if (Options.verboseMode)
+            if (RecorderOptions.VerboseMode)
                 Debug.Log(string.Format("Recorder {0} starting to record", GetType().Name));
-         
-            return recording = true;
+
+            return Recording = true;
         }
 
-        public virtual void EndRecording(RecordingSession session)
+        /// <summary>
+        /// Ends the current recording session. Callback is invoked when the recording session ends.
+        /// </summary>
+        /// <param name="session">The current recording session.</param>
+        protected internal virtual void EndRecording(RecordingSession session)
         {
-            if (!recording)
+            if (!Recording)
                 return;
-            
-            recording = false;
+
+            Recording = false;
 
             if (m_ModifiedCaptureFR )
             {
@@ -106,7 +122,7 @@ namespace UnityEditor.Recorder
                 if (sm_CaptureFrameRateCount == 0)
                 {
                     Time.captureFramerate = 0;
-                    if (Options.verboseMode)
+                    if (RecorderOptions.VerboseMode)
                         Debug.Log("Recorder resetting 'CaptureFrameRate' to zero");
                 }
             }
@@ -117,30 +133,51 @@ namespace UnityEditor.Recorder
                     input.Dispose();
             }
 
-            if(Options.verboseMode)
-                Debug.Log(string.Format("{0} recording stopped, total frame count: {1}", GetType().Name, recordedFramesCount));
+            if(RecorderOptions.VerboseMode)
+                Debug.Log(string.Format("{0} recording stopped, total frame count: {1}", GetType().Name, RecordedFramesCount));
 
-            ++settings.take;
+            ++settings.Take;
         }
-        
-        public abstract void RecordFrame(RecordingSession ctx);
-        
-        public virtual void PrepareNewFrame(RecordingSession ctx)
+
+        /// <summary>
+        /// Records a single frame. Callback is invoked for every frame during the recording session.
+        /// </summary>
+        /// <param name="ctx">The current recording session.</param>
+        protected internal abstract void RecordFrame(RecordingSession ctx);
+
+
+        /// <summary>
+        /// Prepares a frame before recording it. Callback is invoked for every frame during the recording session, before RecordFrame.
+        /// </summary>
+        /// <param name="ctx">The current recording session.</param>
+        protected internal virtual void PrepareNewFrame(RecordingSession ctx)
         {
         }
 
-        public virtual bool SkipFrame(RecordingSession ctx)
+        /// <summary>
+        /// Tests if a frame should be skipped before trying to record it. Callback is invoked for every frame during the recording session.
+        /// </summary>
+        /// <remarks>
+        /// If this function returns True, RecordFrame will not be invoked.
+        /// </remarks>
+        /// <param name="ctx">The current recording session.</param>
+        /// <returns>True if the frame should be skipped, False otherwise.</returns>
+        protected internal virtual bool SkipFrame(RecordingSession ctx)
         {
-            return !recording 
-                || (ctx.frameIndex % settings.captureEveryNthFrame) != 0 
-                || ( settings.recordMode == RecordMode.TimeInterval && ctx.currentFrameStartTS < settings.startTime )
-                || ( settings.recordMode == RecordMode.FrameInterval && ctx.frameIndex < settings.startFrame )
-                || ( settings.recordMode == RecordMode.SingleFrame && ctx.frameIndex < settings.startFrame );
+            return !Recording
+                || ctx.frameIndex % settings.captureEveryNthFrame != 0
+                || settings.RecordMode == RecordMode.TimeInterval && ctx.currentFrameStartTS < settings.StartTime
+                || settings.RecordMode == RecordMode.FrameInterval && ctx.frameIndex < settings.StartFrame
+                || settings.RecordMode == RecordMode.SingleFrame && ctx.frameIndex < settings.StartFrame;
         }
 
-        public bool recording { get; protected set; }
+        /// <summary>
+        /// Tests if there is a recording session currently running.
+        /// </summary>
+        /// <returns>True if a recording session is currently active, False otherwise.</returns>
+        public bool Recording { get; protected set; }
 
-        public void SignalInputsOfStage(ERecordingSessionStage stage, RecordingSession session)
+        internal void SignalInputsOfStage(ERecordingSessionStage stage, RecordingSession session)
         {
             if (m_Inputs == null)
                 return;

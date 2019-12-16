@@ -62,7 +62,7 @@ namespace UnityEditor.Recorder.Timeline
             // to workaround this problem also enable the
             // CaptureCallbackInputStrategy if HDRP is available
 
-            Options.useCameraCaptureCallbacks = CameraInputSettings.IsHDRPAvailable();
+            Options.useCameraCaptureCallbacks = CameraInputSettings.UsingHDRP();
             session.BeginRecording();                
         }
 

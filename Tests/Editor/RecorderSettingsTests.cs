@@ -15,8 +15,8 @@ namespace UnityEditor.Recorder.Tests
 
 			AssertBaseProperties(recorder);
 
-			recorder.captureAlpha = true;
-			recorder.outputFormat = ImageRecorderOutputFormat.PNG;
+			recorder.CaptureAlpha = true;
+			recorder.OutputFormat = ImageRecorderSettings.ImageRecorderOutputFormat.PNG;
 
 			Assert.IsTrue(recorder.imageInputSettings is GameViewInputSettings);
 			
@@ -38,20 +38,20 @@ namespace UnityEditor.Recorder.Tests
 
 			AssertBaseProperties(recorder);
 
-			recorder.captureAlpha = true;
-			recorder.outputFormat = VideoRecorderOutputFormat.MP4;
-			recorder.videoBitRateMode = VideoBitrateMode.High;
+			recorder.CaptureAlpha = true;
+			recorder.OutputFormat = MovieRecorderSettings.VideoRecorderOutputFormat.MP4;
+			recorder.VideoBitRateMode = VideoBitrateMode.High;
 
-			Assert.IsTrue(recorder.imageInputSettings is GameViewInputSettings);
-			Assert.IsNotNull(recorder.audioInputSettings);
+			Assert.IsTrue(recorder.ImageInputSettings is GameViewInputSettings);
+			Assert.IsNotNull(recorder.AudioInputSettings);
 			
-			Assert.DoesNotThrow(() => recorder.imageInputSettings = new CameraInputSettings());
-			Assert.DoesNotThrow(() => recorder.imageInputSettings = new GameViewInputSettings());
-			Assert.DoesNotThrow(() => recorder.imageInputSettings = new Camera360InputSettings());
-			Assert.DoesNotThrow(() => recorder.imageInputSettings = new RenderTextureInputSettings());
-			Assert.DoesNotThrow(() => recorder.imageInputSettings = new RenderTextureSamplerSettings());
+			Assert.DoesNotThrow(() => recorder.ImageInputSettings = new CameraInputSettings());
+			Assert.DoesNotThrow(() => recorder.ImageInputSettings = new GameViewInputSettings());
+			Assert.DoesNotThrow(() => recorder.ImageInputSettings = new Camera360InputSettings());
+			Assert.DoesNotThrow(() => recorder.ImageInputSettings = new RenderTextureInputSettings());
+			Assert.DoesNotThrow(() => recorder.ImageInputSettings = new RenderTextureSamplerSettings());
 			
-			Assert.Throws<ArgumentNullException>(() => recorder.imageInputSettings = null);
+			Assert.Throws<ArgumentNullException>(() => recorder.ImageInputSettings = null);
 			
 			UnityObject.DestroyImmediate(recorder);
 		}
@@ -63,7 +63,7 @@ namespace UnityEditor.Recorder.Tests
 
 			AssertBaseProperties(recorder);
 
-			Assert.IsNotNull(recorder.animationInputSettings);
+			Assert.IsNotNull(recorder.AnimationInputSettings);
 			
 			UnityObject.DestroyImmediate(recorder);
 		}
@@ -75,9 +75,9 @@ namespace UnityEditor.Recorder.Tests
 
 			AssertBaseProperties(recorder);
 
-			recorder.numColors = 123;
-			recorder.keyframeInterval = 15;
-			recorder.maxTasks = 10;
+			recorder.NumColors = 123;
+			recorder.KeyframeInterval = 15;
+			recorder.MaxTasks = 10;
 
 			Assert.IsTrue(recorder.imageInputSettings is CameraInputSettings);
 			
@@ -107,8 +107,8 @@ namespace UnityEditor.Recorder.Tests
 		{
 			var recorder = ScriptableObject.CreateInstance<MovieRecorderSettings>();
 
-			recorder.outputFile = value;
-			Assert.AreEqual(expected, recorder.outputFile);
+			recorder.OutputFile = value;
+			Assert.AreEqual(expected, recorder.OutputFile);
 		}
 		
 		[TestCase(null)]
@@ -117,21 +117,19 @@ namespace UnityEditor.Recorder.Tests
 		{
 			var recorder = ScriptableObject.CreateInstance<MovieRecorderSettings>();
 
-			var e = Assert.Throws<ArgumentException>(() => recorder.outputFile = value);
-			Assert.IsTrue(e.Message.Contains(RecorderSettings.s_OutputFileErrorMessage));
+			Assert.Throws<ArgumentException>(() => recorder.OutputFile = value);
 		}
 
 		static void AssertBaseProperties(RecorderSettings recorder)
 		{
-			Assert.IsTrue(recorder.enabled);
-			Assert.IsNotEmpty(recorder.extension);
-			Assert.IsNotNull(recorder.outputFile);
-			Assert.IsTrue(recorder.take == 1);
+			Assert.IsTrue(recorder.Enabled);
+			Assert.IsNotNull(recorder.OutputFile);
+			Assert.IsTrue(recorder.Take == 1);
 
 			// Test public access
 			Assert.DoesNotThrow(() =>
 			{
-				var b = recorder.isPlatformSupported;
+				var b = recorder.IsPlatformSupported;
 			});
 		}
 	}

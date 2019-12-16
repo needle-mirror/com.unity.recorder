@@ -89,16 +89,16 @@ namespace UnityEditor.Recorder.Input
             
             EditorGUILayout.PropertyField(m_FlipFinalOutput, Styles.FlipVerticalLabel);
             
-            if (Options.verboseMode)
-                EditorGUILayout.LabelField("Color Space", target.colorSpace.ToString());
+            if (RecorderOptions.VerboseMode)
+                EditorGUILayout.LabelField("Color Space", target.ColorSpace.ToString());
             
             if (EditorGUI.EndChangeCheck())
             {
                 property.serializedObject.ApplyModifiedProperties();
                 
                 var aspect = target.outputAspectRatio.GetAspect();
-                target.outputWidth = (int)(aspect * target.outputHeight);
-                target.renderWidth = (int)(aspect * target.renderHeight);
+                target.OutputWidth = (int)(aspect * target.OutputHeight);
+                target.RenderWidth = (int)(aspect * target.RenderHeight);
             }
 
         }

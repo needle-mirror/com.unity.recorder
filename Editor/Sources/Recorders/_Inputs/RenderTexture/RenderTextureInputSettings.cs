@@ -9,15 +9,34 @@ namespace UnityEditor.Recorder.Input
     [Serializable]
     public class RenderTextureInputSettings : ImageInputSettings
     {
-        public RenderTexture renderTexture;
-        public bool flipFinalOutput = false;
-        
-        internal override Type inputType
+         [SerializeField] internal RenderTexture renderTexture;
+         /// <summary>
+         /// Indicates the render texture used for the capture.
+         /// </summary>
+         public RenderTexture RenderTexture
+         {
+             get { return renderTexture; }
+             set { renderTexture = value; }
+         }
+
+         /// <summary>
+        /// Use this property if you need to vertically flip the final output.
+        /// </summary>
+        public bool FlipFinalOutput
+        {
+            get { return flipFinalOutput; }
+            set { flipFinalOutput = value; }
+        }
+        [SerializeField] private bool flipFinalOutput = false;
+
+        /// <inheritdoc/>
+        protected internal override Type InputType
         {
             get { return typeof(RenderTextureInput); }
         }
-        
-        public override int outputWidth
+
+        /// <inheritdoc/>
+        public override int OutputWidth
         {
             get { return renderTexture == null ? 0 : renderTexture.width; }
             set
@@ -27,7 +46,8 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
-        public override int outputHeight
+        /// <inheritdoc/>
+        public override int OutputHeight
         {
             get { return renderTexture == null ? 0 : renderTexture.height; }
             set
@@ -37,7 +57,8 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
-        internal override bool ValidityCheck(List<string> errors)
+        /// <inheritdoc/>
+        protected internal override bool ValidityCheck(List<string> errors)
         {
             var ok = true;
 

@@ -203,7 +203,7 @@ namespace UnityEditor.Recorder
             m_RecordOptionsPanel = new IMGUIContainer(() =>
             {
                 PrepareGUIState(m_RecordOptionsPanel.layout.width);
-                Options.exitPlayMode = EditorGUILayout.Toggle(Styles.ExitPlayModeLabel, Options.exitPlayMode);
+                RecorderOptions.exitPlayMode = EditorGUILayout.Toggle(Styles.ExitPlayModeLabel, RecorderOptions.exitPlayMode);
             })
             {
                 name = "recordOptions"
@@ -491,7 +491,7 @@ namespace UnityEditor.Recorder
                 return;
 
             m_ControllerSettings.ApplyGlobalSettingToAllRecorders();
-            var recorderItems = m_ControllerSettings.recorderSettings.Select(CreateRecorderItem).ToArray();
+            var recorderItems = m_ControllerSettings.RecorderSettings.Select(CreateRecorderItem).ToArray();
             
             foreach (var recorderItem in recorderItems)
                 recorderItem.UpdateState();
@@ -605,7 +605,7 @@ namespace UnityEditor.Recorder
             foreach (var info in RecordersInventory.builtInRecorderInfos)
                 AddRecorderInfoToMenu(info, newRecordMenu);
 
-            if (Options.showLegacyRecorders)
+            if (RecorderOptions.ShowLegacyRecorders)
             {
                 newRecordMenu.AddSeparator(string.Empty);
                 
@@ -655,7 +655,7 @@ namespace UnityEditor.Recorder
 
         string CheckRecordersIncompatibility()
         {
-            var activeRecorders = m_ControllerSettings.recorderSettings.Where(r => r.enabled).ToArray();
+            var activeRecorders = m_ControllerSettings.RecorderSettings.Where(r => r.Enabled).ToArray();
 
             if (activeRecorders.Length == 0)
                 return null;
@@ -675,7 +675,7 @@ namespace UnityEditor.Recorder
 
             foreach (var recorder in activeRecorders)
             {
-                var gameView = recorder.inputsSettings.FirstOrDefault(i => i is GameViewInputSettings) as GameViewInputSettings;
+                var gameView = recorder.InputsSettings.FirstOrDefault(i => i is GameViewInputSettings) as GameViewInputSettings;
                 if (gameView != null)
                 {
                     if (gameViewRecorders.Any() && !gameViewRecorders.ContainsKey(gameView.outputImageHeight))
@@ -756,7 +756,7 @@ namespace UnityEditor.Recorder
 
         void StartRecordingInternal()
         {        
-            if (Options.verboseMode)
+            if (RecorderOptions.VerboseMode)
                 Debug.Log("Start Recording.");
 
             var success = m_RecorderController.StartRecording();
@@ -804,7 +804,7 @@ namespace UnityEditor.Recorder
         
         void StopRecordingInternal()
         {
-            if (Options.verboseMode)
+            if (RecorderOptions.VerboseMode)
                 Debug.Log("Stop Recording.");
             
             m_RecorderController.StopRecording();
@@ -815,7 +815,7 @@ namespace UnityEditor.Recorder
             // Settings might have changed after the session ended
             m_ControllerSettings.Save();
 
-            if (Options.exitPlayMode)
+            if (RecorderOptions.exitPlayMode)
                 EditorApplication.isPlaying = false;
         }
         
@@ -957,7 +957,7 @@ namespace UnityEditor.Recorder
         void AddLastAndSelect(RecorderSettings recorder, string desiredName, bool enabled)
         {
             recorder.name = GetUniqueRecorderName(desiredName);
-            recorder.enabled = enabled;
+            recorder.Enabled = enabled;
             m_ControllerSettings.AddRecorderSettings(recorder);
 
             var item = CreateRecorderItem(recorder);
@@ -971,7 +971,7 @@ namespace UnityEditor.Recorder
             var candidate = item.settings;
             var copy = Instantiate(candidate);
             copy.OnAfterDuplicate();
-            AddLastAndSelect(copy, candidate.name, candidate.enabled);
+            AddLastAndSelect(copy, candidate.name, candidate.Enabled);
         }
 
         void DeleteRecorder(RecorderItem item, bool prompt)
@@ -1001,7 +1001,7 @@ namespace UnityEditor.Recorder
 
         string GetUniqueRecorderName(string desiredName)
         {
-            return ObjectNames.GetUniqueName(m_ControllerSettings.recorderSettings.Select(r => r.name).ToArray(),
+            return ObjectNames.GetUniqueName(m_ControllerSettings.RecorderSettings.Select(r => r.name).ToArray(),
                 desiredName);
         }
 
@@ -1049,7 +1049,7 @@ namespace UnityEditor.Recorder
 
         bool HaveActiveRecordings()
         {
-            return m_ControllerSettings.recorderSettings.Any(r => r.enabled);
+            return m_ControllerSettings.RecorderSettings.Any(r => r.Enabled);
         }
 
         static void ShowMessageInStatusBar(string msg, MessageType messageType)
@@ -1132,7 +1132,7 @@ namespace UnityEditor.Recorder
             
             var settings = session.settings;
 
-            switch (settings.recordMode)
+            switch (settings.RecordMode)
             {
                 case RecordMode.Manual:
                 {
@@ -1144,18 +1144,18 @@ namespace UnityEditor.Recorder
                 case RecordMode.SingleFrame:
                 case RecordMode.FrameInterval:
                 {
-                    var label = session.frameIndex < settings.startFrame
-                        ? string.Format("Skipping first {0} frame(s)...", settings.startFrame - 1)
-                        : string.Format("{0} Frame(s) processed", session.frameIndex - settings.startFrame + 1);
-                    EditorGUI.ProgressBar(progressBarRect, (session.frameIndex + 1) / (float) (settings.endFrame + 1), label);
+                    var label = session.frameIndex < settings.StartFrame
+                        ? string.Format("Skipping first {0} frame(s)...", settings.StartFrame - 1)
+                        : string.Format("{0} Frame(s) processed", session.frameIndex - settings.StartFrame + 1);
+                    EditorGUI.ProgressBar(progressBarRect, (session.frameIndex + 1) / (float) (settings.EndFrame + 1), label);
                     break;
                 }
                 case RecordMode.TimeInterval:
                 {
-                    var label = session.currentFrameStartTS < settings.startTime
-                        ? string.Format("Skipping first {0} second(s)...", settings.startTime)
-                        : string.Format("{0} Frame(s) processed", session.frameIndex - settings.startFrame + 1);
-                    EditorGUI.ProgressBar(progressBarRect, (float) session.currentFrameStartTS / (settings.endTime.Equals(0.0f) ? 0.0001f : settings.endTime), label);
+                    var label = session.currentFrameStartTS < settings.StartTime
+                        ? string.Format("Skipping first {0} second(s)...", settings.StartTime)
+                        : string.Format("{0} Frame(s) processed", session.frameIndex - settings.StartFrame + 1);
+                    EditorGUI.ProgressBar(progressBarRect, (float) session.currentFrameStartTS / (settings.EndTime.Equals(0.0f) ? 0.0001f : settings.EndTime), label);
                     
                     break;
                 }

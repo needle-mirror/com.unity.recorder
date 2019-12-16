@@ -1,77 +1,127 @@
 using System.Collections.Generic;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace UnityEditor.Recorder
 {
-    public enum VideoRecorderOutputFormat
-    {
-        MP4,
-        WEBM
-    }
-
     [RecorderSettings(typeof(MovieRecorder), "Movie", "movie_16")]
     public class MovieRecorderSettings : RecorderSettings
     {
-        public VideoRecorderOutputFormat outputFormat = VideoRecorderOutputFormat.MP4;
-        public VideoBitrateMode videoBitRateMode = VideoBitrateMode.High;
-        public bool captureAlpha;
-        
+        /// <summary>
+        /// Available options for the output video format used by Movie Recorder.
+        /// </summary>
+        public enum VideoRecorderOutputFormat
+        {
+            /// <summary>
+            /// Output the recording in MP4 format.
+            /// </summary>
+            MP4,
+            /// <summary>
+            /// Output the recording in WebM format.
+            /// </summary>
+            WebM
+        }
+        /// <summary>
+        /// Indicates the output video format currently used for this Recorder.
+        /// </summary>
+        public VideoRecorderOutputFormat OutputFormat
+        {
+            get { return outputFormat; }
+            set { outputFormat = value; }
+        }
+
+        [SerializeField] VideoRecorderOutputFormat outputFormat = VideoRecorderOutputFormat.MP4;
+
+        /// <summary>
+        /// Indicates the video bit rate preset currently used for this Recorder.
+        /// </summary>
+        public VideoBitrateMode VideoBitRateMode
+        {
+            get { return videoBitRateMode; }
+            set { videoBitRateMode = value; }
+        }
+
+        [SerializeField] private VideoBitrateMode videoBitRateMode = VideoBitrateMode.High;
+
+        /// <summary>
+        /// Use this property to capture the alpha channel (True) or not (False).
+        /// </summary>
+        public bool CaptureAlpha
+        {
+            get { return captureAlpha; }
+            set { captureAlpha = value; }
+        }
+
+        [SerializeField] private bool captureAlpha;
+
         [SerializeField] ImageInputSelector m_ImageInputSelector = new ImageInputSelector();
         [SerializeField] AudioInputSettings m_AudioInputSettings = new AudioInputSettings();
-        
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public MovieRecorderSettings()
         {
-            fileNameGenerator.fileName = "movie";
-            
-            var iis = m_ImageInputSelector.selected as StandardImageInputSettings;
+            fileNameGenerator.FileName = "movie";
+
+            var iis = m_ImageInputSelector.Selected as StandardImageInputSettings;
             if (iis != null)
                 iis.maxSupportedSize = ImageHeight.x2160p_4K;
-            
-            m_ImageInputSelector.ForceEvenResolution(outputFormat == VideoRecorderOutputFormat.MP4);
+
+            m_ImageInputSelector.ForceEvenResolution(OutputFormat == VideoRecorderOutputFormat.MP4);
         }
 
-        public ImageInputSettings imageInputSettings
+        /// <summary>
+        /// Indicates the Image Input Settings currently used for this Recorder.
+        /// </summary>
+        public ImageInputSettings ImageInputSettings
         {
-            get { return m_ImageInputSelector.imageInputSettings; }
-            set { m_ImageInputSelector.imageInputSettings = value; }
+            get { return m_ImageInputSelector.ImageInputSettings; }
+            set { m_ImageInputSelector.ImageInputSettings = value; }
         }
 
-        public AudioInputSettings audioInputSettings
+        /// <summary>
+        /// Indicates the Audio Input Settings currently used for this Recorder.
+        /// </summary>
+        public AudioInputSettings AudioInputSettings
         {
             get { return m_AudioInputSettings; }
         }
 
-        public override IEnumerable<RecorderInputSettings> inputsSettings
+        /// <inheritdoc/>
+        public override IEnumerable<RecorderInputSettings> InputsSettings
         {
             get
             {
-                yield return m_ImageInputSelector.selected;
+                yield return m_ImageInputSelector.Selected;
                 yield return m_AudioInputSettings;
             }
         }
 
-        public override string extension
+        /// <inheritdoc/>
+        protected internal override string Extension
         {
-            get { return outputFormat.ToString().ToLower(); }
+            get { return OutputFormat.ToString().ToLower(); }
         }
 
-        internal override bool ValidityCheck(List<string> errors)
+        /// <inheritdoc/>
+        protected internal override bool ValidityCheck(List<string> errors)
         {
             var ok = base.ValidityCheck(errors);
 
-            if (frameRatePlayback == FrameRatePlayback.Variable)
+            if (FrameRatePlayback == FrameRatePlayback.Variable)
             {
                 errors.Add("Movie recorder does not properly support Variable frame rate playback. Please consider using Constant frame rate instead");
                 ok = false;
             }
 
-            if (outputFormat == VideoRecorderOutputFormat.MP4)
+            if (OutputFormat == VideoRecorderOutputFormat.MP4)
             {
-                var iis = m_ImageInputSelector.selected as ImageInputSettings;
+                var iis = m_ImageInputSelector.Selected as ImageInputSettings;
                 if (iis != null)
                 {
-                    if (iis.outputHeight % 2 != 0 || iis.outputWidth % 2 != 0)
+                    if (iis.OutputHeight % 2 != 0 || iis.OutputWidth % 2 != 0)
                     {
                         errors.Add("Mp4 format does not support odd values in resolution");
                         ok = false;
@@ -82,9 +132,9 @@ namespace UnityEditor.Recorder
             return ok;
         }
 
-        public override void SelfAdjustSettings()
+        internal override void SelfAdjustSettings()
         {
-            var selectedInput = m_ImageInputSelector.selected;
+            var selectedInput = m_ImageInputSelector.Selected;
             if (selectedInput == null)
                 return;
 
@@ -92,7 +142,7 @@ namespace UnityEditor.Recorder
 
             if (iis != null)
             {
-                iis.maxSupportedSize = outputFormat == VideoRecorderOutputFormat.MP4
+                iis.maxSupportedSize = OutputFormat == VideoRecorderOutputFormat.MP4
                     ? ImageHeight.x2160p_4K
                     : ImageHeight.x4320p_8K;
 
@@ -106,14 +156,14 @@ namespace UnityEditor.Recorder
             var cbis = selectedInput as ImageInputSettings;
             if (cbis != null)
             {
-                cbis.allowTransparency = outputFormat == VideoRecorderOutputFormat.WEBM && captureAlpha;
+                cbis.AllowTransparency = OutputFormat == VideoRecorderOutputFormat.WebM && CaptureAlpha;
             }
 
             var gis = selectedInput as GameViewInputSettings;
             if (gis != null)
-                gis.flipFinalOutput = SystemInfo.supportsAsyncGPUReadback;
-            
-            m_ImageInputSelector.ForceEvenResolution(outputFormat == VideoRecorderOutputFormat.MP4);
+                gis.FlipFinalOutput = SystemInfo.supportsAsyncGPUReadback;
+
+            m_ImageInputSelector.ForceEvenResolution(OutputFormat == VideoRecorderOutputFormat.MP4);
         }
     }
 }

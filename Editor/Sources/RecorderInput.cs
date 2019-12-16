@@ -2,7 +2,7 @@ using System;
 
 namespace UnityEditor.Recorder
 {
-    class RecorderInput : IDisposable
+    public class RecorderInput : IDisposable
     {
         public RecorderInputSettings settings { get; set; }
 
@@ -21,16 +21,16 @@ namespace UnityEditor.Recorder
             GC.SuppressFinalize(this);
         }
 
-        public virtual void SessionCreated(RecordingSession session) {}
+        protected internal virtual void SessionCreated(RecordingSession session) {}
 
-        public virtual void BeginRecording(RecordingSession session) {}
+        protected internal virtual void BeginRecording(RecordingSession session) {}
 
-        public virtual void NewFrameStarting(RecordingSession session) {}
+        protected internal virtual void NewFrameStarting(RecordingSession session) {}
 
-        public virtual void NewFrameReady(RecordingSession session) {}
+        protected internal virtual void NewFrameReady(RecordingSession session) {}
 
-        public virtual void FrameDone(RecordingSession session) {}
+        protected internal virtual void FrameDone(RecordingSession session) {}
 
-        public virtual void EndRecording(RecordingSession session) {}
+        protected internal virtual void EndRecording(RecordingSession session) {}
     }
 }

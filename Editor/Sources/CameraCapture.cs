@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 
 namespace UnityEditor.Recorder.Input
 {
-    public static class CameraCapture
+    internal static class CameraCapture
     {
         private static Dictionary<Camera, HashSet<Action<RenderTargetIdentifier, CommandBuffer> > > actionDict =
             new Dictionary<Camera, HashSet<Action<RenderTargetIdentifier, CommandBuffer> > >();

@@ -27,7 +27,7 @@ namespace UnityEditor.Recorder
             set
             {
                 m_SelectionIndex = value;
-                Options.selectedRecorderIndex = value;
+                RecorderOptions.selectedRecorderIndex = value;
                 if (OnSelectionChanged != null)
                     OnSelectionChanged.Invoke();
             }
@@ -51,7 +51,7 @@ namespace UnityEditor.Recorder
 
             Add(m_ScrollView);
             RegisterCallback<MouseUpEvent>(OnMouseUp);
-            m_SelectionIndex = Options.selectedRecorderIndex;
+            m_SelectionIndex = RecorderOptions.selectedRecorderIndex;
         }
 
         public void Reload(IEnumerable<T> itemList)

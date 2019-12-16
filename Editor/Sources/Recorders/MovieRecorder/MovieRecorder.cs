@@ -12,23 +12,23 @@ namespace UnityEditor.Recorder
     {
         MediaEncoder m_Encoder;
 
-        protected override TextureFormat readbackTextureFormat
+        protected override TextureFormat ReadbackTextureFormat
         {
             get { return TextureFormat.RGBA32; }
         }
 
-        public override bool BeginRecording(RecordingSession session)
+        protected internal override bool BeginRecording(RecordingSession session)
         {
             if (!base.BeginRecording(session))
                 return false;
 
             try
             {
-                m_Settings.fileNameGenerator.CreateDirectory(session);
+                Settings.fileNameGenerator.CreateDirectory(session);
             }
             catch (Exception)
             {
-                Debug.LogError(string.Format( "Movie recorder output directory \"{0}\" could not be created.", m_Settings.fileNameGenerator.BuildAbsolutePath(session)));
+                Debug.LogError(string.Format( "Movie recorder output directory \"{0}\" could not be created.", Settings.fileNameGenerator.BuildAbsolutePath(session)));
                 return false;
             }
 
@@ -38,8 +38,8 @@ namespace UnityEditor.Recorder
                 Debug.LogError("MediaRecorder could not find input.");
                 return false;
             }
-            int width = input.outputWidth;
-            int height = input.outputHeight;
+            int width = input.OutputWidth;
+            int height = input.OutputHeight;
 
             if (width <= 0 || height <= 0)
             {
@@ -47,7 +47,7 @@ namespace UnityEditor.Recorder
                 return false;
             }
 
-            if (m_Settings.outputFormat == VideoRecorderOutputFormat.MP4)
+            if (Settings.OutputFormat == MovieRecorderSettings.VideoRecorderOutputFormat.MP4)
             {
                 if (width > 4096 || height > 4096)
                 {
@@ -63,9 +63,9 @@ namespace UnityEditor.Recorder
 
             var imageInputSettings = m_Inputs[0].settings as ImageInputSettings;
 
-            var includeAlphaFromTexture = imageInputSettings != null && imageInputSettings.supportsTransparent && imageInputSettings.allowTransparency;
+            var includeAlphaFromTexture = imageInputSettings != null && imageInputSettings.SupportsTransparent && imageInputSettings.AllowTransparency;
 
-            if (includeAlphaFromTexture && m_Settings.outputFormat == VideoRecorderOutputFormat.MP4)
+            if (includeAlphaFromTexture && Settings.OutputFormat == MovieRecorderSettings.VideoRecorderOutputFormat.MP4)
             {
                 Debug.LogWarning("Mp4 format does not support alpha.");
                 includeAlphaFromTexture = false;
@@ -73,24 +73,24 @@ namespace UnityEditor.Recorder
 
             var videoAttrs = new VideoTrackAttributes
             {
-                frameRate = RationalFromDouble(session.settings.frameRate),
+                frameRate = RationalFromDouble(session.settings.FrameRate),
                 width = (uint)width,
                 height = (uint)height,
                 includeAlpha = includeAlphaFromTexture,
-                bitRateMode = m_Settings.videoBitRateMode
+                bitRateMode = Settings.VideoBitRateMode
             };
 
-            if (Options.verboseMode)
+            if (RecorderOptions.VerboseMode)
                 Debug.Log(
                     string.Format(
                         "MovieRecorder starting to write video {0}x{1}@[{2}/{3}] fps into {4}",
                         width, height, videoAttrs.frameRate.numerator,
-                        videoAttrs.frameRate.denominator, m_Settings.fileNameGenerator.BuildAbsolutePath(session)));
+                        videoAttrs.frameRate.denominator, Settings.fileNameGenerator.BuildAbsolutePath(session)));
 
             var audioInput = (AudioInput)m_Inputs[1];
             var audioAttrsList = new List<AudioTrackAttributes>();
 
-            if (audioInput.audioSettings.preserveAudio)
+            if (audioInput.audioSettings.PreserveAudio)
             {
                 var audioAttrs = new AudioTrackAttributes
                 {
@@ -105,39 +105,39 @@ namespace UnityEditor.Recorder
 
                 audioAttrsList.Add(audioAttrs);
 
-                if (Options.verboseMode)
+                if (RecorderOptions.VerboseMode)
                     Debug.Log(string.Format("MovieRecorder starting to write audio {0}ch @ {1}Hz", audioAttrs.channelCount, audioAttrs.sampleRate.numerator));
             }
             else
             {
-                if (Options.verboseMode)
+                if (RecorderOptions.VerboseMode)
                     Debug.Log("MovieRecorder starting with no audio.");
             }
 
             try
             {
-                var path =  m_Settings.fileNameGenerator.BuildAbsolutePath(session);
+                var path =  Settings.fileNameGenerator.BuildAbsolutePath(session);
 
                 m_Encoder = new MediaEncoder( path, videoAttrs, audioAttrsList.ToArray() );
                 return true;
             }
             catch
             {
-                if (Options.verboseMode)
+                if (RecorderOptions.VerboseMode)
                     Debug.LogError("MovieRecorder unable to create MovieEncoder.");
             }
 
             return false;
         }
 
-        public override void RecordFrame(RecordingSession session)
+        protected internal override void RecordFrame(RecordingSession session)
         {
             if (m_Inputs.Count != 2)
                 throw new Exception("Unsupported number of sources");
 
             base.RecordFrame(session);
             var audioInput = (AudioInput)m_Inputs[1];
-            if (audioInput.audioSettings.preserveAudio)
+            if (audioInput.audioSettings.PreserveAudio)
                 m_Encoder.AddSamples(audioInput.mainBuffer);
         }
 
@@ -164,7 +164,7 @@ namespace UnityEditor.Recorder
             m_Encoder = null;
 
             // When adding a file to Unity's assets directory, trigger a refresh so it is detected.
-            if (settings.fileNameGenerator.root == OutputPath.Root.AssetsFolder || settings.fileNameGenerator.root == OutputPath.Root.StreamingAssets)
+            if (Settings.fileNameGenerator.Root == OutputPath.Root.AssetsFolder || Settings.fileNameGenerator.Root == OutputPath.Root.StreamingAssets)
                 AssetDatabase.Refresh();
         }
 

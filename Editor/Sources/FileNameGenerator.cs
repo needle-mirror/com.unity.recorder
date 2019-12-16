@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 
 namespace UnityEditor.Recorder
 {
-    class Wildcard
+    internal class Wildcard
     {
         readonly string m_Pattern;
         readonly string m_Label;
@@ -23,10 +23,10 @@ namespace UnityEditor.Recorder
         {
             m_Pattern = pattern;
             m_Label = m_Pattern;
-                
+
             if (info != null)
                 m_Label += " " + info;
-                
+
             m_Resolver = resolver;
         }
 
@@ -35,41 +35,71 @@ namespace UnityEditor.Recorder
             return m_Resolver == null ? string.Empty : m_Resolver(session);
         }
     }
-    
+
     /// <summary>
-    /// Helper class for default wildcards that can be used when constructing the output file of a recorder.
-    /// <see cref="RecorderSettings.outputFile"/>
+    /// Helper class for default Wildcards that you can use when constructing the output file name of a Recorder
+    /// (see <see cref="RecorderSettings.OutputFile"/>).
     /// </summary>
     public static class DefaultWildcard
     {
+        /// <summary>
+        /// The Recorder name.
+        /// </summary>
         public static readonly string Recorder = GeneratePattern("Recorder");
+        /// <summary>
+        /// The time the recording session started (in the 00h00m format).
+        /// </summary>
         public static readonly string Time = GeneratePattern("Time");
+        /// <summary>
+        /// The take number (which is incremented every time a new session is started).
+        /// </summary>
         public static readonly string Take = GeneratePattern("Take");
+        /// <summary>
+        /// The date when the recording session started (in the yyyy-MM-dd format).
+        /// </summary>
         public static readonly string Date = GeneratePattern("Date");
+        /// <summary>
+        /// The name of the current Unity Project.
+        /// </summary>
         public static readonly string Project = GeneratePattern("Project");
+        /// <summary>
+        /// The product name from the build settings (a combination of the Unity Project name and the output file extension).
+        /// </summary>
         public static readonly string Product = GeneratePattern("Product");
+        /// <summary>
+        /// The name of the current Unity Scene.
+        /// </summary>
         public static readonly string Scene = GeneratePattern("Scene");
+        /// <summary>
+        /// The output resolution in pixels.
+        /// </summary>
         public static readonly string Resolution = GeneratePattern("Resolution");
+        /// <summary>
+        /// The current frame ID (a four-digit zero-padded number).
+        /// </summary>
         public static readonly string Frame = GeneratePattern("Frame");
+        /// <summary>
+        /// The file extension of the output format.
+        /// </summary>
         public static readonly string Extension = GeneratePattern("Extension");
-        
+
         public static string GeneratePattern(string tag)
         {
             return "<" + tag + ">";
         }
     }
-    
+
     [Serializable]
-    class FileNameGenerator
+    public class FileNameGenerator
     {
         static string s_ProjectName;
 
         [SerializeField] OutputPath m_Path = new OutputPath();
         [SerializeField] string m_FileName = DefaultWildcard.Recorder;
-        
+
         readonly List<Wildcard> m_Wildcards;
-        
-        public IEnumerable<Wildcard> wildcards
+
+        internal IEnumerable<Wildcard> wildcards
         {
             get { return m_Wildcards; }
         }
@@ -101,46 +131,58 @@ namespace UnityEditor.Recorder
                 m_Path.leaf = string.Empty;
             }
         }
-        
+
         internal string ToPath()
-        {            
+        {
             var path = m_Path.GetFullPath();
-            
+
             if (!string.IsNullOrEmpty(path))
                 path += "/";
-            
+
             return SanitizePath(path + SanitizeFilename(m_FileName));
         }
-        
-        internal string fileName {
+
+        /// <summary>
+        /// Stores the default set of tags that make up the output file name.
+        /// </summary>
+        public string FileName {
             get { return m_FileName; }
             set { m_FileName = value; }
         }
 
-        internal OutputPath.Root root
+        /// <summary>
+        /// Indicates the root location the paths are relative to.
+        /// </summary>
+        public OutputPath.Root Root
         {
             get { return m_Path.root; }
             set { m_Path.root = value; }
         }
-        
-        internal string leaf
+
+        /// <summary>
+        /// Indicates the filename part of the full path (without the extension).
+        /// </summary>
+        public string Leaf
         {
             get { return m_Path.leaf; }
             set { m_Path.leaf = value; }
         }
 
-        internal bool forceAssetsFolder
+        /// <summary>
+        /// Use this property to ensure that the generated file is saved in the Assets folder.
+        /// </summary>
+        public bool ForceAssetsFolder
         {
             get { return m_Path.forceAssetsFolder; }
             set { m_Path.forceAssetsFolder = value; }
         }
 
         readonly RecorderSettings m_RecorderSettings;
-        
+
         internal FileNameGenerator(RecorderSettings recorderSettings)
         {
             m_RecorderSettings = recorderSettings;
-            
+
             m_Wildcards = new List<Wildcard>
             {
                 new Wildcard(DefaultWildcard.Recorder, RecorderResolver),
@@ -156,7 +198,12 @@ namespace UnityEditor.Recorder
             };
         }
 
-        internal void AddWildcard(string tag, Func<RecordingSession, string> resolver)
+        /// <summary>
+        /// Adds a tag and the corresponding callback to resolve it.
+        /// </summary>
+        /// <param name="tag">The tag string.</param>
+        /// <param name="resolver">Callback invoked to replace the tag with custom content.</param>
+        public void AddWildcard(string tag, Func<RecordingSession, string> resolver)
         {
             m_Wildcards.Add(new Wildcard(tag, resolver));
         }
@@ -165,16 +212,16 @@ namespace UnityEditor.Recorder
         {
             return m_RecorderSettings.name;
         }
-        
+
         static string TimeResolver(RecordingSession session)
         {
             var date = session != null ? session.sessionStartTS : DateTime.Now;
             return string.Format("{0:HH}h{1:mm}m", date, date);
         }
-        
+
         string TakeResolver(RecordingSession session)
         {
-            return m_RecorderSettings.take.ToString("000");
+            return m_RecorderSettings.Take.ToString("000");
         }
 
         static string DateResolver(RecordingSession session)
@@ -185,16 +232,16 @@ namespace UnityEditor.Recorder
 
         string ExtensionResolver(RecordingSession session)
         {
-            return m_RecorderSettings.extension;
+            return m_RecorderSettings.Extension;
         }
 
         string ResolutionResolver(RecordingSession session)
         {
-            var input = m_RecorderSettings.inputsSettings.FirstOrDefault() as ImageInputSettings;
+            var input = m_RecorderSettings.InputsSettings.FirstOrDefault() as ImageInputSettings;
             if (input == null)
                 return "NA";
-            
-            return input.outputWidth + "x" + input.outputHeight;
+
+            return input.OutputWidth + "x" + input.OutputHeight;
         }
 
         static string SceneResolver(RecordingSession session)
@@ -215,7 +262,7 @@ namespace UnityEditor.Recorder
                 var parts = Application.dataPath.Split('/');
                 s_ProjectName = parts[parts.Length - 2];
             }
-            
+
             return s_ProjectName;
         }
 
@@ -224,12 +271,17 @@ namespace UnityEditor.Recorder
             return PlayerSettings.productName;
         }
 
-        internal string BuildAbsolutePath(RecordingSession session)
+        /// <summary>
+        /// Builds an absolute path from the list of configured output file tags replaced by the RecordingSession.
+        /// </summary>
+        /// <param name="session">The Recorder session used to replace the tags.</param>
+        /// <returns>An absolute path towards a file.</returns>
+        public string BuildAbsolutePath(RecordingSession session)
         {
-            var fullPath = ApplyWildcards(ToPath(), session) + "." + ExtensionResolver(session);            
-            
+            var fullPath = ApplyWildcards(ToPath(), session) + "." + ExtensionResolver(session);
+
             string drive = null;
-            
+
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
                 if (fullPath.Length > 2 && char.IsLetter(fullPath[0]) && fullPath[1] == ':' && fullPath[2] == '/')
@@ -248,7 +300,11 @@ namespace UnityEditor.Recorder
             return fullPath;
         }
 
-        internal void CreateDirectory(RecordingSession session)
+        /// <summary>
+        /// Creates the directory structure containing the output file from the list of tags and a RecordingSession.
+        /// </summary>
+        /// <param name="session">The Recorder session.</param>
+        public void CreateDirectory(RecordingSession session)
         {
             var path = ApplyWildcards(m_Path.GetFullPath(), session);
             if(!string.IsNullOrEmpty(path) && !Directory.Exists(path))
@@ -261,8 +317,12 @@ namespace UnityEditor.Recorder
             filename = Regex.Replace(filename, "/", "");
             return filename;
         }
-
-        internal static string SanitizePath(string fullPath)
+        /// <summary>
+        /// Makes the output file path compliant with any OS (replacing any "\" by "/").
+        /// </summary>
+        /// <param name="fullPath"></param>
+        /// <returns>The full path with slashes "/" as file separators.</returns>
+        public static string SanitizePath(string fullPath)
         {
             fullPath = fullPath.Replace("\\", "/");
             fullPath = Regex.Replace(fullPath, "/+", "/");
@@ -273,10 +333,10 @@ namespace UnityEditor.Recorder
         {
             if (string.IsNullOrEmpty(str))
                 return string.Empty;
-            
+
             foreach (var w in wildcards)
                 str = str.Replace(w.pattern, w.Resolve(session));
-            
+
             return str;
         }
 

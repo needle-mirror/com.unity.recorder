@@ -12,17 +12,16 @@ namespace UnityEditor.Recorder.Tests
 		{
 			var input = new CameraInputSettings
 			{
-				source = ImageSource.MainCamera,
-				outputWidth = 640,
-				outputHeight = 480,
-				cameraTag = "AAA",
-				allowTransparency = true,
-				captureUI = true,
-				flipFinalOutput = false
+				Source = ImageSource.MainCamera,
+				OutputWidth = 640,
+				OutputHeight = 480,
+				CameraTag = "AAA",
+				CaptureUI = true,
+				FlipFinalOutput = false
 			};
 
-			Assert.AreEqual(640, input.outputWidth);
-			Assert.AreEqual(480, input.outputHeight);
+			Assert.AreEqual(640, input.OutputWidth);
+			Assert.AreEqual(480, input.OutputHeight);
 			
 			Assert.NotNull(input);
 		}
@@ -32,18 +31,18 @@ namespace UnityEditor.Recorder.Tests
 		{
 			var input = new GameViewInputSettings
 			{
-				outputWidth = 1920,
-				outputHeight = 1080,
+				OutputWidth = 1920,
+				OutputHeight = 1080,
 			};
 			
-			Assert.AreEqual(1920, input.outputWidth);
-			Assert.AreEqual(1080, input.outputHeight);
+			Assert.AreEqual(1920, input.OutputWidth);
+			Assert.AreEqual(1080, input.OutputHeight);
 
-			input.outputWidth = 123;
-			input.outputHeight = 456;
+			input.OutputWidth = 123;
+			input.OutputHeight = 456;
 			
-			Assert.AreEqual(123, input.outputWidth);
-			Assert.AreEqual(456, input.outputHeight);
+			Assert.AreEqual(123, input.OutputWidth);
+			Assert.AreEqual(456, input.OutputHeight);
 			
 			Assert.NotNull(input);
 		}
@@ -53,18 +52,18 @@ namespace UnityEditor.Recorder.Tests
 		{
 			var input = new Camera360InputSettings
 			{
-				source = ImageSource.MainCamera,
-				cameraTag = "AAA",
-				renderStereo = true,
-				stereoSeparation = 0.065f,
-				mapSize = 1024,
-				outputWidth = 1024,
-				outputHeight = 2048,
-				flipFinalOutput = false
+				Source = ImageSource.MainCamera,
+				CameraTag = "AAA",
+				RenderStereo = true,
+				StereoSeparation = 0.065f,
+				MapSize = 1024,
+				OutputWidth = 1024,
+				OutputHeight = 2048,
+				FlipFinalOutput = false
 			};
 			
-			Assert.AreEqual(1024, input.outputWidth);
-			Assert.AreEqual(2048, input.outputHeight);
+			Assert.AreEqual(1024, input.OutputWidth);
+			Assert.AreEqual(2048, input.OutputHeight);
 			
 			Assert.NotNull(input);
 		}
@@ -76,23 +75,23 @@ namespace UnityEditor.Recorder.Tests
 			
 			var input = new RenderTextureInputSettings
 			{
-				renderTexture = rt,
-				flipFinalOutput = false
+				FlipFinalOutput = false,
+				RenderTexture = rt
 			};
 			
-			Assert.AreEqual(1234, input.outputWidth);
-			Assert.AreEqual(123, input.outputHeight);
+			Assert.AreEqual(1234, input.OutputWidth);
+			Assert.AreEqual(123, input.OutputHeight);
 
-			input.outputWidth = 256;
-			input.outputHeight = 128;
+			input.OutputWidth = 256;
+			input.OutputHeight = 128;
 			
 			Assert.AreEqual(256, rt.width);
 			Assert.AreEqual(128, rt.height);
 			
 			UnityObject.DestroyImmediate(rt);
 			
-			Assert.AreEqual(0, input.outputWidth);
-			Assert.AreEqual(0, input.outputHeight);
+			Assert.AreEqual(0, input.OutputWidth);
+			Assert.AreEqual(0, input.OutputHeight);
 		}
 		
 		[Test]
@@ -100,24 +99,21 @@ namespace UnityEditor.Recorder.Tests
 		{
 			var input = new RenderTextureSamplerSettings
 			{
-				source = ImageSource.MainCamera,
-				outputWidth = 640,
-				outputHeight = 480,
-				renderWidth = 1920,
-				renderHeight = 1080,
-				cameraTag = "AAA",
-				colorSpace = ColorSpace.Gamma,
-				flipFinalOutput = false,
-				superKernelPower = 16.0f,
-				superKernelScale = 2.0f,
-				superSampling = SuperSamplingCount.X4
+				OutputWidth = 640,
+				OutputHeight = 480,
+				RenderWidth = 1920,
+				RenderHeight = 1080,
+				CameraTag = "AAA",
+				ColorSpace = ColorSpace.Gamma,
+				FlipFinalOutput = false,
+				SuperSampling = SuperSamplingCount.X4
 			};
 			
-			Assert.AreEqual(640, input.outputWidth);
-			Assert.AreEqual(480, input.outputHeight);
+			Assert.AreEqual(640, input.OutputWidth);
+			Assert.AreEqual(480, input.OutputHeight);
 			
-			Assert.AreEqual(1920, input.renderWidth);
-			Assert.AreEqual(1080, input.renderHeight);
+			Assert.AreEqual(1920, input.RenderWidth);
+			Assert.AreEqual(1080, input.RenderHeight);
 			
 			Assert.NotNull(input);
 		}
@@ -144,7 +140,7 @@ namespace UnityEditor.Recorder.Tests
 		{
 			var input = new AudioInputSettings
 			{
-				preserveAudio = true
+				PreserveAudio = true
 			};
 			
 			Assert.NotNull(input);

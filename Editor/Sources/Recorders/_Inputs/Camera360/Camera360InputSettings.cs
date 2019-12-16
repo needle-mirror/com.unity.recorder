@@ -11,34 +11,88 @@ namespace UnityEditor.Recorder.Input
     [Serializable]
     public class Camera360InputSettings : ImageInputSettings
     {
-        public ImageSource source = ImageSource.MainCamera;
-        public string cameraTag;
-        public bool flipFinalOutput = false;
-        public bool renderStereo = true;
-        public float stereoSeparation = 0.065f;
-        public int mapSize = 1024;
-        
+        public ImageSource Source
+        {
+            get { return source; }
+            set { source = value; }
+        }
+        [SerializeField] ImageSource source = ImageSource.MainCamera;
+        /// <summary>
+        /// Indicates the GameObject tag of the Camera used for the capture.
+        /// </summary>
+        public string CameraTag
+        {
+            get => cameraTag;
+            set => cameraTag = value;
+        }
+        [SerializeField] string cameraTag;
+
+        /// <summary>
+        /// Use this property if you need to vertically flip the final output.
+        /// </summary>
+        public bool FlipFinalOutput
+        {
+            get { return flipFinalOutput; }
+            set { flipFinalOutput = value; }
+        }
+
+        [SerializeField] bool flipFinalOutput = false;
+
+        /// <summary>
+        /// Use this property to render stereoscopic views in separate left and right outputs.
+        /// </summary>
+        public bool RenderStereo
+        {
+            get => renderStereo;
+            set => renderStereo = value;
+        }
+
+        [SerializeField] bool renderStereo = true;
+
+        /// <summary>
+        /// Indicates the interocular angle (on the camera's Y axis) when using stereoscopic rendering.
+        /// </summary>
+        public float StereoSeparation
+        {
+            get => stereoSeparation;
+            set => stereoSeparation = value;
+        }
+
+        [SerializeField] float stereoSeparation = 0.065f;
+
+
+        /// <summary>
+        /// Indicates the size of the cube map to use for the 360-degree environment projection.
+        /// </summary>
+        public int MapSize
+        {
+            get => mapSize;
+            set => mapSize = value;
+        }
+
+        [SerializeField] int mapSize = 1024;
+
         [SerializeField] int m_OutputWidth = 1024;
         [SerializeField] int m_OutputHeight = 2048;
 
-        internal override Type inputType
+        protected internal override Type InputType
         {
             get { return typeof(Camera360Input); }
         }
 
-        public override int outputWidth
+        public override int OutputWidth
         {
             get { return m_OutputWidth; }
             set { m_OutputWidth = value; }
         }
 
-        public override int outputHeight
+        public override int OutputHeight
         {
             get { return m_OutputHeight; }
             set { m_OutputHeight = value; }
         }
 
-        internal override bool ValidityCheck(List<string> errors)
+        protected internal override bool ValidityCheck(List<string> errors)
         {
             var ok = true;
 

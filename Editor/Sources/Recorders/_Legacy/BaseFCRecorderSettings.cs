@@ -9,11 +9,11 @@ namespace UnityEditor.Recorder.FrameCapturer
     {
         [SerializeField] internal UTJImageInputSelector m_ImageInputSelector = new UTJImageInputSelector();
 
-        internal override bool ValidityCheck(List<string> errors)
+        protected internal override bool ValidityCheck(List<string> errors)
         {
             var ok = base.ValidityCheck(errors);
             
-            if (string.IsNullOrEmpty(fileNameGenerator.fileName))
+            if (string.IsNullOrEmpty(fileNameGenerator.FileName))
             {
                 ok = false;
                 errors.Add("missing file name");
@@ -28,7 +28,7 @@ namespace UnityEditor.Recorder.FrameCapturer
             set { m_ImageInputSelector.imageInputSettings = value; }
         }
 
-        public override bool isPlatformSupported
+        public override bool IsPlatformSupported
         {
             get
             {
@@ -41,9 +41,9 @@ namespace UnityEditor.Recorder.FrameCapturer
             }
         }
 
-        public override IEnumerable<RecorderInputSettings> inputsSettings
+        public override IEnumerable<RecorderInputSettings> InputsSettings
         {
-            get { yield return m_ImageInputSelector.selected; }
+            get { yield return m_ImageInputSelector.Selected; }
         }
     }
 }

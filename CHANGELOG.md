@@ -3,6 +3,10 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+## [2.1.0-preview.1] - 2019-12-17
+### Public API and HDR recording
+- Added public APIs to be able to implement custom recorders.
+- Added the ability to enable recording HDR images (available only with HDRP)
 
 ## [2.0.3-preview.1] - 2019-08-13
 ### 2019.3, HDRP and build Fixes

@@ -2,156 +2,185 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace UnityEditor.Recorder
 {
     /// <summary>
-    /// A list of possible image source that can be used by some image specific recorders  
+    /// Sets which source camera to use for recording (by some specific Recorders).
     /// </summary>
     [Flags]
     public enum ImageSource
     {
+        /// <summary>
+        /// Use the current active camera.
+        /// </summary>
         ActiveCamera = 1,
+        /// <summary>
+        /// Use the main camera.
+        /// </summary>
         MainCamera = 2,
+        /// <summary>
+        /// Use the first camera that matches a GameObject tag.
+        /// </summary>
         TaggedCamera = 4
     }
 
     /// <summary>
-    /// Type of frame rate the recorder is using.
+    /// Sets which frame rate type to use during recording.
     /// </summary>
     public enum FrameRatePlayback
     {
         /// <summary>
-        /// Will not vary during the recording, even if the actual frame rate is lower or higher
+        /// The frame rate doesn't vary during recording, even if the actual frame rate is lower or higher.
         /// </summary>
         Constant,
-        
+
         /// <summary>
-        /// May vary during the recording. Not supported by all recorders
+        /// Use the application's frame rate, which might vary during recording. This option is not supported by all Recorders.
         /// </summary>
         Variable,
     }
 
     /// <summary>
-    /// Used to specify which time or frame interval to record.
+    /// Sets which time or frame interval to record.
     /// </summary>
-    enum RecordMode
+    public enum RecordMode
     {
         /// <summary>
-        /// Records every frame between the moment the recording is started and stopped (either by pressing the button, or when calling the API methods)
+        /// Record every frame between when the recording is started and when it is stopped (either using the UI or through API methods).
         /// </summary>
         Manual,
-        
+
         /// <summary>
-        /// Records one single frame specified by it's number
+        /// Record one single frame according to the specified frame number.
         /// </summary>
         SingleFrame,
-        
+
         /// <summary>
-        /// Records all the frame between a Start Frame number and a Stop Frame number
+        /// Record all frames within an interval of frames according to the specified Start and End frame numbers.
         /// </summary>
         FrameInterval,
-        
+
         /// <summary>
-        /// Records all the frame between a Start Time and a Stop Time.
+        /// Record all frames within a time interval according to the specified Start time and End time.
         /// </summary>
         TimeInterval
     }
 
     /// <summary>
     /// Main base class for a Recorder settings.
-    /// Each recorder needs to have its corresponding settings properly configured.
+    /// Each Recorder needs to have its corresponding settings properly configured.
     /// </summary>
     public abstract class RecorderSettings : ScriptableObject
     {
-        public static string s_OutputFileErrorMessage = "Recorder output file cannot be empty";
+        private static string s_OutputFileErrorMessage = "Recorder output file cannot be empty";
         /// <summary>
-        /// The output path this recorder will use to generate it's output file.
-        /// File extension is automatically added.
-        /// It can be either an absolute or relative path.
-        /// Wildcards like <c>DefaultWildcard.Time</c> are supported.
+        /// Stores the path this Recorder will use to generate the output file.
+        /// It can be either an absolute or a relative path.
+        /// The file extension is automatically added.
+        /// Wildcards such as <c>DefaultWildcard.Time</c> are supported.
         /// <seealso cref="DefaultWildcard"/>
         /// </summary>
-        public string outputFile
+        public string OutputFile
         {
             get { return fileNameGenerator.ToPath(); }
             set
             {
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentException(s_OutputFileErrorMessage);
-                
+
                 fileNameGenerator.FromPath(value);
             }
         }
-        
+
         /// <summary>
-        /// Used only when starting the recording. If false, this recorder will be ignored.
+        /// Indicates if this Recorder is active when starting the recording. If false, the Recorder is ignored and generates no output.
         /// </summary>
-        public bool enabled = true;
-        
+        public bool Enabled
+        {
+            get { return enabled; }
+            set { enabled = value; }
+        }
+
+        [SerializeField] private bool enabled = true;
+
         /// <summary>
-        /// Current Take number. Automatically incremented after each recording session.
+        /// Stores the current Take number. Automatically incremented after each recording session.
         /// </summary>
-        public int take = 1;
-        
+        public int Take
+        {
+            get { return take; }
+            set { take = value; }
+        }
+
+        [SerializeField] internal int take = 1;
+
         /// <summary>
-        /// The extension used by this recorder without the dot.
+        /// Stores the file extension used by this Recorder (without the dot).
         /// </summary>
-        public abstract string extension { get; }
-        
+        protected internal abstract string Extension { get; }
+
         [SerializeField] internal int captureEveryNthFrame = 1;
-        
+
         [SerializeField] internal FileNameGenerator fileNameGenerator;
 
-        internal RecordMode recordMode { get; set; }
+        public FileNameGenerator FileNameGenerator => fileNameGenerator;
 
-        internal FrameRatePlayback frameRatePlayback { get; set; }
+        public RecordMode RecordMode { get; set; }
 
-        internal float frameRate { get; set; }
+        public FrameRatePlayback FrameRatePlayback { get; set; }
 
-        internal int startFrame { get; set; }
+        public float FrameRate { get; set; }
 
-        internal int endFrame { get; set; }
+        public int StartFrame { get; set; }
 
-        internal float startTime { get; set; }
+        public int EndFrame { get; set; }
 
-        internal float endTime { get; set; }
+        public float StartTime { get; set; }
 
-        internal bool capFrameRate { get; set; }
-        
+        public float EndTime { get; set; }
+
+        public bool CapFrameRate { get; set; }
+
         protected RecorderSettings()
         {
             fileNameGenerator = new FileNameGenerator(this)
             {
-                root = OutputPath.Root.Project,
-                leaf = "Recordings"
+                Root = OutputPath.Root.Project,
+                Leaf = "Recordings"
             };
         }
 
-        internal virtual bool ValidityCheck(List<string> errors)
+        /// <summary>
+        /// Tests if the Recorder is correctly configured.
+        /// </summary>
+        /// <param name="errors">List of errors encountered.</param>
+        /// <returns>True if there are no errors, False otherwise.</returns>
+        protected internal virtual bool ValidityCheck(List<string> errors)
         {
             var ok = true;
 
-            if (inputsSettings != null)
+            if (InputsSettings != null)
             {
                 var inputErrors = new List<string>();
 
-                var valid = inputsSettings.All(x => x.ValidityCheck(inputErrors));
-                
+                var valid = InputsSettings.All(x => x.ValidityCheck(inputErrors));
+
                 if (!valid)
                 {
                     errors.AddRange(inputErrors);
                     ok = false;
                 }
             }
-            
-            if (string.IsNullOrEmpty(fileNameGenerator.fileName))
+
+            if (string.IsNullOrEmpty(fileNameGenerator.FileName))
             {
                 errors.Add("Missing file name");
                 ok = false;
             }
 
-            if (Math.Abs(frameRate) <= float.Epsilon)
+            if (Math.Abs(FrameRate) <= float.Epsilon)
             {
                 ok = false;
                 errors.Add("Invalid frame rate");
@@ -163,7 +192,7 @@ namespace UnityEditor.Recorder
                 errors.Add("Invalid frame skip value");
             }
 
-            if (!isPlatformSupported)
+            if (!IsPlatformSupported)
             {
                 errors.Add("Current platform is not supported");
                 ok  = false;
@@ -173,33 +202,33 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
-        /// Virtual method that can be used to return false if current platform is not supported.
+        /// Indicates if the current platform is supported (True) or not (False).
         /// </summary>
-        public virtual bool isPlatformSupported
+        public virtual bool IsPlatformSupported
         {
             get { return true; }
         }
 
         /// <summary>
-        /// List of Input settings required by this recorder.
+        /// Stores the list of Input settings required by this Recorder.
         /// </summary>
-        public abstract IEnumerable<RecorderInputSettings> inputsSettings { get; }
+        public abstract IEnumerable<RecorderInputSettings> InputsSettings { get; }
 
         /// <summary>
-        /// Called each time a settings has changed in the RecorderWindow and before starting recording.
+        /// This method is automatically called each time a Recorder Settings group has changed in the Recorder Window and before starting recording.
         /// </summary>
-        public virtual void SelfAdjustSettings()
+        internal virtual void SelfAdjustSettings()
         {
         }
 
         /// <summary>
-        /// Override this method if any post treatement need to be done after a this recorder is duplicated in the RecorderWindow
+        /// Override this method if any post treatement needs to be done after this Recorder is duplicated in the Recorder Window.
         /// </summary>
         public virtual void OnAfterDuplicate()
         {
         }
 
-        internal virtual bool HasErrors()
+        protected internal virtual bool HasErrors()
         {
             return false;
         }

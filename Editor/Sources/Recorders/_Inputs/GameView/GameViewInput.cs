@@ -15,28 +15,28 @@ namespace UnityEditor.Recorder.Input
             get { return (GameViewInputSettings)settings; }
         }
 
-        public override void NewFrameReady(RecordingSession session)
+        protected internal override void NewFrameReady(RecordingSession session)
         {
             Profiler.BeginSample("GameViewInput.NewFrameReady");
 #if UNITY_2019_1_OR_NEWER
             ScreenCapture.CaptureScreenshotIntoRenderTexture(m_CaptureTexture);
             m_VFlipper?.Flip(m_CaptureTexture);
 #else
-            readbackTexture = ScreenCapture.CaptureScreenshotAsTexture();
+            ReadbackTexture = ScreenCapture.CaptureScreenshotAsTexture();
 #endif
             Profiler.EndSample();
         }
 
-        public override void BeginRecording(RecordingSession session)
+        protected internal override void BeginRecording(RecordingSession session)
         {
-            outputWidth = scSettings.outputWidth;
-            outputHeight = scSettings.outputHeight;
+            OutputWidth = scSettings.OutputWidth;
+            OutputHeight = scSettings.OutputHeight;
             
             int w, h;
             GameViewSize.GetGameRenderSize(out w, out h);
-            if (w != outputWidth || h != outputHeight)
+            if (w != OutputWidth || h != OutputHeight)
             {
-                var size = GameViewSize.SetCustomSize(outputWidth, outputHeight) ?? GameViewSize.AddSize(outputWidth, outputHeight);
+                var size = GameViewSize.SetCustomSize(OutputWidth, OutputHeight) ?? GameViewSize.AddSize(OutputWidth, OutputHeight);
                 if (GameViewSize.modifiedResolutionCount == 0)
                     GameViewSize.BackupCurrentSize();
                 else
@@ -56,27 +56,27 @@ namespace UnityEditor.Recorder.Input
             // a RenderTexture that is used for reading asynchronously.
             return;
 #else
-            m_CaptureTexture = new RenderTexture(outputWidth, outputHeight, 0, RenderTextureFormat.ARGB32)
+            m_CaptureTexture = new RenderTexture(OutputWidth, OutputHeight, 0, RenderTextureFormat.ARGB32)
             {
                 wrapMode = TextureWrapMode.Repeat
             };
             m_CaptureTexture.Create();
 
-            if (scSettings.flipFinalOutput)
+            if (scSettings.FlipFinalOutput)
             {
                 m_VFlipper = new TextureFlipper(false);
                 m_VFlipper.Init(m_CaptureTexture);
-                outputRT = m_VFlipper.workTexture;
+                OutputRenderTexture = m_VFlipper.workTexture;
             }
             else
-                outputRT = m_CaptureTexture;
+                OutputRenderTexture = m_CaptureTexture;
 #endif
         }
 
-        public override void FrameDone(RecordingSession session)
+        protected internal override void FrameDone(RecordingSession session)
         {
-            UnityHelpers.Destroy(readbackTexture);
-            readbackTexture = null;
+            UnityHelpers.Destroy(ReadbackTexture);
+            ReadbackTexture = null;
         }
 
         protected override void Dispose(bool disposing)

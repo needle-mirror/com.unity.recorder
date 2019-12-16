@@ -13,25 +13,25 @@ namespace UnityEditor.Recorder
 
         private WavEncoder m_Encoder;
         
-        public override bool BeginRecording(RecordingSession session)
+        protected internal override bool BeginRecording(RecordingSession session)
         {
             if (!base.BeginRecording(session))
                 return false;
             
             try
             {
-                m_Settings.fileNameGenerator.CreateDirectory(session);
+                Settings.fileNameGenerator.CreateDirectory(session);
             }
             catch (Exception)
             {
-                Debug.LogError(string.Format( "Audio recorder output directory \"{0}\" could not be created.", m_Settings.fileNameGenerator.BuildAbsolutePath(session)));
+                Debug.LogError(string.Format( "Audio recorder output directory \"{0}\" could not be created.", Settings.fileNameGenerator.BuildAbsolutePath(session)));
                 return false;
             }
             
             var audioInput = (AudioInput)m_Inputs[0];
             var audioAttrsList = new List<AudioTrackAttributes>();
             
-            if (audioInput.audioSettings.preserveAudio)
+            if (audioInput.audioSettings.PreserveAudio)
             {
                 var audioAttrs = new AudioTrackAttributes
                 {
@@ -46,20 +46,20 @@ namespace UnityEditor.Recorder
                 
                 audioAttrsList.Add(audioAttrs);
                 
-                if (Options.verboseMode)
+                if (RecorderOptions.VerboseMode)
                     Debug.Log(string.Format("Audio starting to write audio {0}ch @ {1}Hz", audioAttrs.channelCount, audioAttrs.sampleRate.numerator));
             }
 
             try
             {
-                var path =  m_Settings.fileNameGenerator.BuildAbsolutePath(session);
+                var path =  Settings.fileNameGenerator.BuildAbsolutePath(session);
                 m_Encoder = new WavEncoder(path);
                 
                 return true;
             }
             catch
             {
-                if (Options.verboseMode)
+                if (RecorderOptions.VerboseMode)
                     Debug.LogError("AudioRecorder unable to create MovieEncoder.");
             }
             
@@ -68,18 +68,18 @@ namespace UnityEditor.Recorder
         }
 
 
-        public override void RecordFrame(RecordingSession session)
+        protected internal override void RecordFrame(RecordingSession session)
         {
             var audioInput = (AudioInput)m_Inputs[0];
             
-            if (!audioInput.audioSettings.preserveAudio)
+            if (!audioInput.audioSettings.PreserveAudio)
                 return;
 
             m_Encoder.AddSamples(audioInput.mainBuffer);
         }
         
         
-        public override void EndRecording(RecordingSession session)
+        protected internal override void EndRecording(RecordingSession session)
         {
             base.EndRecording(session);
             
@@ -90,7 +90,7 @@ namespace UnityEditor.Recorder
             }
             
             // When adding a file to Unity's assets directory, trigger a refresh so it is detected.
-            if (settings.fileNameGenerator.root == OutputPath.Root.AssetsFolder || settings.fileNameGenerator.root == OutputPath.Root.StreamingAssets)
+            if (Settings.fileNameGenerator.Root == OutputPath.Root.AssetsFolder || Settings.fileNameGenerator.Root == OutputPath.Root.StreamingAssets)
                 AssetDatabase.Refresh();
             
             
@@ -120,7 +120,7 @@ namespace UnityEditor.Recorder
             int numbits = 32;
             int samplerate = AudioSettings.outputSampleRate;
             
-            if (Options.verboseMode)
+            if (RecorderOptions.VerboseMode)
                 Debug.Log ("Closing file");
             
             long pos = closewriter.BaseStream.Length;
@@ -145,7 +145,7 @@ namespace UnityEditor.Recorder
         public void AddSamples(NativeArray<float> data)
         {
             
-            if (Options.verboseMode)
+            if (RecorderOptions.VerboseMode)
                 Debug.Log ("Writing wav chunk " + data.Length);
 
             if (_binwriter == null)

@@ -7,48 +7,48 @@ namespace UnityEditor.Recorder.FrameCapturer
     {
         fcAPI.fcMP4Context m_ctx;
         
-        public override bool BeginRecording(RecordingSession session)
+        protected internal override bool BeginRecording(RecordingSession session)
         {
             if (!base.BeginRecording(session)) { return false; }
 
-            m_Settings.fileNameGenerator.CreateDirectory(session);
+            Settings.fileNameGenerator.CreateDirectory(session);
 
             var input = (BaseRenderTextureInput)m_Inputs[0];
-            if (input.outputWidth > 4096 || input.outputHeight > 2160 )
+            if (input.OutputWidth > 4096 || input.OutputHeight > 2160 )
             {
-                Debug.LogError("Mp4 format does not support requested resolution.");
+                Debug.LogError("Mp4 format does not support resolutions larger than 4096x2160.");
             }
 
             return true;
         }
 
-        public override void EndRecording(RecordingSession session)
+        protected internal override void EndRecording(RecordingSession session)
         {
             m_ctx.Release();
             base.EndRecording(session);
         }
 
-        public override void RecordFrame(RecordingSession session)
+        protected internal override void RecordFrame(RecordingSession session)
         {
             if (m_Inputs.Count != 1)
                 throw new Exception("Unsupported number of sources");
 
             var input = (BaseRenderTextureInput)m_Inputs[0];
-            var frame = input.outputRT;
+            var frame = input.OutputRenderTexture;
 
             if(!m_ctx)
             {
-                var s = m_Settings.m_MP4EncoderSettings;
+                var s = Settings.m_MP4EncoderSettings;
                 s.video = true;
                 s.audio = false;
                 s.videoWidth = frame.width;
                 s.videoHeight = frame.height;
-                s.videoTargetFramerate = (int)Math.Ceiling(m_Settings.frameRate);
-                if (m_Settings.m_AutoSelectBR)
+                s.videoTargetFramerate = (int)Math.Ceiling(Settings.FrameRate);
+                if (Settings.m_AutoSelectBR)
                 {
                     s.videoTargetBitrate = (int)(( (frame.width * frame.height/1000.0) / 245 + 1.16) * (s.videoTargetFramerate / 48.0 + 0.5) * 1000000);
                 }
-                var path = m_Settings.fileNameGenerator.BuildAbsolutePath(session);
+                var path = Settings.fileNameGenerator.BuildAbsolutePath(session);
                 m_ctx = fcAPI.fcMP4OSCreateContext(ref s, path);
             }
 

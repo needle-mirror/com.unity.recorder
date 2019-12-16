@@ -12,31 +12,31 @@ namespace UnityEditor.Recorder
     {
         Queue<string> m_PathQueue = new Queue<string>();
 
-        protected override TextureFormat readbackTextureFormat
+        protected override TextureFormat ReadbackTextureFormat
         {
             get
             {
-                return m_Settings.outputFormat != ImageRecorderOutputFormat.EXR ? TextureFormat.RGBA32 : TextureFormat.RGBAFloat;
+                return Settings.OutputFormat != ImageRecorderSettings.ImageRecorderOutputFormat.EXR ? TextureFormat.RGBA32 : TextureFormat.RGBAFloat;
             }
         }
 
-        public override bool BeginRecording(RecordingSession session)
+        protected internal override bool BeginRecording(RecordingSession session)
         {
             if (!base.BeginRecording(session)) { return false; }
 
-            m_Settings.fileNameGenerator.CreateDirectory(session);
+            Settings.fileNameGenerator.CreateDirectory(session);
 
             return true;
         }
 
-        public override void RecordFrame(RecordingSession session)
+        protected internal override void RecordFrame(RecordingSession session)
         {
             if (m_Inputs.Count != 1)
                 throw new Exception("Unsupported number of sources");
             // Store path name for this frame into a queue, as WriteFrame may be called
             // asynchronously later on, when the current frame is no longer the same (thus creating
             // a file name that isn't in sync with the session's current frame).
-            m_PathQueue.Enqueue(m_Settings.fileNameGenerator.BuildAbsolutePath(session));
+            m_PathQueue.Enqueue(Settings.fileNameGenerator.BuildAbsolutePath(session));
             base.RecordFrame(session);
         }
 
@@ -46,15 +46,15 @@ namespace UnityEditor.Recorder
             Profiler.BeginSample("ImageRecorder.EncodeImage");
             try
             {
-                switch (m_Settings.outputFormat)
+                switch (Settings.OutputFormat)
                 {
-                case ImageRecorderOutputFormat.PNG:
+                case ImageRecorderSettings.ImageRecorderOutputFormat.PNG:
                     bytes = tex.EncodeToPNG();
                     break;
-                case ImageRecorderOutputFormat.JPEG:
+                case ImageRecorderSettings.ImageRecorderOutputFormat.JPEG:
                     bytes = tex.EncodeToJPG();
                     break;
-                case ImageRecorderOutputFormat.EXR:
+                case ImageRecorderSettings.ImageRecorderOutputFormat.EXR:
                     bytes = tex.EncodeToEXR();
                     break;
                 default:
@@ -67,7 +67,7 @@ namespace UnityEditor.Recorder
                 Profiler.EndSample();
             }
 
-            if(m_Inputs[0] is BaseRenderTextureInput || m_Settings.outputFormat != ImageRecorderOutputFormat.JPEG)
+            if(m_Inputs[0] is BaseRenderTextureInput || Settings.OutputFormat != ImageRecorderSettings.ImageRecorderOutputFormat.JPEG)
                 UnityHelpers.Destroy(tex);
 
             WriteToFile(bytes);

@@ -110,7 +110,7 @@ namespace UnityEditor.Recorder.Input
             get { return (AudioInputSettings)settings; }
         }
 
-        public override void BeginRecording(RecordingSession session)
+        protected internal override void BeginRecording(RecordingSession session)
         {
             m_ChannelCount = new Func<ushort>(() => {
                     switch (AudioSettings.speakerMode)
@@ -126,16 +126,16 @@ namespace UnityEditor.Recorder.Input
                     }
             })();
 
-            if (Options.verboseMode)
+            if (RecorderOptions.VerboseMode)
                 Debug.Log(string.Format("AudioInput.BeginRecording for capture frame rate {0}", Time.captureFramerate));
 
-            if (audioSettings.preserveAudio)
+            if (audioSettings.PreserveAudio)
                 AudioRenderer.Start();
         }
 
-        public override void NewFrameReady(RecordingSession session)
+        protected internal override void NewFrameReady(RecordingSession session)
         {
-            if (!audioSettings.preserveAudio)
+            if (!audioSettings.PreserveAudio)
                 return;
 
             if (s_Handler == null)
@@ -144,7 +144,7 @@ namespace UnityEditor.Recorder.Input
             if (s_Handler == this)
             {
                 var sampleFrameCount = AudioRenderer.GetSampleCountForCaptureFrame();
-                if (Options.verboseMode)
+                if (RecorderOptions.VerboseMode)
                     Debug.Log(string.Format("AudioInput.NewFrameReady {0} audio sample frames @ {1} ch",
                         sampleFrameCount, m_ChannelCount));
 
@@ -159,12 +159,12 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
-        public override void FrameDone(RecordingSession session)
+        protected internal override void FrameDone(RecordingSession session)
         {
 
         }
 
-        public override void EndRecording(RecordingSession session)
+        protected internal override void EndRecording(RecordingSession session)
         {
             if (s_BufferManager != null)
             {
@@ -174,7 +174,7 @@ namespace UnityEditor.Recorder.Input
 
             s_Handler = null;
 
-            if (audioSettings.preserveAudio)
+            if (audioSettings.PreserveAudio)
                 AudioRenderer.Stop();
         }
     }

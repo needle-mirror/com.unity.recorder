@@ -5,11 +5,11 @@ namespace UnityEditor.Recorder
 {
     class AnimationRecorder : GenericRecorder<AnimationRecorderSettings>
     {
-        public override void RecordFrame(RecordingSession session)
+        protected internal override void RecordFrame(RecordingSession session)
         {
         }
 
-        public override void EndRecording(RecordingSession session)
+        protected internal override void EndRecording(RecordingSession session)
         {
             var ars = (AnimationRecorderSettings)session.settings;
 
@@ -17,7 +17,7 @@ namespace UnityEditor.Recorder
             {
                 var aInput = (AnimationInput)input;
 
-                if (aInput.gameObjectRecorder == null)
+                if (aInput.GameObjectRecorder == null)
                     continue;
                 
                 var clip = new AnimationClip();
@@ -29,11 +29,11 @@ namespace UnityEditor.Recorder
                 
                 AssetDatabase.CreateAsset(clip, clipName);
     #if UNITY_2018_3_OR_NEWER
-                aInput.gameObjectRecorder.SaveToClip(clip, ars.frameRate);
+                aInput.GameObjectRecorder.SaveToClip(clip, ars.FrameRate);
     #else
                 aInput.gameObjectRecorder.SaveToClip(clip);
     #endif
-                aInput.gameObjectRecorder.ResetRecording();
+                aInput.GameObjectRecorder.ResetRecording();
             }
 
             base.EndRecording(session);

@@ -39,9 +39,9 @@ namespace UnityEditor.Recorder
 
             var movieSettings = (MovieRecorderSettings) target;
             
-            if (movieSettings.outputFormat == VideoRecorderOutputFormat.WEBM)
+            if (movieSettings.OutputFormat == MovieRecorderSettings.VideoRecorderOutputFormat.WebM)
             {
-                var supportsAlpha = movieSettings.imageInputSettings.supportsTransparent;
+                var supportsAlpha = movieSettings.ImageInputSettings.SupportsTransparent;
                 
                 if (!supportsAlpha)
                     m_CaptureAlpha.boolValue = false;

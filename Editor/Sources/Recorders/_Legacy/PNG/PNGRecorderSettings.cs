@@ -7,10 +7,10 @@ namespace UnityEditor.Recorder.FrameCapturer
 
         public PNGRecorderSettings()
         {
-            fileNameGenerator.fileName = "image_" + DefaultWildcard.Frame;
+            fileNameGenerator.FileName = "image_" + DefaultWildcard.Frame;
         }
-        
-        public override string extension
+
+        protected internal override string Extension
         {
             get { return "png"; }
         }

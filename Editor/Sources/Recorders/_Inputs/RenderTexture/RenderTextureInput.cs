@@ -11,24 +11,24 @@ namespace UnityEditor.Recorder.Input
             get { return (RenderTextureInputSettings)settings; }
         }
 
-        public override void BeginRecording(RecordingSession session)
+        protected internal override void BeginRecording(RecordingSession session)
         {
             if (cbSettings.renderTexture == null)
                 throw new Exception("No Render Texture object provided as source");
             
-            outputHeight = cbSettings.outputHeight;
-            outputWidth = cbSettings.outputWidth;
+            OutputHeight = cbSettings.OutputHeight;
+            OutputWidth = cbSettings.OutputWidth;
             
-            outputRT = cbSettings.renderTexture;
+            OutputRenderTexture = cbSettings.renderTexture;
             
-            if (cbSettings.flipFinalOutput)
+            if (cbSettings.FlipFinalOutput)
                 m_VFlipper = new TextureFlipper();
         }
 
-        public override void NewFrameReady(RecordingSession session)
+        protected internal override void NewFrameReady(RecordingSession session)
         {
-            if (cbSettings.flipFinalOutput)
-                m_VFlipper.Flip(outputRT);
+            if (cbSettings.FlipFinalOutput)
+                m_VFlipper.Flip(OutputRenderTexture);
             
             base.NewFrameReady(session);
         }

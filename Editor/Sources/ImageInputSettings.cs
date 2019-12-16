@@ -1,53 +1,67 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace UnityEditor.Recorder.Input
 {
     /// <inheritdoc />
     /// <summary>
-    /// Optional base class for Image related inputs.
+    /// Optional base class for image related inputs.
     /// </summary>
     public abstract class ImageInputSettings : RecorderInputSettings
-    {       
-        public abstract int outputWidth { get; set; }
-        public abstract int outputHeight { get; set; }
-        
-        public virtual bool supportsTransparent
+    {
+        /// <summary>
+        /// Stores the output image width.
+        /// </summary>
+        public abstract int OutputWidth { get; set; }
+        /// <summary>
+        /// Stores the output image height.
+        /// </summary>
+        public abstract int OutputHeight { get; set; }
+
+        /// <summary>
+        /// Indicates if derived classes support transparency.
+        /// </summary>
+        public virtual bool SupportsTransparent
         {
             get { return true; }
         }
-        
-        public bool allowTransparency;
+
+
+        internal bool AllowTransparency;
     }
-    
+
     /// <inheritdoc />
     /// <summary>
-    /// Regroups settings needed to specify the size of an Image input using a size and an aspect ratio
+    /// This class regroups settings required to specify the size of an image input using a size and an aspect ratio.
     /// </summary>
+    [Serializable]
     public abstract class StandardImageInputSettings : ImageInputSettings
     {
         [SerializeField] OutputResolution m_OutputResolution = new OutputResolution();
-          
+
         internal bool forceEvenSize;
-        
-        public override int outputWidth
+
+        /// <inheritdoc />
+        public override int OutputWidth
         {
             get { return ForceEvenIfNecessary(m_OutputResolution.GetWidth()); }
             set { m_OutputResolution.SetWidth(ForceEvenIfNecessary(value)); }
         }
 
-        public override int outputHeight
+        /// <inheritdoc />
+        public override int OutputHeight
         {
             get { return ForceEvenIfNecessary(m_OutputResolution.GetHeight()); }
             set { m_OutputResolution.SetHeight(ForceEvenIfNecessary(value)); }
         }
-        
+
         internal ImageHeight outputImageHeight
         {
             get { return m_OutputResolution.imageHeight; }
             set { m_OutputResolution.imageHeight = value; }
         }
-        
+
         internal ImageHeight maxSupportedSize
         {
             get { return m_OutputResolution.maxSupportedHeight; }
@@ -62,25 +76,26 @@ namespace UnityEditor.Recorder.Input
             return v;
         }
 
-        internal override bool ValidityCheck(List<string> errors)
+        /// <inheritdoc />
+        protected internal override bool ValidityCheck(List<string> errors)
         {
             var ok = true;
 
-            var h = outputHeight;
-            
+            var h = OutputHeight;
+
             if (h > (int) maxSupportedSize)
             {
                 ok = false;
                 errors.Add("Output size exceeds maximum supported size: " + (int) maxSupportedSize );
             }
 
-            var w = outputWidth;
+            var w = OutputWidth;
             if (w <= 0 || h <= 0)
             {
                 ok = false;
                 errors.Add("Invalid output resolution: " + w + "x" + h);
             }
-            
+
             return ok;
         }
     }

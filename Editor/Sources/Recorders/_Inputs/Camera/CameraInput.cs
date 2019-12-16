@@ -6,7 +6,10 @@ using UnityObject = UnityEngine.Object;
 
 namespace UnityEditor.Recorder.Input
 {
-    class CameraInput : BaseRenderTextureInput
+    /// <summary>
+    /// Use this class to record from a Scene Camera.
+    /// </summary>
+    public class CameraInput : BaseRenderTextureInput
     {
         struct CanvasBackup
         {
@@ -174,36 +177,40 @@ namespace UnityEditor.Recorder.Input
             get { return (CameraInputSettings)settings; }
         }
 
-        protected Camera targetCamera
+        /// <summary>
+        /// Indicates the Camera to use to record the Scene.
+        /// </summary>
+        protected Camera TargetCamera
         {
             get { return m_InputStrategy.targetCamera; }
             set { m_InputStrategy.targetCamera = value; }
         }
 
-        public override void BeginRecording(RecordingSession session)
+        /// <inheritdoc/>
+        protected internal override void BeginRecording(RecordingSession session)
         {
-            if (cbSettings.flipFinalOutput)
+            if (cbSettings.FlipFinalOutput)
                 m_VFlipper = new TextureFlipper();
 
             if (Options.useCameraCaptureCallbacks)
-                m_InputStrategy = new CaptureCallbackInputStrategy(cbSettings.allowTransparency);
+                m_InputStrategy = new CaptureCallbackInputStrategy(cbSettings.AllowTransparency);
             else
-                m_InputStrategy = new CameraCommandBufferInputStrategy(cbSettings.allowTransparency);
+                m_InputStrategy = new CameraCommandBufferInputStrategy(cbSettings.AllowTransparency);
 
-            switch (cbSettings.source)
+            switch (cbSettings.Source)
             {
                 case ImageSource.ActiveCamera:
                 case ImageSource.MainCamera:
                 case ImageSource.TaggedCamera:
                 {
-                    outputWidth = cbSettings.outputWidth;
-                    outputHeight = cbSettings.outputHeight;
-                    
+                    OutputWidth = cbSettings.OutputWidth;
+                    OutputHeight = cbSettings.OutputHeight;
+
                     if (cbSettings.outputImageHeight != ImageHeight.Window)
                     {
-                        var size = GameViewSize.SetCustomSize(outputWidth, outputHeight);
+                        var size = GameViewSize.SetCustomSize(OutputWidth, OutputHeight);
                         if (size == null)
-                            size = GameViewSize.AddSize(outputWidth, outputHeight);
+                            size = GameViewSize.AddSize(OutputWidth, OutputHeight);
 
                         if (GameViewSize.modifiedResolutionCount == 0)
                             GameViewSize.BackupCurrentSize();
@@ -222,7 +229,7 @@ namespace UnityEditor.Recorder.Input
                     throw new ArgumentOutOfRangeException();
             }
 
-            if (cbSettings.captureUI)
+            if (cbSettings.CaptureUI)
             {
                 var uiGO = new GameObject();
                 uiGO.name = "UICamera";
@@ -232,20 +239,21 @@ namespace UnityEditor.Recorder.Input
                 m_UICamera.cullingMask = 1 << 5;
                 m_UICamera.clearFlags = CameraClearFlags.Depth;
                 m_UICamera.renderingPath = RenderingPath.DeferredShading;
-                m_UICamera.targetTexture = outputRT;
+                m_UICamera.targetTexture = OutputRenderTexture;
                 m_UICamera.enabled = false;
             }
         }
 
-        public override void NewFrameStarting(RecordingSession session)
+        /// <inheritdoc/>
+        protected internal override void NewFrameStarting(RecordingSession session)
         {
             m_InputStrategy.UnsetupCamera();
 
-            switch (cbSettings.source)
+            switch (cbSettings.Source)
             {
                 case ImageSource.ActiveCamera:
                 {
-                    if (targetCamera == null)
+                    if (TargetCamera == null)
                     {
                         var displayGO = new GameObject();
                         displayGO.name = "CameraHostGO-" + displayGO.GetInstanceID();
@@ -258,21 +266,21 @@ namespace UnityEditor.Recorder.Input
                         camera.rect = new Rect(0, 0, 1, 1);
                         camera.depth = float.MaxValue;
 
-                        targetCamera = camera;
+                        TargetCamera = camera;
                     }
                     break;
                 }
 
                 case ImageSource.MainCamera:
                 {
-                    targetCamera = Camera.main;
+                    TargetCamera = Camera.main;
                     break;
                 }
                 case ImageSource.TaggedCamera:
                 {
-                    var tag = ((CameraInputSettings) settings).cameraTag;
+                    var tag = ((CameraInputSettings) settings).CameraTag;
 
-                    if (targetCamera == null || !targetCamera.gameObject.CompareTag(tag))
+                    if (TargetCamera == null || !TargetCamera.gameObject.CompareTag(tag))
                     {
                         try
                         {
@@ -281,26 +289,27 @@ namespace UnityEditor.Recorder.Input
                             var cams = objs.Select(obj => obj.GetComponent<Camera>()).Where(c => c != null);
                             if (cams.Count() > 1)
                                 Debug.LogWarning("More than one camera has the requested target tag '" + tag + "'");
-                            
-                            targetCamera = cams.FirstOrDefault();
+
+                            TargetCamera = cams.FirstOrDefault();
                         }
                         catch (UnityException)
                         {
                             Debug.LogWarning("No camera has the requested target tag '" + tag + "'");
-                            targetCamera = null;
+                            TargetCamera = null;
                         }
                     }
                     break;
                 }
             }
 
-            PrepFrameRenderTexture();
-            m_InputStrategy.SetupCamera(outputRT);
+            PrepFrameRenderTexture(session);
+            m_InputStrategy.SetupCamera(OutputRenderTexture);
         }
 
-        public override void NewFrameReady(RecordingSession session)
+        /// <inheritdoc/>
+        protected internal override void NewFrameReady(RecordingSession session)
         {
-            if (cbSettings.captureUI)
+            if (cbSettings.CaptureUI)
             {
                 // Find canvases
                 var canvases = UnityObject.FindObjectsOfType<Canvas>();
@@ -331,20 +340,21 @@ namespace UnityEditor.Recorder.Input
                 // Restore canvas settings
                 for (var i = 0; i < m_CanvasBackups.Length; i++)
                 {
-                    // Skip those canvases that are not roots canvases or are 
+                    // Skip those canvases that are not roots canvases or are
                     // not using ScreenSpaceOverlay as a render mode.
                     if (m_CanvasBackups[i].canvas == null)
                         continue;
-                        
+
                     m_CanvasBackups[i].canvas.renderMode = RenderMode.ScreenSpaceOverlay;
                     m_CanvasBackups[i].canvas.worldCamera = m_CanvasBackups[i].camera;
                 }
             }
 
-            if (cbSettings.flipFinalOutput)
-                m_VFlipper.Flip(outputRT);
+            if (cbSettings.FlipFinalOutput)
+                m_VFlipper.Flip(OutputRenderTexture);
         }
 
+        /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -358,7 +368,7 @@ namespace UnityEditor.Recorder.Input
                     if (GameViewSize.modifiedResolutionCount == 0)
                         GameViewSize.RestoreSize();
                 }
-                
+
                 if (m_VFlipper != null)
                     m_VFlipper.Dispose();
             }
@@ -366,23 +376,32 @@ namespace UnityEditor.Recorder.Input
             base.Dispose(disposing);
         }
 
-        void PrepFrameRenderTexture()
+        void PrepFrameRenderTexture(RecordingSession session)
         {
-            if (outputRT != null)
+            if (OutputRenderTexture != null)
             {
-                if (outputRT.IsCreated() && outputRT.width == outputWidth && outputRT.height == outputHeight)
+                if (OutputRenderTexture.IsCreated() && OutputRenderTexture.width == OutputWidth && OutputRenderTexture.height == OutputHeight)
                     return;
 
                 ReleaseBuffer();
             }
 
-            outputRT = new RenderTexture(outputWidth, outputHeight, 0, RenderTextureFormat.ARGB32)
+            ImageRecorderSettings s = session.settings as ImageRecorderSettings;
+            var fmtRW = RenderTextureReadWrite.Default;
+            var fmt = RenderTextureFormat.ARGB32;
+            if (s != null && s.CanCaptureHDRFrames() && s.CaptureHDR)
+            {
+                fmtRW = RenderTextureReadWrite.Linear;
+                fmt = RenderTextureFormat.DefaultHDR;
+            }
+
+            OutputRenderTexture = new RenderTexture(OutputWidth, OutputHeight, 0, fmt, fmtRW)
             {
                 wrapMode = TextureWrapMode.Repeat
             };
-            outputRT.Create();
+            OutputRenderTexture.Create();
             if (m_UICamera != null)
-                m_UICamera.targetTexture = outputRT;
+                m_UICamera.targetTexture = OutputRenderTexture;
 
             return;
         }

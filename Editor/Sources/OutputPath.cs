@@ -3,53 +3,77 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
-{    
+{
+    /// <summary>
+    /// Class that allows building file paths relative.
+    /// </summary>
     [Serializable]
-    class OutputPath
+    public class OutputPath
     {
+        /// <summary>
+        /// Options specifying which root location the output path is relative to (or if the path is absolute).
+        /// </summary>
         public enum Root
         {
+            /// <summary>
+            /// Relative path to Project file (parent of Assets).
+            /// </summary>
             Project,
+            /// <summary>
+            /// Relative path to Assets.
+            /// </summary>
             AssetsFolder,
+            /// <summary>
+            /// Relative path to StreamingAssets.
+            /// </summary>
             StreamingAssets,
+            /// <summary>
+            /// Relative path to PersistentData.
+            /// </summary>
             PersistentData,
+            /// <summary>
+            /// Relative path to Temporary Cache.
+            /// </summary>
             TemporaryCache,
+            /// <summary>
+            /// Absolute path.
+            /// </summary>
             Absolute
         }
 
         [SerializeField] Root m_Root;
         [SerializeField] string m_Leaf;
-        
+
         [SerializeField] bool m_ForceAssetFolder;
 
-        public Root root
+        internal Root root
         {
             get { return m_Root; }
             set { m_Root = value; }
         }
-        
-        public string leaf
+
+        internal string leaf
         {
             get { return m_Leaf; }
             set { m_Leaf = value; }
         }
 
-        public bool forceAssetsFolder
+        internal bool forceAssetsFolder
         {
             get { return m_ForceAssetFolder;}
             set
             {
                 m_ForceAssetFolder = value;
-                
+
                 if (m_ForceAssetFolder)
                     m_Root = Root.AssetsFolder;
             }
         }
 
-        public static OutputPath FromPath(string path)
+        internal static OutputPath FromPath(string path)
         {
             var result = new OutputPath();
-            
+
             if (path.Contains(Application.streamingAssetsPath))
             {
                 result.m_Root = Root.StreamingAssets;
@@ -84,8 +108,8 @@ namespace UnityEditor.Recorder
             return result;
         }
 
-        public static string GetFullPath(Root root, string leaf)
-        {          
+        internal static string GetFullPath(Root root, string leaf)
+        {
             var ret = string.Empty;
             switch (root)
             {
@@ -111,10 +135,10 @@ namespace UnityEditor.Recorder
                 ret += "/";
             }
             ret += leaf;
-            return ret;            
+            return ret;
         }
 
-        public string GetFullPath()
+        internal string GetFullPath()
         {
             return GetFullPath(m_Root, m_Leaf);
         }

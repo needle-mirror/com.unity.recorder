@@ -8,16 +8,16 @@ namespace UnityEditor.Recorder.Input
 {
     /// <inheritdoc/>
     /// <summary>
-    /// Regroups all the information required to record an Animation from a given gameObject.
+    /// Use this class to manage all the information required to record an Animation from a given GameObject.
     /// </summary>
     [Serializable]
     [DisplayName("Animation")]
     public class AnimationInputSettings : RecorderInputSettings
     {
         [SerializeField] string m_BindingId = null;
-        
+
         /// <summary>
-        /// The gameObject to record from.
+        /// Indicates the GameObject to record from.
         /// </summary>
         public GameObject gameObject
         {
@@ -25,7 +25,7 @@ namespace UnityEditor.Recorder.Input
             {
                 if (string.IsNullOrEmpty(m_BindingId))
                     return null;
-                
+
                 return BindingManager.Get(m_BindingId) as GameObject;
             }
 
@@ -33,20 +33,26 @@ namespace UnityEditor.Recorder.Input
             {
                 if (string.IsNullOrEmpty(m_BindingId))
                     m_BindingId = GenerateBindingId();
-                
+
                 BindingManager.Set(m_BindingId, value);
             }
         }
-        
+
         /// <summary>
-        /// If true, all the gameObject hierarchy will be recorded.
+        /// Use this property to record all the gameObject hierarchy (True) or not (False).
         /// </summary>
-        public bool recursive = true;
-        
+        public bool Recursive
+        {
+            get => recursive;
+            set => recursive = value;
+        }
+
+        [SerializeField] bool recursive = true;
+
         /// <summary>
-        /// Add a component to record from.
+        /// Adds a Component to record from the GameObject.
         /// </summary>
-        /// <param name="componentType">The type of the Component</param>
+        /// <param name="componentType">The type of the Component.</param>
         public void AddComponentToRecord(Type componentType)
         {
             if (componentType == null)
@@ -56,10 +62,10 @@ namespace UnityEditor.Recorder.Input
             if (!bindingTypeNames.Contains(typeName))
                 bindingTypeNames.Add(typeName);
         }
-        
+
         [SerializeField]
         internal List<string> bindingTypeNames = new List<string>();
-        
+
         internal List<Type> bindingType
         {
             get
@@ -73,12 +79,14 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
-        internal override Type inputType
+        /// <inheritdoc/>
+        protected internal override Type InputType
         {
             get { return typeof(AnimationInput); }
         }
 
-        internal override bool ValidityCheck(List<string> errors)
+        /// <inheritdoc/>
+        protected internal override bool ValidityCheck(List<string> errors)
         {
             var ok = true;
 
@@ -97,7 +105,10 @@ namespace UnityEditor.Recorder.Input
             return GUID.Generate().ToString();
         }
 
-        internal void DuplicateExposedReference()
+        /// <summary>
+        /// Duplicates the existing Scene binding key under a new unique key (useful when duplicating the Recorder input).
+        /// </summary>
+        public void DuplicateExposedReference()
         {
             if (string.IsNullOrEmpty(m_BindingId))
                 return;
@@ -106,15 +117,18 @@ namespace UnityEditor.Recorder.Input
             var dst = GenerateBindingId();
 
             m_BindingId = dst;
-            
+
             BindingManager.Duplicate(src, dst);
         }
 
-        internal void ClearExposedReference()
+        /// <summary>
+        /// Removes the binding value for the current key.
+        /// </summary>
+        public void ClearExposedReference()
         {
             if (string.IsNullOrEmpty(m_BindingId))
                 return;
-            
+
             BindingManager.Set(m_BindingId, null);
         }
     }

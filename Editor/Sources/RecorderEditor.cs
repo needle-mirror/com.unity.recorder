@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {   
-    abstract class RecorderEditor : Editor
+    public abstract class RecorderEditor : Editor
     {
         SerializedProperty m_CaptureEveryNthFrame;
         SerializedProperty m_FileNameGenerator;
@@ -33,8 +33,8 @@ namespace UnityEditor.Recorder
                 s_SeparatorTexture = Resources.Load<Texture2D>("vertical_gradient");
             }
         }
-        
-        static internal void DrawSeparator()
+
+        protected static void DrawSeparator()
         {
             EditorGUILayout.Separator();
             
@@ -117,7 +117,7 @@ namespace UnityEditor.Recorder
         {
             var recorder = (RecorderSettings) target;
            
-            foreach (var inputsSetting in recorder.inputsSettings)
+            foreach (var inputsSetting in recorder.InputsSettings)
             {
                 var p = GetInputSerializedProperty(serializedObject, inputsSetting);
                 
@@ -156,7 +156,7 @@ namespace UnityEditor.Recorder
 
         protected virtual void ExtraOptionsGUI()
         {
-            if (((RecorderSettings)target).frameRatePlayback == FrameRatePlayback.Variable)
+            if (((RecorderSettings)target).FrameRatePlayback == FrameRatePlayback.Variable)
                 EditorGUILayout.PropertyField(m_CaptureEveryNthFrame, Styles.RenderStepFrameLabel);
         }
 

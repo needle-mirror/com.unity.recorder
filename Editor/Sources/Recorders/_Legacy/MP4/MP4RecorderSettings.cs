@@ -10,21 +10,21 @@ namespace UnityEditor.Recorder.FrameCapturer
 
         public MP4RecorderSettings()
         {
-            fileNameGenerator.fileName = "movie";
+            fileNameGenerator.FileName = "movie";
             m_AutoSelectBR = true;
             
             m_ImageInputSelector.cameraInputSettings.maxSupportedSize = ImageHeight.x2160p_4K;
         }
 
-        public override bool isPlatformSupported
+        public override bool IsPlatformSupported
         {
             get
             {
                 return Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer;
             }
         }
-        
-        public override string extension
+
+        protected internal override string Extension
         {
             get { return "mp4"; }
         }

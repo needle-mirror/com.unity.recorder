@@ -32,7 +32,7 @@ namespace UnityEditor.Recorder
             var p = new Preset(copy) { name = model.name };
             data.m_Model = p;
             
-            foreach (var recorder in model.recorderSettings)
+            foreach (var recorder in model.RecorderSettings)
             {
                 var rp = new Preset(recorder) { name = recorder.name };
                 data.m_RecorderPresets.Add(rp);

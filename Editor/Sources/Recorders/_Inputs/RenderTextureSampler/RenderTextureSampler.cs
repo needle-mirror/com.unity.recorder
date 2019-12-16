@@ -97,30 +97,30 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
-        public override void BeginRecording(RecordingSession session)
+        protected internal override void BeginRecording(RecordingSession session)
         {
             superShader = Shader.Find("Hidden/Volund/BS4SuperShader");
             accumulateShader = Shader.Find("Hidden/BeautyShot/Accumulate");
             normalizeShader = Shader.Find("Hidden/BeautyShot/Normalize");
 
-            if (rtsSettings.flipFinalOutput)
+            if (rtsSettings.FlipFinalOutput)
                 m_VFlipper = new TextureFlipper();
 
-            var h = rtsSettings.outputHeight;
+            var h = rtsSettings.OutputHeight;
             
             // Below here is considered 'void Start()', but we run it for directly "various reasons".
-            if (h > rtsSettings.renderHeight)
+            if (h > rtsSettings.RenderHeight)
                 throw new UnityException("Upscaling is not supported! Output dimension must be smaller or equal to render dimension.");
 
             // Calculate aspect and render/output sizes
             // Clamp size to 16K, which is the min always supported size in d3d11
             // Force output to divisible by two as x264 doesn't approve of odd image dimensions.
             //var aspect = rtsSettings.m_OutputAspect.GetAspect();
-            m_renderHeight = Mathf.Min(16 * 1024, Mathf.RoundToInt(rtsSettings.renderHeight)); //rtsSettings.renderHeight; //m_RenderSize;
-            m_renderWidth = Mathf.Min(16 * 1024, Mathf.RoundToInt(rtsSettings.renderWidth));
+            m_renderHeight = Mathf.Min(16 * 1024, Mathf.RoundToInt(rtsSettings.RenderHeight)); //rtsSettings.renderHeight; //m_RenderSize;
+            m_renderWidth = Mathf.Min(16 * 1024, Mathf.RoundToInt(rtsSettings.RenderWidth));
             
-            outputHeight = h;
-            outputWidth = rtsSettings.outputWidth;
+            OutputHeight = h;
+            OutputWidth = rtsSettings.OutputWidth;
 
             m_superMaterial = new Material(superShader) { hideFlags = HideFlags.DontSave };
 
@@ -141,16 +141,16 @@ namespace UnityEditor.Recorder.Input
                 m_accumulateRTs[i].Create();
             }
             
-            var rt = new RenderTexture(outputWidth, outputHeight, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
+            var rt = new RenderTexture(OutputWidth, OutputHeight, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
             rt.Create();
-            outputRT = rt;
-            m_samples = new Vector2[(int)rtsSettings.superSampling];
-            GenerateSamplesMSAA(m_samples, rtsSettings.superSampling);
+            OutputRenderTexture = rt;
+            m_samples = new Vector2[(int)rtsSettings.SuperSampling];
+            GenerateSamplesMSAA(m_samples, rtsSettings.SuperSampling);
 
             m_hookedCameras = new List<HookedCamera>();
         }
 
-        public override void NewFrameStarting(RecordingSession session)
+        protected internal override void NewFrameStarting(RecordingSession session)
         {
             switch (rtsSettings.source)
             {
@@ -214,7 +214,7 @@ namespace UnityEditor.Recorder.Input
                 case ImageSource.TaggedCamera:
                 {
                     GameObject[] taggedObjs;
-                    var tag = (settings as RenderTextureSamplerSettings).cameraTag;
+                    var tag = (settings as RenderTextureSamplerSettings).CameraTag;
                     try
                     {
                         taggedObjs = GameObject.FindGameObjectsWithTag(tag);
@@ -295,30 +295,30 @@ namespace UnityEditor.Recorder.Input
             base.Dispose(disposing);
         }
 
-        public override void NewFrameReady(RecordingSession session)
+        protected internal override void NewFrameReady(RecordingSession session)
         {
             PerformSubSampling();
 
-            if (rtsSettings.renderHeight == rtsSettings.outputHeight)
+            if (rtsSettings.RenderHeight == rtsSettings.OutputHeight)
             {
                 // Blit with normalization if sizes match.
-                m_normalizeMaterial.SetFloat("_NormalizationFactor", 1.0f / (float)rtsSettings.superSampling);
-                m_normalizeMaterial.SetInt("_ApplyGammaCorrection", QualitySettings.activeColorSpace == ColorSpace.Linear && rtsSettings.colorSpace == ColorSpace.Gamma ? 1 : 0);
-                Graphics.Blit(m_renderRT, outputRT, m_normalizeMaterial);
+                m_normalizeMaterial.SetFloat("_NormalizationFactor", 1.0f / (float)rtsSettings.SuperSampling);
+                m_normalizeMaterial.SetInt("_ApplyGammaCorrection", QualitySettings.activeColorSpace == ColorSpace.Linear && rtsSettings.ColorSpace == ColorSpace.Gamma ? 1 : 0);
+                Graphics.Blit(m_renderRT, OutputRenderTexture, m_normalizeMaterial);
             }
             else
             {
                 // Ideally we would use a separable filter here, but we're massively bound by readback and disk anyway for hi-res.
-                m_superMaterial.SetVector("_Target_TexelSize", new Vector4(1f / outputWidth, 1f / outputHeight, outputWidth, outputHeight));
+                m_superMaterial.SetVector("_Target_TexelSize", new Vector4(1f / OutputWidth, 1f / OutputHeight, OutputWidth, OutputHeight));
                 m_superMaterial.SetFloat("_KernelCosPower", rtsSettings.superKernelPower);
                 m_superMaterial.SetFloat("_KernelScale", rtsSettings.superKernelScale);
-                m_superMaterial.SetFloat("_NormalizationFactor", 1.0f / (float)rtsSettings.superSampling);
-                m_superMaterial.SetInt("_ApplyGammaCorrection", QualitySettings.activeColorSpace == ColorSpace.Linear && rtsSettings.colorSpace == ColorSpace.Gamma ? 1 : 0);
-                Graphics.Blit(m_renderRT, outputRT, m_superMaterial);
+                m_superMaterial.SetFloat("_NormalizationFactor", 1.0f / (float)rtsSettings.SuperSampling);
+                m_superMaterial.SetInt("_ApplyGammaCorrection", QualitySettings.activeColorSpace == ColorSpace.Linear && rtsSettings.ColorSpace == ColorSpace.Gamma ? 1 : 0);
+                Graphics.Blit(m_renderRT, OutputRenderTexture, m_superMaterial);
             }
 
-            if (rtsSettings.flipFinalOutput)
-                m_VFlipper.Flip(outputRT);
+            if (rtsSettings.FlipFinalOutput)
+                m_VFlipper.Flip(OutputRenderTexture);
         }
 
         void ShiftProjectionMatrix(Camera camera, Vector2 sample)
@@ -351,7 +351,7 @@ namespace UnityEditor.Recorder.Input
             {
                 var cam = hookedCam.camera;
 
-                for (int i = 0, n = (int)rtsSettings.superSampling; i < n; i++)
+                for (int i = 0, n = (int)rtsSettings.SuperSampling; i < n; i++)
                 {
                     var oldProjectionMatrix = cam.projectionMatrix;
                     var oldRect = cam.rect;

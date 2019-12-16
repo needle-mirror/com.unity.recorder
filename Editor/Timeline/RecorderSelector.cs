@@ -22,7 +22,7 @@ namespace UnityEditor.Recorder.Timeline
             {
                 var recorderList = RecordersInventory.builtInRecorderInfos.ToList();
                 
-                if (Options.showLegacyRecorders)
+                if (RecorderOptions.ShowLegacyRecorders)
                     recorderList.AddRange(RecordersInventory.legacyRecorderInfos);
                 
                 recorderList.AddRange(RecordersInventory.customRecorderInfos);

@@ -25,7 +25,7 @@ namespace UnityEditor.Recorder
         void SetWidth(float value)
         {
             m_AffectedElement.style.width = value;
-            Options.recorderPanelWith = value;
+            RecorderOptions.recorderPanelWith = value;
         }
 
         public PanelSplitter(VisualElement affectedElement)
@@ -40,7 +40,7 @@ namespace UnityEditor.Recorder
             UIElementHelper.RegisterTrickleDownCallback<MouseMoveEvent>(this, OnMouseMove);
             UIElementHelper.RegisterTrickleDownCallback<MouseUpEvent>(this, OnMouseUp);
 
-            var w = Options.recorderPanelWith;
+            var w = RecorderOptions.recorderPanelWith;
             if (w > 0.0f)
                 SetWidth(w);
         }

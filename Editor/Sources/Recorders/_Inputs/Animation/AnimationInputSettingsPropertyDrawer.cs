@@ -37,7 +37,7 @@ namespace UnityEditor.Recorder.Input
                 var compos = gameObject.GetComponents<Component>()
                     .Where(x => x != null)
                     .Select(x => x.GetType());
-                if (target.recursive)
+                if (target.Recursive)
                 {
                     compos = compos.Union(gameObject.GetComponentsInChildren<Component>()
                         .Where(x => x != null)

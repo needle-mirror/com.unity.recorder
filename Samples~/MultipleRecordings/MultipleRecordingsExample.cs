@@ -32,54 +32,54 @@ namespace UnityEngine.Recorder.Examples
            // Video
            var videoRecorder = ScriptableObject.CreateInstance<MovieRecorderSettings>();
            videoRecorder.name = "My Video Recorder";
-           videoRecorder.enabled = true;
+           videoRecorder.Enabled = true;
     
-           videoRecorder.outputFormat = VideoRecorderOutputFormat.MP4;
-           videoRecorder.videoBitRateMode = VideoBitrateMode.Low;
+           videoRecorder.OutputFormat = MovieRecorderSettings.VideoRecorderOutputFormat.MP4;
+           videoRecorder.VideoBitRateMode = VideoBitrateMode.Low;
     
-           videoRecorder.imageInputSettings = new GameViewInputSettings
+           videoRecorder.ImageInputSettings = new GameViewInputSettings
            {
-               outputWidth = 1920,
-               outputHeight = 1080
+               OutputWidth = 1920,
+               OutputHeight = 1080
            };
     
-           videoRecorder.audioInputSettings.preserveAudio = true;
+           videoRecorder.AudioInputSettings.PreserveAudio = true;
     
-           videoRecorder.outputFile = Path.Combine(mediaOutputFolder, "video_v" + DefaultWildcard.Take);
+           videoRecorder.OutputFile = Path.Combine(mediaOutputFolder, "video_v" + DefaultWildcard.Take);
     
            // Animation
            var animationRecorder = ScriptableObject.CreateInstance<AnimationRecorderSettings>();
            animationRecorder.name = "My Animation Recorder";
-           animationRecorder.enabled = true;
+           animationRecorder.Enabled = true;
     
            var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
     
-           animationRecorder.animationInputSettings = new AnimationInputSettings
+           animationRecorder.AnimationInputSettings = new AnimationInputSettings
            {
                gameObject = sphere, 
-               recursive = true,
+               Recursive = true,
            };
            
-           animationRecorder.animationInputSettings.AddComponentToRecord(typeof(Transform));
+           animationRecorder.AnimationInputSettings.AddComponentToRecord(typeof(Transform));
            
-           animationRecorder.outputFile = Path.Combine(animationOutputFolder, "anim_" + DefaultWildcard.GeneratePattern("GameObject") + "_v" + DefaultWildcard.Take);
+           animationRecorder.OutputFile = Path.Combine(animationOutputFolder, "anim_" + DefaultWildcard.GeneratePattern("GameObject") + "_v" + DefaultWildcard.Take);
     
            // Image Sequence
            var imageRecorder = ScriptableObject.CreateInstance<ImageRecorderSettings>();
            imageRecorder.name = "My Image Recorder";
-           imageRecorder.enabled = true;
+           imageRecorder.Enabled = true;
     
-           imageRecorder.outputFormat = ImageRecorderOutputFormat.PNG;
-           imageRecorder.captureAlpha = true;
+           imageRecorder.OutputFormat = ImageRecorderSettings.ImageRecorderOutputFormat.PNG;
+           imageRecorder.CaptureAlpha = true;
 
-           imageRecorder.outputFile = Path.Combine(mediaOutputFolder, "_png", "image_v" + DefaultWildcard.Take + "." + DefaultWildcard.Frame);
+           imageRecorder.OutputFile = Path.Combine(mediaOutputFolder, "_png", "image_v" + DefaultWildcard.Take + "." + DefaultWildcard.Frame);
 
            imageRecorder.imageInputSettings = new CameraInputSettings
            {
-               source = ImageSource.MainCamera,
-               outputWidth = 1920,
-               outputHeight = 1080,
-               captureUI = true
+               Source = ImageSource.MainCamera,
+               OutputWidth = 1920,
+               OutputHeight = 1080,
+               CaptureUI = true
            };
     
            // Setup Recording
@@ -88,9 +88,9 @@ namespace UnityEngine.Recorder.Examples
            controllerSettings.AddRecorderSettings(imageRecorder);
     
            controllerSettings.SetRecordModeToManual();
-           controllerSettings.frameRate = 60.0f;
+           controllerSettings.FrameRate = 60.0f;
     
-           Options.verboseMode = false;
+           RecorderOptions.VerboseMode = false;
            m_RecorderController.StartRecording();
        }
     

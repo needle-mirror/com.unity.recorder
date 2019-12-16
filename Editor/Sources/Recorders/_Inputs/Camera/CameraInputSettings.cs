@@ -1,51 +1,85 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace UnityEditor.Recorder.Input
 {
+    /// <summary>
+    /// Use this class to manage all the information required to record from a Scene Camera.
+    /// </summary>
     [DisplayName("Targeted Camera")]
     [Serializable]
     public class CameraInputSettings : StandardImageInputSettings
     {
-        public ImageSource source = ImageSource.ActiveCamera;
-        public string cameraTag;
-        public bool flipFinalOutput;
-        public bool captureUI;
-
-        internal static bool IsHDRPAvailable()
+        /// <summary>
+        /// Indicates the Camera input type.
+        /// </summary>
+        public ImageSource Source
         {
-            // For backward compatibility with unity version < 19.1
-            // Use reflection to determine if hdrp is available 
-#if UNITY_2019_3_OR_NEWER
-            const string ClassName = "UnityEngine.Rendering.HighDefinition.HDRenderPipeline";
-#else
-            const string ClassName = "UnityEngine.Experimental.Rendering.HDPipeline.HDRenderPipeline";
-#endif            
-            const string editorDllName = "Unity.RenderPipelines.HighDefinition.Runtime";
-            
-            var hdrpRenderPipeline = Type.GetType(ClassName + ", " + editorDllName );
-            return (hdrpRenderPipeline != null);
+            get { return source; }
+            set { source = value; }
         }
-        
+
+        [SerializeField] private ImageSource source = ImageSource.MainCamera;
+
+        /// <summary>
+        /// Indicates the GameObject tag of the Camera used for the capture.
+        /// </summary>
+        public string CameraTag
+        {
+            get { return cameraTag; }
+            set { cameraTag = value; }
+        }
+
+        [SerializeField] private string cameraTag;
+
+        /// <summary>
+        /// Use this property if you need to vertically flip the final output.
+        /// </summary>
+        public bool FlipFinalOutput
+        {
+            get { return flipFinalOutput; }
+            set { flipFinalOutput = value; }
+        }
+        [SerializeField] private bool flipFinalOutput;
+
+        /// <summary>
+        /// Use this property to include the UI GameObjects to the recording.
+        /// </summary>
+        public bool CaptureUI
+        {
+            get { return captureUI; }
+            set { captureUI = value; }
+        }
+        [SerializeField] private bool captureUI;
+        internal static bool UsingHDRP()
+        {
+            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
+            var usingHDRP = pipelineAsset != null && pipelineAsset.GetType().FullName.Contains("High");
+            return usingHDRP;
+        }
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public CameraInputSettings()
         {
-            if (IsHDRPAvailable())
-            {
-                source = ImageSource.MainCamera;
-            }
             outputImageHeight = ImageHeight.Window;
         }
-        
-        internal override Type inputType
+
+        /// <inheritdoc/>
+        protected internal override Type InputType
         {
             get { return typeof(CameraInput); }
         }
 
-        internal override bool ValidityCheck(List<string> errors)
+        /// <inheritdoc/>
+        protected internal override bool ValidityCheck(List<string> errors)
         {
             var ok = base.ValidityCheck(errors);
-            if (source == ImageSource.TaggedCamera && string.IsNullOrEmpty(cameraTag))
+            if (Source == ImageSource.TaggedCamera && string.IsNullOrEmpty(CameraTag))
             {
                 ok = false;
                 errors.Add("Missing tag for camera selection");

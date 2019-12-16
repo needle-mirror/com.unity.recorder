@@ -21,32 +21,32 @@ namespace UnityEditor.Recorder
             {
                 session.RecordFrame();
 
-                switch (session.recorder.settings.recordMode)
+                switch (session.recorder.settings.RecordMode)
                 {
                     case RecordMode.Manual:
                         break;
                     case RecordMode.SingleFrame:
                     {
-                        if (session.recorder.recordedFramesCount == 1)
+                        if (session.recorder.RecordedFramesCount == 1)
                             Destroy(this);
                         break;
                     }
                     case RecordMode.FrameInterval:
                     {
-                        if (session.frameIndex > session.settings.endFrame)
+                        if (session.frameIndex > session.settings.EndFrame)
                             Destroy(this);
                         break;
                     }
                     case RecordMode.TimeInterval:
                     {
-                        if (session.settings.frameRatePlayback == FrameRatePlayback.Variable)
+                        if (session.settings.FrameRatePlayback == FrameRatePlayback.Variable)
                         {
-                            if (session.currentFrameStartTS >= session.settings.endTime)
+                            if (session.currentFrameStartTS >= session.settings.EndTime)
                                 Destroy(this);
                         }
                         else
                         {
-                            var expectedFrames = (session.settings.endTime - session.settings.startTime) * session.settings.frameRate;
+                            var expectedFrames = (session.settings.EndTime - session.settings.StartTime) * session.settings.FrameRate;
                             if (session.RecordedFrameSpan >= expectedFrames)
                                 Destroy(this);
                         }

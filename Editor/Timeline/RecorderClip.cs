@@ -7,14 +7,20 @@ using UnityEngine.Timeline;
 
 namespace UnityEditor.Recorder.Timeline
 {
+    /// <summary>
+    /// Use this class to manage Recorder Clip Timeline integration.
+    /// </summary>
     [DisplayName("Recorder Clip")]
     public class RecorderClip : PlayableAsset, ITimelineClipAsset, ISerializationCallbackReceiver
     {
+        /// <summary>
+        /// Indicates the Recorder Settings instance used for this Clip.
+        /// </summary>
         [SerializeField]
         public RecorderSettings settings;
 
         internal bool needsDuplication;
-        
+
         static readonly Dictionary<RecorderSettings, RecorderClip> s_SettingsLookup = new Dictionary<RecorderSettings, RecorderClip>();
 
         readonly SceneHook m_SceneHook = new SceneHook(Guid.NewGuid().ToString());
@@ -24,11 +30,13 @@ namespace UnityEditor.Recorder.Timeline
             get { return settings == null ? null : RecordersInventory.GetRecorderInfo(settings.GetType()).recorderType; }
         }
 
+        /// <inheritdoc/>
         public ClipCaps clipCaps
         {
             get { return ClipCaps.None; }
         }
 
+        /// <inheritdoc/>
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
             var playable = ScriptPlayable<RecorderPlayableBehaviour>.Create(graph);
@@ -40,11 +48,13 @@ namespace UnityEditor.Recorder.Timeline
             return playable;
         }
 
+        /// <inheritdoc/>
         public void OnDestroy()
         {
             UnityHelpers.Destroy(settings, true);
         }
 
+        /// <inheritdoc/>
         public void OnBeforeSerialize()
         {
             if (settings != null)
@@ -85,9 +95,9 @@ namespace UnityEditor.Recorder.Timeline
         {
             if (settings == null || timelineAsset == null)
                 return;
-            settings.frameRate = timelineAsset.editorSettings.fps;
-            settings.frameRatePlayback = FrameRatePlayback.Constant;
-            settings.capFrameRate = true;
+            settings.FrameRate = timelineAsset.editorSettings.fps;
+            settings.FrameRatePlayback = FrameRatePlayback.Constant;
+            settings.CapFrameRate = true;
         }
 
         private void OnEnable()
@@ -95,6 +105,7 @@ namespace UnityEditor.Recorder.Timeline
             PushTimelineIntoRecorder(FindTimelineAsset());
         }
 
+        /// <inheritdoc/>
         public void OnAfterDeserialize()
         {
             // Nothing

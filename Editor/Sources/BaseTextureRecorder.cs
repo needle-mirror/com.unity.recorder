@@ -1,19 +1,28 @@
+using System;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 
 namespace UnityEditor.Recorder
 {
-    abstract class BaseTextureRecorder<T> : GenericRecorder<T> where T : RecorderSettings
+    /// <summary>
+    /// Abstract base class for all Recorders that output images.
+    /// </summary>
+    /// <typeparam name="T">The class implementing the Recorder Settings.</typeparam>
+    public abstract class BaseTextureRecorder<T> : GenericRecorder<T> where T : RecorderSettings
     {
         int       m_OngoingAsyncGPURequestsCount;
         bool      m_DelayedEncoderDispose;
         bool      m_UseAsyncGPUReadback;
         Texture2D m_ReadbackTexture;
 
-        protected abstract TextureFormat readbackTextureFormat { get; }
+        /// <summary>
+        /// Stores the format of the texture used for the readback.
+        /// </summary>
+        protected abstract TextureFormat ReadbackTextureFormat { get; }
 
-        public override bool BeginRecording(RecordingSession session)
+        /// <inheritdoc/>
+        protected internal override bool BeginRecording(RecordingSession session)
         {
             if (!base.BeginRecording(session))
                 return false;
@@ -24,22 +33,23 @@ namespace UnityEditor.Recorder
             return true;
         }
 
-        public override void RecordFrame(RecordingSession session)
+        /// <inheritdoc/>
+        protected internal override void RecordFrame(RecordingSession session)
         {
             var input = (BaseRenderTextureInput)m_Inputs[0];
 
-            if (input.readbackTexture != null)
+            if (input.ReadbackTexture != null)
             {
-                WriteFrame(input.readbackTexture);
+                WriteFrame(input.ReadbackTexture);
                 return;
             }
 
-            var renderTexture = input.outputRT;
+            var renderTexture = input.OutputRenderTexture;
 
             if (m_UseAsyncGPUReadback)
             {
                 AsyncGPUReadback.Request(
-                    renderTexture, 0, readbackTextureFormat, ReadbackDone);
+                    renderTexture, 0, ReadbackTextureFormat, ReadbackDone);
                 ++m_OngoingAsyncGPURequestsCount;
                 return;
             }
@@ -68,7 +78,8 @@ namespace UnityEditor.Recorder
                 DisposeEncoder();
         }
 
-        public override void EndRecording(RecordingSession session)
+        /// <inheritdoc/>
+        protected internal override void EndRecording(RecordingSession session)
         {
             base.EndRecording(session);
             if (m_OngoingAsyncGPURequestsCount > 0)
@@ -79,9 +90,13 @@ namespace UnityEditor.Recorder
 
         private Texture2D CreateReadbackTexture(int width, int height)
         {
-            return new Texture2D(width, height, readbackTextureFormat, false);
+            return new Texture2D(width, height, ReadbackTextureFormat, false);
         }
 
+        /// <summary>
+        /// Writes the frame from an asynchronous GPU read request.
+        /// </summary>
+        /// <param name="r">The asynchronous readback target.</param>
         protected virtual void WriteFrame(AsyncGPUReadbackRequest r)
         {
             if (m_ReadbackTexture == null)
@@ -92,8 +107,15 @@ namespace UnityEditor.Recorder
             WriteFrame(m_ReadbackTexture);
         }
 
+        /// <summary>
+        /// Writes the frame from a Texture2D.
+        /// </summary>
+        /// <param name="t">The readback target.</param>
         protected abstract void WriteFrame(Texture2D t);
 
+        /// <summary>
+        /// Releases the encoder resources.
+        /// </summary>
         protected virtual void DisposeEncoder()
         {
             UnityHelpers.Destroy(m_ReadbackTexture);
