@@ -36,7 +36,9 @@ Right click the Recorder you want to delete and choose **Delete** from the conte
 
 Or
 
-Select the Recorder you want to delete and use the **Ctrl/Cmd + Delete** shortcut.
+Select the Recorder you want to delete and:
+* On Windows or Linux, press **Delete**, or
+* On Mac, use the **Cmd + Delete** shortcut.
 
 <a name="ManageRecorderLists"></a>
 ## Managing Recorder lists
@@ -65,6 +67,3 @@ Use the Preset icon ![](Images/IconPreset.png) in the Recorder Properties pane t
 This is useful for creating predefined Recorders that you can reuse in different [Recorder Lists](#ManageRecorderLists).
 
 For information about saving and loading Presets, see the [Presets](https://docs.unity3d.com/Manual/Presets.html) section in the Unity Manual.
-
-
-

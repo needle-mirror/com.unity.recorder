@@ -21,11 +21,11 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Stores the output image width.
         /// </summary>
-        protected internal int OutputWidth { get; protected set; }
+        public int OutputWidth { get; protected set; }
         /// <summary>
         /// Stores the output image height.
         /// </summary>
-        protected internal int OutputHeight { get; protected set; }
+        public int OutputHeight { get; protected set; }
 
         /// <summary>
         /// Releases all resources allocated by this class instance.

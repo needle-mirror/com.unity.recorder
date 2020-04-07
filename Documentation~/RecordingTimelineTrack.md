@@ -26,7 +26,7 @@ To set up a recording session in a Timeline instance:
 
 ## Editing Recorder Clip properties
 
-Recorder Clip properties are the same as regular [Recorder properties](RecorderSetup.md), but you set them from the Recorder Clip inspector rather than the Recorder window.
+Recorder Clip properties are the same as regular [Recorder properties](RecorderProperties.md), but you set them from the Recorder Clip inspector rather than the Recorder window.
 
 ![Adding a Recorder Track in Timeline.](Images/RecorderClipProperties.png)
 
@@ -34,7 +34,7 @@ Recorder Clip properties are the same as regular [Recorder properties](RecorderS
 |-|-|
 |![](Images/Label-A.png)   | Choose the type of Recorder you want the Recorder Clip to use. |
 |![](Images/Label-B.png)   | Load any existing [Recorder Preset](RecorderManage.md#RecorderPreset), or save the current Recorder Clip settings as a Preset.  |
-|![](Images/Label-C.png)   | Set the Recorder Clip properties. These vary according to the **Selected Recorder** setting. You set them the same way you set regular [Recorder properties](RecorderSetup.md). |
+|![](Images/Label-C.png)   | Set the Recorder Clip properties. These vary according to the **Selected Recorder** setting. You set them the same way you set regular [Recorder properties](RecorderProperties.md). |
 
 >[!NOTE]
 > Unity stores the **Recorder Clip** properties in the Timeline Track. They do not affect properties you set in the Recorder window.  

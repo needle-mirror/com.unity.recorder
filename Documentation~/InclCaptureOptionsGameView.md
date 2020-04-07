@@ -4,7 +4,8 @@
 These options appear when you set **Capture** to **Game View**.
 
 >[!NOTE]
->If you are using more than one Recorder to capture Game View, they must all use the same resolution settings.
+>* If you have multiple Game Views in your project, the Recorder captures only the last one you selected in the Editor.
+>* If you are using more than one Recorder to capture Game View, they must all use the same resolution settings.
 
 ![](Images/CaptureOptionsGameView.png)
 

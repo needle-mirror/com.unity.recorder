@@ -192,10 +192,10 @@ namespace UnityEditor.Recorder.Input
             if (cbSettings.FlipFinalOutput)
                 m_VFlipper = new TextureFlipper();
 
-            if (Options.useCameraCaptureCallbacks)
-                m_InputStrategy = new CaptureCallbackInputStrategy(cbSettings.AllowTransparency);
-            else
+            if ( CameraInputSettings.UsingLegacyRP())
                 m_InputStrategy = new CameraCommandBufferInputStrategy(cbSettings.AllowTransparency);
+            else
+                m_InputStrategy = new CaptureCallbackInputStrategy(cbSettings.AllowTransparency);
 
             switch (cbSettings.Source)
             {

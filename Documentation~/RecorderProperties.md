@@ -1,6 +1,6 @@
 # Setting Recorder properties
 
-To configure a Recorder, set its properties in the [Recorder window](RecorderWindow.md) or, if you're recording from a Timeline Track, in the [Recorder Clip Inspector](RecordingTimelineTrack,md).
+To configure a Recorder, set its properties in the [Recorder window](RecorderWindow.md) or, if you're recording from a Timeline Track, in the [Recorder Clip Inspector](RecordingTimelineTrack.md).
 
 From there, you can set the following types of properties:
 
@@ -44,5 +44,3 @@ These properties define file output options for any type of Recorder.
 |   | _[PATH]_  | Displays the full output path, as set in the **File Name** and **Path** properties. |
 |   | File Browser button <br/>![](Images/RecorderReveal.png)  | Opens your operating system's file browser to the current path.  |
 |**Take Number**   || A value that the Recorder uses to number recordings. It increases by one after each recording. <br/><br/>You can use the **<Take>** wildcard to append current **Take** value to the **File Name**. |
-
-

@@ -57,8 +57,10 @@ namespace UnityEngine.Recorder.Tests
 			new GameObject("Light").AddComponent<Light>().type = LightType.Directional;
 			var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			cube.transform.localPosition = new Vector3(0.0f, -5.0f, 0.0f);
+
+			var runTimeSeconds = clip.start + clip.duration + 0.5f;
 			
-			while (director.time < 3.5f)
+			while (director.time < runTimeSeconds)
 			{
 				cube.transform.localPosition = cube.transform.localPosition + Vector3.up * 0.02f; 
 				yield return null;

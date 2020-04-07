@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -96,11 +95,12 @@ namespace UnityEditor.Recorder
         
         RecorderControllerSettings m_ControllerSettings;
         RecorderController m_RecorderController;
-        
+
         enum State
         {
             Idle,
             WaitingForPlayModeToStartRecording,
+            WaitingForScenesData,
             Error,
             Recording
         }
@@ -392,9 +392,8 @@ namespace UnityEditor.Recorder
 
             m_ControllerSettings = RecorderControllerSettings.LoadOrCreate(Application.dataPath + s_PrefsFileName);
             m_RecorderController = new RecorderController(m_ControllerSettings);
-            
+
             m_RecorderSettingsPrefsEditor = (RecorderSettingsPrefsEditor) Editor.CreateEditor(m_ControllerSettings);
-            
             
 #if UNITY_2018_2_OR_NEWER
             m_RecordingListItem.RegisterCallback<ValidateCommandEvent>(OnRecorderListValidateCommand);
@@ -444,6 +443,20 @@ namespace UnityEditor.Recorder
         {
             if (IsRecording())
                 StopRecordingInternal();
+        }
+
+        [RuntimeInitializeOnLoadMethod]
+        static void RuntimeInit()
+        {
+            var windows = Resources.FindObjectsOfTypeAll<RecorderWindow>();
+
+            if (windows != null && windows.Length > 0)
+            {
+                RecorderWindow win = windows[0];
+
+                if (win.m_State == State.WaitingForPlayModeToStartRecording)
+                    win.RequestStartRecording();
+            }
         }
 
         void OnPlayModeStateChanged(PlayModeStateChange obj)
@@ -590,14 +603,22 @@ namespace UnityEditor.Recorder
         void ApplyPreset(string presetPath)
         {           
             var candidate = AssetDatabase.LoadAssetAtPath<RecorderControllerSettingsPreset>(presetPath);
-
-            if (candidate == null)
-                return;
-                
-            candidate.AppyTo(m_ControllerSettings);
-            ReloadRecordings();
+            ApplyPreset(candidate);
         }
 
+        /// <summary>
+        /// Loads a previously saved Recorder List.
+        /// </summary>
+        /// <param name="preset">The instance of Recorder List to load.</param>
+        public void ApplyPreset(RecorderControllerSettingsPreset preset)
+        {
+            if (preset == null)
+                return;
+                
+            preset.ApplyTo(m_ControllerSettings);
+            ReloadRecordings();
+        }
+        
         void ShowNewRecorderMenu()
         {
             var newRecordMenu = new GenericMenu();
@@ -699,21 +720,18 @@ namespace UnityEditor.Recorder
 
         void Update()
         {
-            if (EditorApplication.isPlaying)
-            {
-                if (m_State == State.WaitingForPlayModeToStartRecording)
-                {
-                    StartRecordingInternal();
-                }
-            }
-            else
+            if (!EditorApplication.isPlaying)
             {
                 if (m_State == State.Recording)
                 {
                     StopRecordingInternal();
                 }
             }
-            
+            else if (m_State == State.WaitingForScenesData && UnityHelpers.AreAllSceneDataLoaded())
+            {
+                StartRecordingInternal();
+            }
+
             var enable = !ShouldDisableRecordSettings();
                 
             m_AddNewRecordPanel.SetEnabled(enable);
@@ -755,12 +773,12 @@ namespace UnityEditor.Recorder
         }
 
         void StartRecordingInternal()
-        {        
+        {
             if (RecorderOptions.VerboseMode)
                 Debug.Log("Start Recording.");
 
-            var success = m_RecorderController.StartRecording();
-            
+            bool success = m_RecorderController.StartRecording();
+
             if (success)
             {
                 m_State = State.Recording;
@@ -771,6 +789,16 @@ namespace UnityEditor.Recorder
                 StopRecordingInternal();
                 m_State = State.Error;
             }
+        }
+
+        void RequestStartRecording()
+        {
+            if (RecorderOptions.VerboseMode)
+                Debug.Log("Prepare and wait all scenes to load.");
+
+            m_RecorderController.PrepareRecording();
+
+            m_State = State.WaitingForScenesData;
         }
 
         void OnRecordButtonClick()

@@ -13,7 +13,12 @@ namespace UnityEditor.Recorder
     {
         int       m_OngoingAsyncGPURequestsCount;
         bool      m_DelayedEncoderDispose;
-        bool      m_UseAsyncGPUReadback;
+
+        /// <summary>
+        /// Whether or not to use asynchronous GPU commands in order to get the texture for the recorder.
+        /// </summary>
+        protected bool      UseAsyncGPUReadback;
+
         Texture2D m_ReadbackTexture;
 
         /// <summary>
@@ -27,7 +32,7 @@ namespace UnityEditor.Recorder
             if (!base.BeginRecording(session))
                 return false;
 
-            m_UseAsyncGPUReadback = SystemInfo.supportsAsyncGPUReadback;
+            UseAsyncGPUReadback = SystemInfo.supportsAsyncGPUReadback;
             m_OngoingAsyncGPURequestsCount = 0;
             m_DelayedEncoderDispose = false;
             return true;
@@ -46,7 +51,7 @@ namespace UnityEditor.Recorder
 
             var renderTexture = input.OutputRenderTexture;
 
-            if (m_UseAsyncGPUReadback)
+            if (UseAsyncGPUReadback)
             {
                 AsyncGPUReadback.Request(
                     renderTexture, 0, ReadbackTextureFormat, ReadbackDone);

@@ -16,6 +16,7 @@ namespace UnityEditor.Recorder
         float m_FPSNextTimeStart;
         int m_FPSNextFrameCount;
 
+        internal bool prepareFrameCalled { get; private set; }
         internal double currentFrameStartTS { get; private set; }
         internal double recordingStartTS { get; private set; }
         
@@ -61,9 +62,10 @@ namespace UnityEditor.Recorder
             try
             {
                 AllowInBackgroundMode();
-                recordingStartTS = (Time.time / Time.timeScale);
+                recordingStartTS = (Time.time / (Mathf.Approximately(Time.timeScale, 0f)? 1f : Time.timeScale));
                 sessionStartTS = DateTime.Now;
                 recorder.SessionCreated(this);
+                prepareFrameCalled = false;
                 return true;
 
             }
@@ -86,7 +88,7 @@ namespace UnityEditor.Recorder
 
                 AllowInBackgroundMode();
 
-                recordingStartTS = (Time.time / Time.timeScale);
+                recordingStartTS = (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale));
                 recorder.SignalInputsOfStage(ERecordingSessionStage.BeginRecording, this);
 
                 if (!recorder.BeginRecording(this))
@@ -179,10 +181,11 @@ namespace UnityEditor.Recorder
             try
             {
                 AllowInBackgroundMode();
+                currentFrameStartTS = (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale)) - recordingStartTS;
 
-                currentFrameStartTS = (Time.time / Time.timeScale) - recordingStartTS;
                 recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameStarting, this);
                 recorder.PrepareNewFrame(this);
+                prepareFrameCalled = true;
             }
             catch (Exception ex)
             {

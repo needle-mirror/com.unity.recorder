@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using UnityEditor.Recorder;
 
 namespace UnityEngine.Recorder.Tests
@@ -15,7 +15,8 @@ namespace UnityEngine.Recorder.Tests
 			var recorderController = new RecorderController(settings);
 
 			RecorderOptions.VerboseMode = false; // Make sure visibility is not toggled on because of debugMode.
-			
+
+            recorderController.PrepareRecording();
 			Assert.IsTrue(recorderController.StartRecording());
 			Assert.IsTrue(recorderController.IsRecording());
 		

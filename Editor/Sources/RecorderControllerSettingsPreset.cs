@@ -4,7 +4,10 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {   
-    class RecorderControllerSettingsPreset : ScriptableObject
+    /// <summary>
+    /// Class that models a Recorder List (a stack of preset Recorder Settings instances) that you can save and load for reuse into a Recorder Window.
+    /// </summary>
+    public class RecorderControllerSettingsPreset : ScriptableObject
     {
         [SerializeField] Preset m_Model;
         [SerializeField] List<Preset> m_RecorderPresets = new List<Preset>();
@@ -19,7 +22,12 @@ namespace UnityEditor.Recorder
             get { return m_RecorderPresets.ToArray(); }
         }
 
-        internal static void SaveAtPath(RecorderControllerSettings model, string path)
+        /// <summary>
+        /// Saves the specified Recorder List to a file on disk. Note that this method doesn't save Scene references (such as a GameObject reference in Animation Recorder Settings).
+        /// </summary>
+        /// <param name="model">The Recorder List to save.</param>
+        /// <param name="path">The path on disk where to save the Recorder List. You must specify a path relative to the project.</param>
+        public static void SaveAtPath(RecorderControllerSettings model, string path)
         {
             var data = CreateInstance<RecorderControllerSettingsPreset>();
             
@@ -53,7 +61,11 @@ namespace UnityEditor.Recorder
             AssetDatabase.Refresh();
         }
                 
-        internal void AppyTo(RecorderControllerSettings prefs)
+        /// <summary>
+        /// Applies the current Recorder List to the specified RecorderControllerSettings instance.
+        /// </summary>
+        /// <param name="prefs">The RecorderControllerSettings instance to apply the Recorder List to.</param>
+        public void ApplyTo(RecorderControllerSettings prefs)
         {
             prefs.ReleaseRecorderSettings();
             

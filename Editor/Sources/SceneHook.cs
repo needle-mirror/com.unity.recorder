@@ -6,10 +6,18 @@ using UnityEngine.SceneManagement;
 
 namespace UnityEditor.Recorder
 {
-    static class BindingManager
+    /// <summary>
+    /// This class manages Recorder references to GameObjects in the form of key-value pairs saved inside Recorder assets.
+    /// </summary>
+    public static class BindingManager
     {  
         const string k_HostGoName = "Unity-RecorderBindings";
         
+        /// <summary>
+        /// Retrieves the GameObject bound to a specific key.
+        /// </summary>
+        /// <param name="id">The GameObject referenced by the key.</param>
+        /// <returns>The reference associated with the key.</returns>
         public static Object Get(string id)
         {
             var rcs = FindRecorderBindings();
@@ -18,6 +26,11 @@ namespace UnityEditor.Recorder
             return rc != null ? rc.GetBindingValue(id) : null;
         }
 
+        /// <summary>
+        /// Creates a new key and binds it to the same GameObject referenced by the specified key.
+        /// </summary>
+        /// <param name="id">The existing key from which you want to create a duplicate.</param>
+        /// <param name="newId">The new key to create.</param>
         public static void Duplicate(string id, string newId)
         {
             var rcs = FindRecorderBindings();
@@ -27,6 +40,11 @@ namespace UnityEditor.Recorder
             }
         }
         
+        /// <summary>
+        /// Creates a key-value pair in the Binding manager to reference a GameObject.
+        /// </summary>
+        /// <param name="id">The reference key.</param>
+        /// <param name="obj">The referenced GameObject.</param>
         public static void Set(string id, Object obj)
         {
             var rbs = FindRecorderBindings();
@@ -74,7 +92,7 @@ namespace UnityEditor.Recorder
                 Object.DestroyImmediate(rb.gameObject);
         }
         
-        public static RecorderBindings[] FindRecorderBindings()
+        internal static RecorderBindings[] FindRecorderBindings()
         {
             return Object.FindObjectsOfType<RecorderBindings>();
         }

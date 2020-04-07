@@ -30,11 +30,10 @@ Use the **Frame Rate** properties to specify how to constrain the frame rate dur
 | **Record Mode** ||Specifies the frames or time interval to record.|
 ||_Manual_ |Start and stop recording when you manually click **Start Recording** and **Stop Recording**, respectively.|
 || _Single Frame_ |Record a single frame. Use the **Frame Number** property to specify this frame.|
-|| _Frame Interval_ |Record a set of consecutive frames during Play mode. Use the **First Frame** and **Last Frame** properties to specify when to start and stop.|
+|| _Frame Interval_ |Record a set of consecutive frames during Play mode. Use the **Start** and **End** properties to specify when to start and stop.|
 || _Time Interval_ |Record a specific duration, in seconds, during Play mode. Use the **Start** and **End** properties to specify when to start and stop.|
 | **Frame Number** ||Specifies the number of the frame to capture when in **Single Frame** mode.|
-| **First Frame**/ <br/> **Last Frame** ||Specifies the range of frames to capture when in **Frame Interval** mode.|
-| **Start**/ <br/> **End** ||Specifies the time, in seconds, to start and stop recording.|
+| **Start**/ <br/> **End** ||• When in **Frame Interval** mode, specifies the range of frames to capture.<br/>• When in **Time Interval** mode, specifies the time, in seconds, to start and stop recording.|
 
 ### Frame Rate properties
 
@@ -76,5 +75,3 @@ When a recording stops the Editor remains in Play mode unless:
   - Use the **F10**/**fn+F10** shortcut.
   - Close the Recorder window.
   - Exit Play mode.
-
-

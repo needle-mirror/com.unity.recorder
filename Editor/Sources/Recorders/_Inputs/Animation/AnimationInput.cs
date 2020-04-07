@@ -1,4 +1,4 @@
-﻿#if UNITY_2018_3_OR_NEWER
+#if UNITY_2018_3_OR_NEWER
 using UnityEditor.Animations;
 #else
 using UnityEditor.Experimental.Animations;
@@ -25,7 +25,7 @@ namespace UnityEditor.Recorder.Input
             var srcGO = aniSettings.gameObject;
 
             if (srcGO == null)
-                return;
+                throw new System.NullReferenceException("srcGO");
 
             GameObjectRecorder = new GameObjectRecorder(srcGO);
 

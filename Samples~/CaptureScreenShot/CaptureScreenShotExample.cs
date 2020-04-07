@@ -49,6 +49,7 @@ namespace UnityEngine.Recorder.Examples
         {
             if (GUI.Button(new Rect(10, 10, 150, 50), "Capture ScreenShot"))
             {
+                m_RecorderController.PrepareRecording();
                 m_RecorderController.StartRecording();
             }
         }

@@ -1,6 +1,7 @@
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Recorder;
+using UnityEngine.SceneManagement;
 using UnityObject = UnityEngine.Object;
 
 namespace UnityEditor.Recorder
@@ -73,6 +74,17 @@ namespace UnityEditor.Recorder
                     }
                 }
             }
+        }
+
+        internal static bool AreAllSceneDataLoaded()
+        {
+            for (int i = 0; i < SceneManager.sceneCount; ++i)
+            {
+                Scene s = SceneManager.GetSceneAt(i);
+                if (s.isLoaded == false)
+                    return false;
+            }
+            return true;
         }
     }
 }

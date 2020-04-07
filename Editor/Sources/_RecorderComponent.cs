@@ -1,23 +1,38 @@
-using System.Collections;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
-    [ExecuteInEditMode]
-    class RecorderComponent : MonoBehaviour
-    {
+    class RecorderComponent : _FrameRequestComponent
+    {        
         public RecordingSession session { get; set; }
 
         public void Update()
         {
             if (session != null && session.isRecording)
+            {
                 session.PrepareNewFrame();
+            }
         }
 
-        IEnumerator RecordFrame()
+        public void LateUpdate()
         {
-            yield return new WaitForEndOfFrame();
             if (session != null && session.isRecording)
+            {
+                RequestNewFrame();
+            }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            if (session != null)
+                session.Dispose();
+        }
+
+        protected override void FrameReady()
+        {
+            if (session.prepareFrameCalled)
             {
                 session.RecordFrame();
 
@@ -54,18 +69,6 @@ namespace UnityEditor.Recorder
                     }
                 }
             }
-        }
-
-        public void LateUpdate()
-        {
-            if (session != null && session.isRecording)
-                StartCoroutine(RecordFrame());
-        }
-
-        public void OnDestroy()
-        {
-            if (session != null)
-                session.Dispose();
         }
     }
 }

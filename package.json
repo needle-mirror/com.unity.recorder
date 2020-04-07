@@ -1,7 +1,7 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Unity Recorder",
-  "version": "2.1.0-preview.1",
+  "version": "2.2.0-preview.4",
   "unity": "2018.3",
   "unityRelease": "4f1",
   "dependencies": {
@@ -19,9 +19,10 @@
     "images"
   ],
   "repository": {
+    "footprint": "31bf4b6400f779bbdd42c58d24a552a6e46ccc3b",
     "type": "git",
-    "url": "git@github.com:Unity-Technologies/com.unity.recorder.git",
-    "revision": "680b1b716abed7aa476f0b653e8f283b232595bf"
+    "url": "https://github.com/Unity-Technologies/com.unity.recorder.git",
+    "revision": "b97e1ca7c4f1fc85711e4f7f24ca74a8debdd1ac"
   },
   "samples": [
     {

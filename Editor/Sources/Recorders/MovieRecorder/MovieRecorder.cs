@@ -92,6 +92,15 @@ namespace UnityEditor.Recorder
 
             if (audioInput.audioSettings.PreserveAudio)
             {
+#if UNITY_EDITOR_OSX
+                // Special case with WebM and audio on older Apple computers: deactivate async GPU readback because there
+                // is a risk of not respecting the WebM standard and receiving audio frames out of sync (see "monotonically
+                // increasing timestamps"). This happens only with Target Cameras.
+                if (m_Inputs[0].settings is CameraInputSettings && Settings.OutputFormat == MovieRecorderSettings.VideoRecorderOutputFormat.WebM)
+                {
+                    UseAsyncGPUReadback = false;
+                }
+#endif
                 var audioAttrs = new AudioTrackAttributes
                 {
                     sampleRate = new MediaRational

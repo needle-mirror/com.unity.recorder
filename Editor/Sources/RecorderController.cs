@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -34,36 +34,25 @@ namespace UnityEditor.Recorder
             m_Settings = settings;   
             m_SceneHook = new SceneHook(Guid.NewGuid().ToString());
         }
-        
+
         /// <summary>
-        /// Start recording. Works only in Playmode. 
+        /// Prepare the recording context by setting up the internal data and pausing the simulation.
+        /// Must be called before <see cref="StartRecording"/>.
         /// </summary>
-        /// <returns>false if an error occured. The console will usually contains logs about the errors.</returns>
-        /// <exception cref="Exception">If not in Playmode.</exception>
-        /// <exception cref="NullReferenceException">If settings is null.</exception>
-        public bool StartRecording()
-        {          
+        public void PrepareRecording()
+        {
             if (!Application.isPlaying)
                 throw new Exception("Start Recording can only be called in Playmode.");
 
+            if (RecorderOptions.VerboseMode)
+                Debug.Log("Prepare Recording.");
+
             if (m_Settings == null)
                 throw new NullReferenceException("Can start recording without prefs");
-            
-            if (IsRecording())
-            {
-                if (RecorderOptions.VerboseMode)
-                    Debug.Log("Recording was already started.");
-                
-                return false;
-            }
 
-            if (RecorderOptions.VerboseMode)
-                Debug.Log("Start Recording.");
-            
             SceneHook.PrepareSessionRoot();
-            
             m_RecordingSessions = new List<RecordingSession>();
-            
+
             foreach (var recorderSetting in m_Settings.RecorderSettings)
             {
                 if (recorderSetting == null)
@@ -84,21 +73,6 @@ namespace UnityEditor.Recorder
                     continue;
                 }
 
-                var errors = new List<string>();
-
-                if (!recorderSetting.ValidityCheck(errors))
-                {
-                    foreach (var error in errors)
-                        Debug.LogWarning(recorderSetting.name + ": " + error);
-                }
-
-                if (errors.Count > 0)
-                {
-                    if (RecorderOptions.VerboseMode)
-                        Debug.LogWarning("Recorder '" + recorderSetting.name +
-                                         "' has warnings and may not record properly.");
-                }
-
                 if (!recorderSetting.Enabled)
                 {
                     if (RecorderOptions.VerboseMode)
@@ -111,7 +85,51 @@ namespace UnityEditor.Recorder
 
                 m_RecordingSessions.Add(session);
             }
-            
+        }
+
+        /// <summary>
+        /// Start recording. Works only in Playmode.
+        /// Must be called after <see cref="PrepareRecording"/> to setup the recording context.
+        /// </summary>
+        /// <returns>false if an error occured. The console will usually contains logs about the errors.</returns>
+        /// <exception cref="Exception">If not in Playmode.</exception>
+        /// <exception cref="NullReferenceException">If settings is null.</exception>
+        public bool StartRecording()
+        {
+            if (!Application.isPlaying)
+                throw new Exception("Start Recording can only be called in Playmode.");
+
+            if (IsRecording())
+            {
+                if (RecorderOptions.VerboseMode)
+                    Debug.Log("Recording was already started.");
+
+                return false;
+            }
+
+            foreach (var recorderSetting in m_Settings.RecorderSettings)
+            {
+                var errors = new List<string>();
+
+                // This can be done only here as some recorders needs data from scenes.
+                // Example: Animation Recorder needs their target to exist.
+                if (!recorderSetting.ValidityCheck(errors))
+                {
+                    foreach (var error in errors)
+                        Debug.LogWarning(recorderSetting.name + ": " + error);
+                }
+
+                if (errors.Count > 0)
+                {
+                    if (RecorderOptions.VerboseMode)
+                        Debug.LogWarning("Recorder '" + recorderSetting.name +
+                                         "' has warnings and may not record properly.");
+                }
+            }
+
+            if (RecorderOptions.VerboseMode)
+                Debug.Log("Start Recording.");
+
             var success = m_RecordingSessions.Any() && m_RecordingSessions.All(r => r.SessionCreated() && r.BeginRecording());
 
             return success;

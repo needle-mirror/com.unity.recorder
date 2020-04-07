@@ -323,7 +323,6 @@ namespace UnityEditor.Recorder.Input
 
         void ShiftProjectionMatrix(Camera camera, Vector2 sample)
         {
-            camera.ResetProjectionMatrix();
             Matrix4x4 projectionMatrix = camera.projectionMatrix;
             float dx = sample.x / m_renderWidth;
             float dy = sample.y / m_renderHeight;

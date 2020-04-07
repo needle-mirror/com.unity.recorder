@@ -14,9 +14,7 @@ This page covers properties specific to GIF Animation Recorders. To fully config
 |Property:||Function:|
 |:---|:---|:-|
 | **Capture** ||Specifies the input for the recording.|
-|| Game View |Records frames rendered in the Game View.<br/><br/>Selecting this option displays the [Game View capture properties](#GameView). |
 || Targeted Camera |Records frames captured by a specific Camera, even if the Game View does not use that Camera.<br/><br/>Selecting this option displays the [Targeted Camera capture properties](#TargetedCamera).|
-|| 360 View |Records a 360-degree video.<br/><br/>Selecting this option displays the [360 View capture properties](#360View).|
 || Render Texture Asset |Records frames rendered in a Render Texture.<br/><br/>Selecting this option displays the [Render Texture Asset capture properties](#RenderTextureAsset).|
 || Texture Sampling |Supersamples the **Source** camera during the capture to generate anti-aliased images in the recording. Use this capture method when the **Rendering Resolution** has the same or higher resolution than the **Output Resolution**. <br/><br/>Selecting this option displays the [Texture Sampling capture properties](#TextureSampling).|
 | **Encoding** ||Properties for controlling the quality and size of the .gif output.|
@@ -29,7 +27,3 @@ This page covers properties specific to GIF Animation Recorders. To fully config
 [!include[<title>](InclCaptureOptionsRenderTextureAsset.md)]
 
 [!include[<title>](InclCaptureOptionsTextureSampling.md)]
-
-
-
-

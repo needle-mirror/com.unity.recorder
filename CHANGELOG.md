@@ -3,6 +3,14 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+## [2.2.0-preview.4] - 2020-04-08
+### Public API and bugfixes
+- Added public api's to allow loading previously saved recorder lists.
+- Fixed bug where the first few frames after going in play-mode were not recorded. 
+- Fixed a bug where the texture sampling recorder that did not correctly support the physical cameras. 
+- Fixed an issue when starting a record session from scripts.
+- Fixed movie recoder's default framerate value being not set in the API. Default value is now set at 30 FPS.
+
 ## [2.1.0-preview.1] - 2019-12-17
 ### Public API and HDR recording
 - Added public APIs to be able to implement custom recorders.

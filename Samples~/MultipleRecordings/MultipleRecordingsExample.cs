@@ -91,6 +91,7 @@ namespace UnityEngine.Recorder.Examples
            controllerSettings.FrameRate = 60.0f;
     
            RecorderOptions.VerboseMode = false;
+           m_RecorderController.PrepareRecording();
            m_RecorderController.StartRecording();
        }
     

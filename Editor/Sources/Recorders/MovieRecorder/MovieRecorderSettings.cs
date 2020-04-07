@@ -64,6 +64,7 @@ namespace UnityEditor.Recorder
         public MovieRecorderSettings()
         {
             fileNameGenerator.FileName = "movie";
+            FrameRate = 30;
 
             var iis = m_ImageInputSelector.Selected as StandardImageInputSettings;
             if (iis != null)

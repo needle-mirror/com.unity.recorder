@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using UnityEditor.Recorder;
 
@@ -7,13 +7,12 @@ namespace UnityEngine.Recorder.Tests
 	class RecorderControllerTests
 	{
 		[Test]
-		public void StartRecording_WithNullSettings_ThrowsException()
+		public void PrepareRecording_WithNullSettings_ThrowsException()
 		{
 			var recorderController = new RecorderController(null);
 
-			var ex = Assert.Throws<NullReferenceException>(() => recorderController.StartRecording());
-			Assert.IsTrue(ex.Message.Contains("Can start recording without prefs"));
-			Assert.IsFalse(recorderController.IsRecording());
+            var ex = Assert.Throws<NullReferenceException>(() => recorderController.PrepareRecording());
+            Assert.IsTrue(ex.Message.Contains("Can start recording without prefs"));
 		}
 		
 		[Test]
@@ -22,6 +21,7 @@ namespace UnityEngine.Recorder.Tests
 			var settings = ScriptableObject.CreateInstance<RecorderControllerSettings>();
 			var recorderController = new RecorderController(settings);
 
+            recorderController.PrepareRecording();
 			Assert.IsFalse(recorderController.StartRecording());
 			Assert.IsFalse(recorderController.IsRecording());
 			
@@ -37,6 +37,7 @@ namespace UnityEngine.Recorder.Tests
 			settings.AddRecorderSettings(imageRecorder);
 			var recorderController = new RecorderController(settings);
 
+            recorderController.PrepareRecording();
 			Assert.IsTrue(recorderController.StartRecording());
 			Assert.IsTrue(recorderController.IsRecording());
 			
