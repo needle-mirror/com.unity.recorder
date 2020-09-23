@@ -12,10 +12,10 @@ namespace UnityEditor.Recorder
     public class RecorderController
     {
         readonly SceneHook m_SceneHook;
-        
+
         List<RecordingSession> m_RecordingSessions;
         readonly RecorderControllerSettings m_Settings;
-        
+
         /// <summary>
         /// Current settings used by this RecorderControler.
         /// </summary>
@@ -30,19 +30,22 @@ namespace UnityEditor.Recorder
         /// <param name="settings">The RecorderControllerSettings to be used by this RecorderController.</param>
         /// <see cref="RecorderControllerSettings"/>
         public RecorderController(RecorderControllerSettings settings)
-        {          
-            m_Settings = settings;   
+        {
+            m_Settings = settings;
             m_SceneHook = new SceneHook(Guid.NewGuid().ToString());
         }
 
         /// <summary>
-        /// Prepare the recording context by setting up the internal data and pausing the simulation.
-        /// Must be called before <see cref="StartRecording"/>.
+        /// Prepares the recording context.
+        /// To start recording once you've called this method, you must call <see cref="StartRecording"/>.
         /// </summary>
+        /// <remarks>
+        /// This method sets up the internal data for the recording session and pauses the simulation to ensure a proper synchronization between the Recorder and the Unity Editor.
+        /// </remarks>
         public void PrepareRecording()
         {
             if (!Application.isPlaying)
-                throw new Exception("Start Recording can only be called in Playmode.");
+                throw new Exception("You can only call the PrepareRecording method in Play mode.");
 
             if (RecorderOptions.VerboseMode)
                 Debug.Log("Prepare Recording.");
@@ -88,16 +91,17 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
-        /// Start recording. Works only in Playmode.
-        /// Must be called after <see cref="PrepareRecording"/> to setup the recording context.
+        /// Starts the recording (works only in Play mode).
+        /// To use this method, you must first have called <see cref="PrepareRecording"/> to set up the recording context.
+        /// Also ensure that you've finished loading any additional Scene data required before you start recording.
         /// </summary>
-        /// <returns>false if an error occured. The console will usually contains logs about the errors.</returns>
+        /// <returns>false if an error occured. The console usually contains logs about the errors.</returns>
         /// <exception cref="Exception">If not in Playmode.</exception>
         /// <exception cref="NullReferenceException">If settings is null.</exception>
         public bool StartRecording()
         {
             if (!Application.isPlaying)
-                throw new Exception("Start Recording can only be called in Playmode.");
+                throw new Exception("You can only call the StartRecording method in Play mode.");
 
             if (IsRecording())
             {
@@ -123,7 +127,7 @@ namespace UnityEditor.Recorder
                 {
                     if (RecorderOptions.VerboseMode)
                         Debug.LogWarning("Recorder '" + recorderSetting.name +
-                                         "' has warnings and may not record properly.");
+                            "' has warnings and may not record properly.");
                 }
             }
 
@@ -158,7 +162,7 @@ namespace UnityEditor.Recorder
         /// </summary>
         /// <seealso cref="RecorderControllerSettings.SetRecordModeToManual"/>
         public void StopRecording()
-        {           
+        {
             if (RecorderOptions.VerboseMode)
                 Debug.Log("Stop Recording.");
 
@@ -166,8 +170,8 @@ namespace UnityEditor.Recorder
             {
                 foreach (var session in m_RecordingSessions)
                 {
-                    session.EndRecording();
-                    
+                    session.Dispose();
+
                     if (session.recorderComponent != null)
                         UnityEngine.Object.Destroy(session.recorderComponent);
                 }
@@ -175,7 +179,7 @@ namespace UnityEditor.Recorder
                 m_RecordingSessions = null;
             }
         }
-        
+
         internal IEnumerable<RecordingSession> GetRecordingSessions()
         {
             return m_SceneHook.GetRecordingSessions();

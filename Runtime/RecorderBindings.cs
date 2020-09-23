@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
@@ -16,7 +16,7 @@ namespace UnityEngine.Recorder
     public class RecorderBindings : MonoBehaviour
     {
         [Serializable]
-        class PropertyObjects : SerializedDictionary<string, UnityObject> { }
+        class PropertyObjects : SerializedDictionary<string, UnityObject> {}
 
         [SerializeField] PropertyObjects m_References = new PropertyObjects();
 

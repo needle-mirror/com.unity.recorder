@@ -5,16 +5,17 @@ using Unity.Collections;
 
 namespace UnityEditor.Recorder.Input
 {
-    static class AudioRenderer
+    class AudioRenderer : ScriptableSingleton<AudioRenderer>
     {
-        static readonly MethodInfo s_StartMethod;
-        static readonly MethodInfo s_StopMethod;
-        static readonly MethodInfo s_GetSampleCountForCaptureFrameMethod;
-        static readonly MethodInfo s_RenderMethod;
+        readonly MethodInfo s_StartMethod;
+        readonly MethodInfo s_StopMethod;
+        readonly MethodInfo s_GetSampleCountForCaptureFrameMethod;
+        readonly MethodInfo s_RenderMethod;
 
-        static int s_StartCount = 0;
+        [SerializeField]
+        int s_StartCount = 0;
 
-        static AudioRenderer()
+        AudioRenderer()
         {
             const string className = "UnityEngine.AudioRenderer";
             const string dllName = "UnityEngine";
@@ -33,30 +34,30 @@ namespace UnityEditor.Recorder.Input
         }
 
         public static void Start()
-        {   
-            if (s_StartCount == 0)
-                s_StartMethod.Invoke(null, null);
+        {
+            if (instance.s_StartCount == 0)
+                instance.s_StartMethod.Invoke(null, null);
 
-            ++s_StartCount;
+            ++instance.s_StartCount;
         }
 
         public static void Stop()
         {
-            --s_StartCount;
-            
-            if (s_StartCount <= 0)
-                s_StopMethod.Invoke(null, null);
+            --instance.s_StartCount;
+
+            if (instance.s_StartCount <= 0)
+                instance.s_StopMethod.Invoke(null, null);
         }
 
         public static uint GetSampleCountForCaptureFrame()
         {
-            var count = (int)s_GetSampleCountForCaptureFrameMethod.Invoke(null, null);
+            var count = (int)instance.s_GetSampleCountForCaptureFrameMethod.Invoke(null, null);
             return (uint)count;
         }
 
         public static void Render(NativeArray<float> buffer)
         {
-            s_RenderMethod.Invoke(null, new object[] { buffer });
+            instance.s_RenderMethod.Invoke(null, new object[] { buffer });
         }
     }
 
@@ -91,7 +92,7 @@ namespace UnityEditor.Recorder.Input
         {
             get { return m_ChannelCount; }
         }
-        
+
         public int sampleRate
         {
             get { return AudioSettings.outputSampleRate; }
@@ -113,8 +114,8 @@ namespace UnityEditor.Recorder.Input
         protected internal override void BeginRecording(RecordingSession session)
         {
             m_ChannelCount = new Func<ushort>(() => {
-                    switch (AudioSettings.speakerMode)
-                    {
+                switch (AudioSettings.speakerMode)
+                {
                     case AudioSpeakerMode.Mono:        return 1;
                     case AudioSpeakerMode.Stereo:      return 2;
                     case AudioSpeakerMode.Quad:        return 4;
@@ -123,7 +124,7 @@ namespace UnityEditor.Recorder.Input
                     case AudioSpeakerMode.Mode7point1: return 7;
                     case AudioSpeakerMode.Prologic:    return 2;
                     default: return 1;
-                    }
+                }
             })();
 
             if (RecorderOptions.VerboseMode)
@@ -140,7 +141,7 @@ namespace UnityEditor.Recorder.Input
 
             if (s_Handler == null)
                 s_Handler = this;
-            
+
             if (s_Handler == this)
             {
                 var sampleFrameCount = AudioRenderer.GetSampleCountForCaptureFrame();
@@ -161,7 +162,6 @@ namespace UnityEditor.Recorder.Input
 
         protected internal override void FrameDone(RecordingSession session)
         {
-
         }
 
         protected internal override void EndRecording(RecordingSession session)
@@ -171,6 +171,9 @@ namespace UnityEditor.Recorder.Input
                 s_BufferManager.Dispose();
                 s_BufferManager = null;
             }
+
+            if (s_Handler == null)
+                return;
 
             s_Handler = null;
 

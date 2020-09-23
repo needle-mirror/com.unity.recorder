@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 namespace UnityEditor.Recorder
 {
     static class SerializableObjHelper
-    {       
+    {
         public static SerializedProperty FindPropertyRelative(this SerializedProperty obj, Expression<Func<object>> exp)
         {
             var body = exp.Body as MemberExpression;
@@ -29,7 +29,7 @@ namespace UnityEditor.Recorder
         }
 
         public delegate TResult FuncX<TResult>(TType x);
-        public SerializedProperty Find( Expression<FuncX<object>> exp)
+        public SerializedProperty Find(Expression<FuncX<object>> exp)
         {
             var body = exp.Body as MemberExpression;
             if (body == null)
@@ -42,6 +42,5 @@ namespace UnityEditor.Recorder
 
             return m_Obj.FindProperty(name);
         }
-
     }
 }

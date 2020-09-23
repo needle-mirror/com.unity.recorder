@@ -18,5 +18,4 @@ namespace UnityEditor.Recorder.FrameCapturer
         public abstract void Release();
         public abstract bool IsValid();
     }
-
 }

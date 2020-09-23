@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace UnityEditor.Recorder
@@ -9,7 +9,7 @@ namespace UnityEditor.Recorder
         {
             if (!typeof(TEnum).IsEnum) throw new ArgumentException("Arg not an enum");
             var values = Enum.GetValues(typeof(TEnum));
-            for( int i = 0, j = -1; i < values.Length; i++ )
+            for (int i = 0, j = -1; i < values.Length; i++)
             {
                 if (((int)values.GetValue(i) & mask) != 0)
                     j++;
@@ -24,7 +24,7 @@ namespace UnityEditor.Recorder
         {
             if (!typeof(TEnum).IsEnum) throw new ArgumentException("Arg not an enum");
             var values = Enum.GetValues(typeof(TEnum));
-            for( int i = 0, j = -1; i < values.Length; i++ )
+            for (int i = 0, j = -1; i < values.Length; i++)
             {
                 var v = (int)values.GetValue(i);
                 if ((v & mask) != 0)
@@ -37,19 +37,18 @@ namespace UnityEditor.Recorder
             return 0;
         }
 
-        internal static string[] MaskOutEnumNames<TEnum>(int mask )
+        internal static string[] MaskOutEnumNames<TEnum>(int mask)
         {
             if (!typeof(TEnum).IsEnum) throw new ArgumentException("Arg not an enum");
             var names = Enum.GetNames(typeof(TEnum));
             var values = Enum.GetValues(typeof(TEnum));
             var result = new List<String>();
-            for( int i = 0; i < values.Length; i++ )
+            for (int i = 0; i < values.Length; i++)
             {
-                if( ((int)values.GetValue(i) & mask ) != 0 )
-                    result.Add( (string)names.GetValue(i) );
+                if (((int)values.GetValue(i) & mask) != 0)
+                    result.Add((string)names.GetValue(i));
             }
             return result.ToArray();
         }
     }
-
 }

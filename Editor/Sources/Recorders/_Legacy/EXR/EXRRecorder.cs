@@ -25,10 +25,9 @@ namespace UnityEditor.Recorder.FrameCapturer
 
         protected internal override void RecordFrame(RecordingSession session)
         {
-            
             if (m_Inputs.Count != 1)
                 throw new Exception("Unsupported number of sources");
-            
+
             var path = Settings.fileNameGenerator.BuildAbsolutePath(session);
 
             var input = (BaseRenderTextureInput)m_Inputs[0];
@@ -44,6 +43,5 @@ namespace UnityEditor.Recorder.FrameCapturer
                 fcAPI.fcExrEndImage(m_ctx);
             });
         }
-
     }
 }

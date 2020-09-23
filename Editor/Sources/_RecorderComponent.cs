@@ -3,7 +3,7 @@ using UnityEngine;
 namespace UnityEditor.Recorder
 {
     class RecorderComponent : _FrameRequestComponent
-    {        
+    {
         public RecordingSession session { get; set; }
 
         public void Update()
@@ -16,7 +16,7 @@ namespace UnityEditor.Recorder
 
         public void LateUpdate()
         {
-            if (session != null && session.isRecording)
+            if (session != null && session.isRecording && session.prepareFrameCalled)
             {
                 RequestNewFrame();
             }
@@ -32,8 +32,14 @@ namespace UnityEditor.Recorder
 
         protected override void FrameReady()
         {
+            #if DEBUG_RECORDER_TIMING
+            Debug.LogFormat("FrameReady Out at frame # {0} - {1} - {2} ", Time.renderedFrameCount, Time.time, Time.deltaTime);
+            #endif
             if (session.prepareFrameCalled)
             {
+                #if DEBUG_RECORDER_TIMING
+                Debug.LogFormat("FrameReady IN at frame # {0} - {1} - {2} ", Time.renderedFrameCount, Time.time, Time.deltaTime);
+                #endif
                 session.RecordFrame();
 
                 switch (session.recorder.settings.RecordMode)

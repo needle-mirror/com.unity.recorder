@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder.FrameCapturer
 {
-    [RecorderSettings(typeof(MP4Recorder), "Legacy/MP4" )]
+    [RecorderSettings(typeof(MP4Recorder), "Legacy/MP4")]
     class MP4RecorderSettings : BaseFCRecorderSettings
     {
         public fcAPI.fcMP4Config m_MP4EncoderSettings = fcAPI.fcMP4Config.default_value;
@@ -12,7 +12,7 @@ namespace UnityEditor.Recorder.FrameCapturer
         {
             fileNameGenerator.FileName = "movie";
             m_AutoSelectBR = true;
-            
+
             m_ImageInputSelector.cameraInputSettings.maxSupportedSize = ImageHeight.x2160p_4K;
         }
 

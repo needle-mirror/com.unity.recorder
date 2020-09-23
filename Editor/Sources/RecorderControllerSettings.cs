@@ -16,7 +16,7 @@ namespace UnityEditor.Recorder
         [SerializeField] RecordMode m_RecordMode = RecordMode.Manual;
         [SerializeField] FrameRatePlayback m_FrameRatePlayback = FrameRatePlayback.Constant;
         [SerializeField] FrameRateType m_FrameRateType = FrameRateType.FR_30;
-        [SerializeField] [Range(1.0f, 120.0f)] float m_CustomFrameRateValue = 30.0f;
+        [SerializeField] float m_CustomFrameRateValue = 30.0f;
 
         [SerializeField] int m_StartFrame;
         [SerializeField] int m_EndFrame;
@@ -37,6 +37,11 @@ namespace UnityEditor.Recorder
             { FrameRateType.FR_59, 60 * 1000 / 1001f },
             { FrameRateType.FR_60, 60 }
         };
+
+        void OnValidate()
+        {
+            m_CustomFrameRateValue = Mathf.Max(2 * float.Epsilon, m_CustomFrameRateValue); // Eps complains about the invalid frame rate.
+        }
 
         /// <summary>
         /// Indicates the type of frame rate (constant or variable) for the current list of Recorders.
@@ -151,6 +156,16 @@ namespace UnityEditor.Recorder
             return prefs;
         }
 
+        /// <summary>
+        /// Get the global controller settings.
+        /// </summary>
+        /// <returns>The global RecorderControllerSettings</returns>
+        public static RecorderControllerSettings GetGlobalSettings()
+        {
+            var globalPath = Path.Combine(Application.dataPath, "..", "Library", "Recorder", "recorder.pref");
+            return LoadOrCreate(globalPath);
+        }
+
         internal void ReleaseRecorderSettings()
         {
             foreach (var recorder in m_RecorderSettings)
@@ -171,7 +186,14 @@ namespace UnityEditor.Recorder
         /// </summary>
         public IEnumerable<RecorderSettings> RecorderSettings
         {
-            get { return m_RecorderSettings; }
+            get
+            {
+                foreach (var setting in m_RecorderSettings)
+                {
+                    if (setting != null) // It's important to keep null entries because they could be recorderSettings that rely on external code (that did not compile for now)
+                        yield return setting;
+                }
+            }
         }
 
         /// <summary>

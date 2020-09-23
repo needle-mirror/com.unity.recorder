@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,8 +27,10 @@ namespace UnityEditor.Recorder.Input
             get { return true; }
         }
 
-
-        internal bool AllowTransparency;
+        /// <summary>
+        /// This property indicates that the alpha channel should be grabbed from the GPU.
+        /// </summary>
+        public bool RecordTransparency { get; set; }
     }
 
     /// <inheritdoc />
@@ -38,7 +40,8 @@ namespace UnityEditor.Recorder.Input
     [Serializable]
     public abstract class StandardImageInputSettings : ImageInputSettings
     {
-        [SerializeField] OutputResolution m_OutputResolution = new OutputResolution();
+        [SerializeField]
+        OutputResolution m_OutputResolution = new OutputResolution();
 
         internal bool forceEvenSize;
 
@@ -83,10 +86,10 @@ namespace UnityEditor.Recorder.Input
 
             var h = OutputHeight;
 
-            if (h > (int) maxSupportedSize)
+            if (h > (int)maxSupportedSize)
             {
                 ok = false;
-                errors.Add("Output size exceeds maximum supported size: " + (int) maxSupportedSize );
+                errors.Add("Output size exceeds maximum supported height: " + (int)maxSupportedSize + "px");
             }
 
             var w = OutputWidth;

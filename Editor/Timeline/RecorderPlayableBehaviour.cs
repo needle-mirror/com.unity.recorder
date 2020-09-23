@@ -2,7 +2,7 @@ using UnityEditor.Recorder.Input;
 using UnityEngine.Playables;
 
 namespace UnityEditor.Recorder.Timeline
-{  
+{
     class RecorderPlayableBehaviour : PlayableBehaviour
     {
         PlayState m_PlayState = PlayState.Paused;

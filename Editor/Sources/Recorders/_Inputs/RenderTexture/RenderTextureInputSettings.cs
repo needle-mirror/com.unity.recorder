@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
@@ -9,17 +9,17 @@ namespace UnityEditor.Recorder.Input
     [Serializable]
     public class RenderTextureInputSettings : ImageInputSettings
     {
-         [SerializeField] internal RenderTexture renderTexture;
-         /// <summary>
-         /// Indicates the render texture used for the capture.
-         /// </summary>
-         public RenderTexture RenderTexture
-         {
-             get { return renderTexture; }
-             set { renderTexture = value; }
-         }
+        [SerializeField] internal RenderTexture renderTexture;
+        /// <summary>
+        /// Indicates the render texture used for the capture.
+        /// </summary>
+        public RenderTexture RenderTexture
+        {
+            get { return renderTexture; }
+            set { renderTexture = value; }
+        }
 
-         /// <summary>
+        /// <summary>
         /// Use this property if you need to vertically flip the final output.
         /// </summary>
         public bool FlipFinalOutput

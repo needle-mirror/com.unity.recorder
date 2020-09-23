@@ -9,6 +9,5 @@ namespace UnityEditor.Recorder.FrameCapturer
         {
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ExrEncoderSettings"), new GUIContent("Encoding"), true);
         }
-
     }
 }

@@ -44,6 +44,5 @@ namespace UnityEditor.Recorder.FrameCapturer
         {
             // not supported
         }
-
     }
 }

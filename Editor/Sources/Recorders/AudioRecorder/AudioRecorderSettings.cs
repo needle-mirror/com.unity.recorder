@@ -1,21 +1,20 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
-    
     enum AudioRecorderOutputFormat
     {
-       // MP3,
+        // MP3,
         WAV
     }
-    
+
     [RecorderSettings(typeof(AudioRecorder), "Audio")]
     class AudioRecorderSettings : RecorderSettings
     {
         public AudioRecorderOutputFormat  outputFormat = AudioRecorderOutputFormat.WAV;
-        
+
         [SerializeField] AudioInputSettings m_AudioInputSettings = new AudioInputSettings();
 
         protected internal override string Extension
@@ -27,7 +26,7 @@ namespace UnityEditor.Recorder
         {
             get { return m_AudioInputSettings; }
         }
-        
+
         public override IEnumerable<RecorderInputSettings> InputsSettings
         {
             get { yield return m_AudioInputSettings; }
@@ -36,7 +35,7 @@ namespace UnityEditor.Recorder
 
         public AudioRecorderSettings()
         {
-            fileNameGenerator.FileName = "mixdown";
+            fileNameGenerator.FileName = "mixdown_" + DefaultWildcard.Take;
         }
     }
 }

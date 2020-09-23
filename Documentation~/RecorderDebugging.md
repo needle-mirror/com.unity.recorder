@@ -21,4 +21,3 @@ Verbose mode logs information to the [Console window](https://docs.unity3d.com/M
 To toggle Verbose mode:
 
 - Select **Window > General > Recorder > Options > Verbose Mode** from  Unity's main menu.
-

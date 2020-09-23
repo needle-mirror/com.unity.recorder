@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -70,12 +70,12 @@ namespace UnityEditor.Recorder.FrameCapturer
             public void Release() { fcReleaseStream(this); ptr = IntPtr.Zero; }
             public static implicit operator bool(fcStream v) { return v.ptr != IntPtr.Zero; }
         }
-        [DllImport ("fccore")] internal static extern fcStream     fcCreateFileStream(string path);
-        [DllImport ("fccore")] static extern void        fcReleaseStream(fcStream s);
-        
-        [DllImport ("fccore")] static extern void         fcGuardBegin();
-        [DllImport ("fccore")] static extern void         fcGuardEnd();
-        [DllImport ("fccore")] static extern void        fcReleaseDeferredCall(fcDeferredCall dc);
+        [DllImport("fccore")] internal static extern fcStream     fcCreateFileStream(string path);
+        [DllImport("fccore")] static extern void        fcReleaseStream(fcStream s);
+
+        [DllImport("fccore")] static extern void         fcGuardBegin();
+        [DllImport("fccore")] static extern void         fcGuardEnd();
+        [DllImport("fccore")] static extern void        fcReleaseDeferredCall(fcDeferredCall dc);
 
         internal static fcPixelFormat fcGetPixelFormat(TextureFormat v)
         {
@@ -110,9 +110,8 @@ namespace UnityEditor.Recorder.FrameCapturer
             return 0;
         }
 
-
-        [DllImport ("fccore")] internal static extern void fcWaitAsyncDelete();
-        [DllImport ("fccore")] internal static extern void fcReleaseContext(IntPtr ctx);
+        [DllImport("fccore")] internal static extern void fcWaitAsyncDelete();
+        [DllImport("fccore")] internal static extern void fcReleaseContext(IntPtr ctx);
 
 
         // -------------------------------------------------------------
@@ -156,9 +155,9 @@ namespace UnityEditor.Recorder.FrameCapturer
             public static implicit operator bool(fcPngContext v) { return v.ptr != IntPtr.Zero; }
         }
 
-        [DllImport ("fccore")] internal static extern Bool         fcPngIsSupported();
-        [DllImport ("fccore")] internal static extern fcPngContext fcPngCreateContext(ref fcPngConfig conf);
-        [DllImport ("fccore")] internal static extern Bool         fcPngExportPixels(fcPngContext ctx, string path, byte[] pixels, int width, int height, fcPixelFormat fmt, int num_channels);
+        [DllImport("fccore")] internal static extern Bool         fcPngIsSupported();
+        [DllImport("fccore")] internal static extern fcPngContext fcPngCreateContext(ref fcPngConfig conf);
+        [DllImport("fccore")] internal static extern Bool         fcPngExportPixels(fcPngContext ctx, string path, byte[] pixels, int width, int height, fcPixelFormat fmt, int num_channels);
 
 
         // -------------------------------------------------------------
@@ -214,11 +213,11 @@ namespace UnityEditor.Recorder.FrameCapturer
             public static implicit operator bool(fcExrContext v) { return v.ptr != IntPtr.Zero; }
         }
 
-        [DllImport ("fccore")] internal static extern Bool         fcExrIsSupported();
-        [DllImport ("fccore")] internal static extern fcExrContext fcExrCreateContext(ref fcExrConfig conf);
-        [DllImport ("fccore")] internal static extern Bool         fcExrBeginImage(fcExrContext ctx, string path, int width, int height);
-        [DllImport ("fccore")] internal static extern Bool         fcExrAddLayerPixels(fcExrContext ctx, byte[] pixels, fcPixelFormat fmt, int ch, string name);
-        [DllImport ("fccore")] internal static extern Bool         fcExrEndImage(fcExrContext ctx);
+        [DllImport("fccore")] internal static extern Bool         fcExrIsSupported();
+        [DllImport("fccore")] internal static extern fcExrContext fcExrCreateContext(ref fcExrConfig conf);
+        [DllImport("fccore")] internal static extern Bool         fcExrBeginImage(fcExrContext ctx, string path, int width, int height);
+        [DllImport("fccore")] internal static extern Bool         fcExrAddLayerPixels(fcExrContext ctx, byte[] pixels, fcPixelFormat fmt, int ch, string name);
+        [DllImport("fccore")] internal static extern Bool         fcExrEndImage(fcExrContext ctx);
 
 
         // -------------------------------------------------------------
@@ -230,9 +229,15 @@ namespace UnityEditor.Recorder.FrameCapturer
         {
             [HideInInspector] public int width;
             [HideInInspector] public int height;
-            [Range(1, 256)] public int numColors;
-            [Range(1, 120)] public int keyframeInterval;
-            [Range(1, 32)] public int maxTasks;
+            [Range(1, 256)]
+            [Tooltip("The number of colors used in the GIF palette.")]
+            public int numColors;
+            [Range(1, 120)]
+            [Tooltip("The number of successive frames that share the same color palette.")]
+            public int keyframeInterval;
+            [Range(1, 32)]
+            [Tooltip("The maximum number of frames to encode in parallel.")]
+            public int maxTasks;
 
             internal static fcGifConfig default_value
             {
@@ -254,10 +259,10 @@ namespace UnityEditor.Recorder.FrameCapturer
             public static implicit operator bool(fcGifContext v) { return v.ptr != IntPtr.Zero; }
         }
 
-        [DllImport ("fccore")] internal static extern Bool         fcGifIsSupported();
-        [DllImport ("fccore")] internal static extern fcGifContext fcGifCreateContext(ref fcGifConfig conf);
-        [DllImport ("fccore")] internal static extern void         fcGifAddOutputStream(fcGifContext ctx, fcStream stream);
-        [DllImport ("fccore")] internal static extern Bool         fcGifAddFramePixels(fcGifContext ctx, byte[] pixels, fcPixelFormat fmt, double timestamp = -1.0);
+        [DllImport("fccore")] internal static extern Bool         fcGifIsSupported();
+        [DllImport("fccore")] internal static extern fcGifContext fcGifCreateContext(ref fcGifConfig conf);
+        [DllImport("fccore")] internal static extern void         fcGifAddOutputStream(fcGifContext ctx, fcStream stream);
+        [DllImport("fccore")] internal static extern Bool         fcGifAddFramePixels(fcGifContext ctx, byte[] pixels, fcPixelFormat fmt, double timestamp = -1.0);
 
 
         // -------------------------------------------------------------
@@ -270,7 +275,7 @@ namespace UnityEditor.Recorder.FrameCapturer
             H264AMD     = 1 << 2,
             H264IntelHW = 1 << 3,
             H264IntelSW = 1 << 4,
-            H264OpenH264= 1 << 5,
+            H264OpenH264 = 1 << 5,
             H264Mask = H264NVIDIA | H264AMD | H264IntelHW | H264IntelSW | H264OpenH264,
         };
 
@@ -332,10 +337,10 @@ namespace UnityEditor.Recorder.FrameCapturer
             public static implicit operator bool(fcMP4Context v) { return v.ptr != IntPtr.Zero; }
         }
 
-        [DllImport ("fccore")] internal static extern Bool             fcMP4OSIsSupported();
-        [DllImport ("fccore")] internal static extern fcMP4Context     fcMP4OSCreateContext(ref fcMP4Config conf, string path);
-        [DllImport ("fccore")] internal static extern Bool             fcMP4AddVideoFramePixels(fcMP4Context ctx, byte[] pixels, fcPixelFormat fmt, double timestamp = -1.0);
-        [DllImport ("fccore")] internal static extern Bool             fcMP4AddAudioSamples(fcMP4Context ctx, float[] samples, int num_samples);
+        [DllImport("fccore")] internal static extern Bool             fcMP4OSIsSupported();
+        [DllImport("fccore")] internal static extern fcMP4Context     fcMP4OSCreateContext(ref fcMP4Config conf, string path);
+        [DllImport("fccore")] internal static extern Bool             fcMP4AddVideoFramePixels(fcMP4Context ctx, byte[] pixels, fcPixelFormat fmt, double timestamp = -1.0);
+        [DllImport("fccore")] internal static extern Bool             fcMP4AddAudioSamples(fcMP4Context ctx, float[] samples, int num_samples);
 
 
         // -------------------------------------------------------------
@@ -406,13 +411,13 @@ namespace UnityEditor.Recorder.FrameCapturer
             }
         }
 
-        [DllImport ("fccore")] internal static extern Bool fcWebMIsSupported();
-        [DllImport ("fccore")] internal static extern fcWebMContext fcWebMCreateContext(ref fcWebMConfig conf);
-        [DllImport ("fccore")] internal static extern void fcWebMAddOutputStream(fcWebMContext ctx, fcStream stream);
+        [DllImport("fccore")] internal static extern Bool fcWebMIsSupported();
+        [DllImport("fccore")] internal static extern fcWebMContext fcWebMCreateContext(ref fcWebMConfig conf);
+        [DllImport("fccore")] internal static extern void fcWebMAddOutputStream(fcWebMContext ctx, fcStream stream);
         // timestamp=-1 is treated as current time.
-        [DllImport ("fccore")] internal static extern Bool fcWebMAddVideoFramePixels(fcWebMContext ctx, byte[] pixels, fcPixelFormat fmt, double timestamp = -1.0);
+        [DllImport("fccore")] internal static extern Bool fcWebMAddVideoFramePixels(fcWebMContext ctx, byte[] pixels, fcPixelFormat fmt, double timestamp = -1.0);
         // timestamp=-1 is treated as current time.
-        [DllImport ("fccore")] internal static extern Bool fcWebMAddAudioSamples(fcWebMContext ctx, float[] samples, int num_samples);
+        [DllImport("fccore")] internal static extern Bool fcWebMAddAudioSamples(fcWebMContext ctx, float[] samples, int num_samples);
 
 
         // -------------------------------------------------------------
@@ -440,7 +445,7 @@ namespace UnityEditor.Recorder.FrameCapturer
                     };
                 }
             }
-        }       
+        }
 
         // -------------------------------------------------------------
         // Ogg Exporter
@@ -482,7 +487,7 @@ namespace UnityEditor.Recorder.FrameCapturer
             [HideInInspector] public int sampleRate;
             [HideInInspector] public int numChannels;
             public fcAudioBitsPerSample bitsPerSample;
-            [Range(0,9)] public int compressionLevel;
+            [Range(0, 9)] public int compressionLevel;
             public int blockSize;
             [HideInInspector] public Bool verify;
             [Range(1, 32)] public int maxTasks;

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -13,13 +13,13 @@ namespace UnityEditor.Recorder
         protected override void Initialize(SerializedProperty property)
         {
             base.Initialize(property);
-            
+
             if (m_RootProperty == null)
                 m_RootProperty = property.FindPropertyRelative("m_Root");
-            
+
             if (m_LeafProperty == null)
                 m_LeafProperty = property.FindPropertyRelative("m_Leaf");
-            
+
             if (m_ForceAssetFolder == null)
                 m_ForceAssetFolder = property.FindPropertyRelative("m_ForceAssetFolder");
         }
@@ -27,16 +27,17 @@ namespace UnityEditor.Recorder
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Initialize(property);
-            
+
+            label.tooltip = "The path to the folder where the Recorder saves the output files";
             EditorGUI.BeginProperty(position, label, property);
-            position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+            position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Keyboard), label);
 
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
 
             const float rootWidth = 110.0f;
             const float btnWidth = 30.0f;
-            
+
             var leafWidth = target.forceAssetsFolder ? position.width - rootWidth : position.width - rootWidth - btnWidth - 10;
             var rootRect = new Rect(position.x, position.y, rootWidth, position.height);
             var leafRect = new Rect(position.x + rootWidth + 5, position.y, leafWidth, position.height);
@@ -44,7 +45,7 @@ namespace UnityEditor.Recorder
 
             if (target.forceAssetsFolder)
             {
-                var root = (OutputPath.Root) m_RootProperty.intValue;
+                var root = (OutputPath.Root)m_RootProperty.intValue;
                 GUI.Label(rootRect, root + " " + Path.DirectorySeparatorChar);
             }
             else
@@ -58,13 +59,13 @@ namespace UnityEditor.Recorder
 
             if (!target.forceAssetsFolder)
             {
-                if (GUI.Button(btnRect, new GUIContent("...", fullPath)))
+                if (GUI.Button(btnRect, new GUIContent("...", "Select the output location through your file browser")))
                 {
                     var newPath = EditorUtility.OpenFolderPanel("Select output location", fullPath, "");
                     if (!string.IsNullOrEmpty(newPath))
                     {
                         var newValue = OutputPath.FromPath(newPath);
-                        m_RootProperty.intValue = (int) newValue.root;
+                        m_RootProperty.intValue = (int)newValue.root;
                         m_LeafProperty.stringValue = newValue.leaf;
                     }
                 }

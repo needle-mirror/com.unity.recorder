@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -76,7 +76,7 @@ namespace UnityEditor.Recorder
 
             frameProducedCount++;
         }
-        
+
         void SaveProjectTimeScale()
         {
             projectTimeScale = Time.timeScale;
@@ -100,6 +100,5 @@ namespace UnityEditor.Recorder
             currentState = State.Running;
             RestoreProjectTimeScale();
         }
-
     }
 }

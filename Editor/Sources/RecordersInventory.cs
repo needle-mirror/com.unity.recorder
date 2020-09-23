@@ -19,7 +19,7 @@ namespace UnityEditor.Recorder
         static Dictionary<Type, RecorderInfo> s_Recorders;
         static HashSet<RecorderInfo> s_BuiltInRecorderInfos;
         static HashSet<RecorderInfo> s_LegacyRecorderInfos;
-        
+
         static IEnumerable<KeyValuePair<Type, object[]>> FindRecorders()
         {
             var attribType = typeof(RecorderSettingsAttribute);
@@ -32,7 +32,7 @@ namespace UnityEditor.Recorder
                 }
                 catch (Exception)
                 {
-                    Debug.LogError( "Failed reflecting assembly: " + a.FullName );
+                    Debug.LogError("Failed reflecting assembly: " + a.FullName);
                     continue;
                 }
 
@@ -60,7 +60,7 @@ namespace UnityEditor.Recorder
 
                     if (settingsAttribs.Length == 1)
                     {
-                        var settingsAttrib = (RecorderSettingsAttribute) settingsAttribs[0];
+                        var settingsAttrib = (RecorderSettingsAttribute)settingsAttribs[0];
 
                         var info = new RecorderInfo
                         {
@@ -100,14 +100,14 @@ namespace UnityEditor.Recorder
                 }
             }
         }
-        
+
         internal static RecorderInfo GetRecorderInfo(Type settingsType)
         {
             Init();
 
             if (settingsType == null || string.IsNullOrEmpty(settingsType.FullName))
                 return null;
-            
+
             return s_Recorders.ContainsKey(settingsType) ? s_Recorders[settingsType] : null;
         }
 
@@ -119,7 +119,7 @@ namespace UnityEditor.Recorder
                 return s_BuiltInRecorderInfos;
             }
         }
-        
+
         internal static IEnumerable<RecorderInfo> legacyRecorderInfos
         {
             get
@@ -128,7 +128,7 @@ namespace UnityEditor.Recorder
                 return s_LegacyRecorderInfos;
             }
         }
-        
+
         internal static IEnumerable<RecorderInfo> customRecorderInfos
         {
             get
@@ -149,10 +149,10 @@ namespace UnityEditor.Recorder
                 recorder.settings = recorderSettings;
                 return recorder;
             }
-            
+
             throw new ArgumentException("No factory was registered for " + recorderSettings.GetType().Name);
         }
-        
+
         internal static RecorderSettings CreateDefaultRecorderSettings(Type settingsType)
         {
             Init();
@@ -164,8 +164,8 @@ namespace UnityEditor.Recorder
 
                 return settings;
             }
-            
-            throw new ArgumentException("No factory was registered for " + settingsType.Name);            
+
+            throw new ArgumentException("No factory was registered for " + settingsType.Name);
         }
     }
 }

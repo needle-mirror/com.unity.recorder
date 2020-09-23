@@ -1,6 +1,6 @@
 namespace UnityEditor.Recorder.FrameCapturer
 {
-    [RecorderSettings(typeof(WEBMRecorder), "Legacy/WebM" )]
+    [RecorderSettings(typeof(WEBMRecorder), "Legacy/WebM")]
     class WEBMRecorderSettings : BaseFCRecorderSettings
     {
         public fcAPI.fcWebMConfig m_WebmEncoderSettings = fcAPI.fcWebMConfig.default_value;

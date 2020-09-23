@@ -1,4 +1,3 @@
-
 namespace UnityEditor.Recorder
 {
     enum FrameRateType
@@ -13,7 +12,7 @@ namespace UnityEditor.Recorder
         FR_60,
         FR_CUSTOM,
     }
-    
+
     enum ImageAspect
     {
         x19_10,
@@ -25,7 +24,7 @@ namespace UnityEditor.Recorder
         x1_1,
         Custom
     }
-    
+
     enum ImageHeight
     {
         Window = 0,

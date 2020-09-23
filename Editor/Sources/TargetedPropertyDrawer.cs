@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace UnityEditor.Recorder
 {
@@ -12,7 +12,7 @@ namespace UnityEditor.Recorder
             {
                 var path = prop.propertyPath.Split('.');
                 object obj = prop.serializedObject.targetObject;
-                
+
                 foreach (var pathNode in path)
                     obj = GetSerializedField(obj, pathNode).GetValue(obj);
 

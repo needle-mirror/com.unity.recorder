@@ -3,6 +3,31 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+
+## [2.3.0-preview.3] - 2020-09-23
+### Features
+- Added animation curve data compression setting with keyframe reduction options in the Animation Recorder.
+- Added an option to set the generated animation key tangents to ClampedAuto in the Animation Recorder.
+- Added ProRes encoder support in the MovieRecorder for OSX and Windows.
+- Added option to specify the color space of the recorded images as either sRGB or Linear sRGB (unclamped).
+- UX improvements
+
+### Bugfixes
+- Fixed a bug that in the texture sampler recorder for animated camera fov and animated physical properties 
+- Fixed a bug that caused the recorder to hang when docked next to the GameView.
+- Fixed a bug that caused the recorder to hang if starting recording while already in playmode
+- Fixed a bug where the AudioRecorder would not close the handle to the recorded file.
+- Fixed a bug where the recorder could output multiple files in a single session, when only one was expected.
+- Fixed a bug where one could not set a framerate larger than 120FPS
+- Fixed a bug where the AnimationRecorder would not flush the data to disk when done recording.
+- Fixed a bug where the RecorderWindow would get corrupted if some custom RecorderSettings code would not compile.
+- Fixed a bug where the RecorderWindow would generate errors after a failed QuickRecord session.
+- Fixed a bug where file creation could fail because of certain invalid characters in the file name.
+- Fixed a bug where scripted Recorder sessions could generate errors if frames were recorded before the session was prepared.
+
+### Known issues
+- When the animationRecorder starts at frame zero and the timelineWindow inspects the timeline, multiple clip files are generated (some empty). To Fix, please update to the latest version of the Timeline package.
+
 ## [2.2.0-preview.4] - 2020-04-08
 ### Public API and bugfixes
 - Added public api's to allow loading previously saved recorder lists.

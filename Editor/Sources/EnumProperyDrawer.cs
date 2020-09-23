@@ -7,7 +7,7 @@ namespace UnityEditor.Recorder
     abstract class EnumProperyDrawer<T> : PropertyDrawer
     {
         GUIContent[] m_DisplayNames;
-        
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (m_DisplayNames == null)
@@ -21,14 +21,14 @@ namespace UnityEditor.Recorder
 
                 m_DisplayNames = displayNames.ToArray();
             }
-            
+
             EditorGUI.BeginProperty(position, label, property);
-            
+
             property.intValue = EditorGUI.Popup(position, label, property.intValue, m_DisplayNames);
-                
+
             EditorGUI.EndProperty();
         }
 
-        protected abstract string ToLabel(T value); 
+        protected abstract string ToLabel(T value);
     }
 }

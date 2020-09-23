@@ -20,16 +20,16 @@ namespace UnityEditor.Recorder
         readonly Toggle m_Toggle;
 
         readonly Texture2D m_RecorderIcon;
-        
+
         Texture2D m_Icon;
 
         public event Action<bool> OnEnableStateChanged;
-        
+
         static readonly Dictionary<string, Texture2D> s_IconCache = new Dictionary<string, Texture2D>();
 
         bool m_Selected;
         bool m_Disabled;
-        
+
         public void SetItemSelected(bool value)
         {
             m_Selected = value;
@@ -40,21 +40,21 @@ namespace UnityEditor.Recorder
         }
 
         public void SetItemEnabled(RecorderControllerSettings prefs, bool value)
-        {           
+        {
             m_Disabled = !value;
             settings.Enabled = value;
             prefs.Save();
-            
+
             m_EditableLabel.SetLabelEnabled(value);
 
             if (m_Toggle != null)
                 UIElementHelper.SetToggleValue(m_Toggle, value);
-            
+
             if (value)
                 RemoveFromClassList("disabled");
             else
                 AddToClassList("disabled");
-            
+
             if (OnEnableStateChanged != null)
                 OnEnableStateChanged.Invoke(value);
         }
@@ -100,7 +100,7 @@ namespace UnityEditor.Recorder
             {
                 if (value == State.None)
                     return;
-                
+
                 if (m_State == value)
                     return;
 
@@ -142,33 +142,37 @@ namespace UnityEditor.Recorder
                 return null;
 
             Texture2D icon;
-            
+
             if (s_IconCache.TryGetValue(iconName, out icon))
                 return icon;
 
             if (EditorGUIUtility.isProSkin)
-                icon = Resources.Load<Texture2D>("d_" + iconName);   
-            
+                icon = Resources.Load<Texture2D>("d_" + iconName);
+
             if (icon == null)
                 icon = Resources.Load<Texture2D>(iconName);
-            
+
             s_IconCache[iconName] = icon;
-            
+
             return icon;
         }
-        
+
         public RecorderItem(RecorderControllerSettings prefs, RecorderSettings recorderSettings, string iconName)
-        {           
+        {
             settings = recorderSettings;
 
             if (settings != null)
+            {
                 editor = Editor.CreateEditor(settings);
+                ((RecorderEditor) editor).OnRecorderValidated += OnRecorderValidated;
+            }
+
 
             UIElementHelper.SetFlex(this, 1.0f);
             style.flexDirection = FlexDirection.Row;
 
             m_Toggle = new Toggle();
-           
+
 #if UNITY_2019_1_OR_NEWER
             m_Toggle.RegisterValueChangedCallback(evt =>
 #elif UNITY_2018_3_OR_NEWER
@@ -179,21 +183,21 @@ namespace UnityEditor.Recorder
             {
                 SetItemEnabled(prefs, UIElementHelper.GetToggleValue(m_Toggle));
             });
-            
+
             Add(m_Toggle);
-                
+
             m_RecorderIcon = LoadIcon(iconName);
-            
+
             if (m_RecorderIcon == null)
                 m_RecorderIcon = LoadIcon("customrecorder_16");
-       
+
             UpdateState(false);
-            
+
             var iconContainer = new IMGUIContainer(() => // UIElement Image doesn't support tint yet. Use IMGUI instead.
-            {   
+            {
                 var r = EditorGUILayout.GetControlRect();
-                r.width = r.height = Mathf.Max(r.width, r.height);
-                
+                r.width = r.height = Mathf.Min(r.width, r.height);
+
                 var c = GUI.color;
 
                 var newColor = Color.white;
@@ -205,22 +209,22 @@ namespace UnityEditor.Recorder
                 else
                 {
                     if (!m_Selected)
-                        newColor.a = 0.8f;    
+                        newColor.a = 0.8f;
                 }
 
                 GUI.color = newColor;
-                
+
                 GUI.DrawTexture(r, m_Icon);
 
                 GUI.color = c;
             });
-            
+
             iconContainer.AddToClassList("RecorderItemIcon");
 
             iconContainer.SetEnabled(false);
-            
+
             Add(iconContainer);
-            
+
             m_EditableLabel = new EditableLabel { text = settings.name };
             m_EditableLabel.OnValueChanged(newValue =>
             {
@@ -234,10 +238,15 @@ namespace UnityEditor.Recorder
 
             SetItemEnabled(prefs, recorderEnabled);
         }
-    
+
         public void StartRenaming()
         {
             m_EditableLabel.StartEditing();
+        }
+
+        void OnRecorderValidated()
+        {
+            UpdateState();
         }
     }
 }

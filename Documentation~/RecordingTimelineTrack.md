@@ -1,50 +1,54 @@
 # Recording from a Timeline track
 
-This page explains how to set up and launch a recording from a [Timeline](https://docs.unity3d.com/Manual/TimelineSection.html) Track.
+If you installed [Timeline](https://docs.unity3d.com/Packages/com.unity.timeline@latest), you can control your recordings through [Recorder Clips](RecordingTimelineTrack.md) in Timeline Tracks.
 
-If you want to record from the Recorder window, see [Recording in Play mode](RecordingPlayMode.md).
+> **Note:** If you want to record from the Recorder window, see [Recording from the Recorder window](RecordingRecorderWindow.md).
 
-You can start and stop recordings from Timeline. A **Recorder Track** in Timeline contains one or more **Recorder Clips**. Each clip defines a recording for the Recorder to capture while Timeline plays the **Recorder Track**.
+## Recorder Tracks and Recorder Clips
 
-![Adding a Recorder Track in Timeline.](Images/TimelineRecorderTrack.png)
+To record through Timeline, you must add at least one **Recorder Track** with at least one  **Recorder Clip** in it. The Recorder Clip defines a recording for the Recorder to capture while Timeline plays the Recorder Track.
 
-## Setting up Recorder Clips
+You can use multiple Recorder Clips in the same Recorder Track to record data at different times of your Timeline sequence.
+
+To record multiple types of data at the same time, you must use multiple Recorder Tracks.
+
+## Setting up a Recorder Clip
 
 To set up a recording session in a Timeline instance:
 
 1. Select the GameObject associated with the Timeline Asset.
 
-1. In the Timeline window, click the Add (**+**) button.
+1. In the Timeline window, select the Add (**+**) button and select **UnityEditor.Recorder.Timeline > Recorder Track**.
+   <br />![Adding a Recorder Track in Timeline.](Images/TimelineRecorderTrack.png)
 
-1. From the context menu, select **UnityEditor.Recorder.Timeline > Recorder Track**.
+1. Right-click the **Recorder Track** you just added and select **Add Recorder Clip**.
 
-1. Right-click the **Recorder Track**.
+1. Select the **Recorder Clip** and [set up its properties](#recorder-clip-properties) in the **Inspector**.
 
-1. From the context menu, select **Add Recorder Clip**.
+## Recorder Clip properties
 
-1. Select the **Recorder Clip** and edit properties in the **Inspector** window.
+![](Images/RecorderClip.png)
 
-## Editing Recorder Clip properties
+### ![](Images/Label-A.png) General recording properties
 
-Recorder Clip properties are the same as regular [Recorder properties](RecorderProperties.md), but you set them from the Recorder Clip inspector rather than the Recorder window.
+The Recorder Clip's **Clip Timing** properties control the recording's **Start**, **End**, and **Duration**.
 
-![Adding a Recorder Track in Timeline.](Images/RecorderClipProperties.png)
+>**Note:** The **Frame Rate Playback** property is locked to **Constant** mode, because Timeline plays back at a constant frame rate. Also, the Recorder Clip inherits its **Frame Rate Target** setting from the Timeline’s **Frame Rate** setting.
 
-|||
-|-|-|
-|![](Images/Label-A.png)   | Choose the type of Recorder you want the Recorder Clip to use. |
-|![](Images/Label-B.png)   | Load any existing [Recorder Preset](RecorderManage.md#RecorderPreset), or save the current Recorder Clip settings as a Preset.  |
-|![](Images/Label-C.png)   | Set the Recorder Clip properties. These vary according to the **Selected Recorder** setting. You set them the same way you set regular [Recorder properties](RecorderProperties.md). |
+### ![](Images/Label-B.png) Recorder selection
 
->[!NOTE]
-> Unity stores the **Recorder Clip** properties in the Timeline Track. They do not affect properties you set in the Recorder window.  
+Select the type of Recorder you want the Recorder Clip to use.
+<br />You can also load any existing Recorder Preset, or save the current Recorder Clip settings as a Preset.
 
-The Recorder Clip Inspector also includes a subset of the [recording controls](RecordingPlayMode.md#setting-up-a-recording) in the Recorder window.
+### ![](Images/Label-C.png) Recorder properties
 
-![Adding a Recorder Track in Timeline.](Images/RecorderClipPropertiesRec.png)
+Use this section to [set up the properties of the selected Recorder](RecorderProperties.md).
+<br />Recorder properties include Capture, Format and Output File properties.
 
-|||
-|-|-|
-|![](Images/Label-A.png)   | The Recorder Clip's **Clip Timing** properties control the recording's **Start**, **End**, and **Duration**.  |
-|![](Images/Label-B.png)   | The **Frame Rate > Playback** property is locked to **Constant** mode, because Timeline plays back at a constant frame rate.  |
-|![](Images/Label-C.png)   | The Recorder Clip inherits its **Frame Rate > Target** setting from the Timeline’s **Frame Rate** setting.  |
+## Starting and stopping the recording
+
+- The recording automatically starts when the Timeline plays the Recorder Clip, according to the **Start** setting value of the clip.
+
+- The recording automatically stops when the Recorder Clip reaches its **End** setting value or if you manually stop the Timeline before.
+
+See the [Timeline](https://docs.unity3d.com/Packages/com.unity.timeline@latest) documentation for more information about managing and playing Timeline tracks and clips.

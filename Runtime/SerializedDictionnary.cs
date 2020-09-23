@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace UnityEngine.Recorder
-{     
+{
     [Serializable]
     class SerializedDictionary<TKey, TValue> : ISerializationCallbackReceiver
     {
@@ -10,7 +10,7 @@ namespace UnityEngine.Recorder
         [SerializeField] List<TValue> m_Values = new List<TValue>();
 
         readonly Dictionary<TKey, TValue> m_Dictionary = new Dictionary<TKey, TValue>();
-        
+
         public Dictionary<TKey, TValue> dictionary
         {
             get { return m_Dictionary; }
@@ -31,7 +31,7 @@ namespace UnityEngine.Recorder
         public void OnAfterDeserialize()
         {
             m_Dictionary.Clear();
-            
+
             for (int i = 0; i < m_Keys.Count; ++i)
                 m_Dictionary.Add(m_Keys[i], m_Values[i]);
         }

@@ -131,7 +131,12 @@ namespace UnityEditor.Recorder
 
         public FrameRatePlayback FrameRatePlayback { get; set; }
 
-        public float FrameRate { get; set; }
+        float frameRate = 30;
+        public float FrameRate
+        {
+            get => frameRate;
+            set => frameRate = value;
+        }
 
         public int StartFrame { get; set; }
 

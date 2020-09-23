@@ -2,12 +2,12 @@ using System;
 using UnityEngine;
 
 namespace UnityEditor.Recorder.FrameCapturer
-{   
+{
     class WEBMRecorder : GenericRecorder<WEBMRecorderSettings>
     {
         fcAPI.fcWebMContext m_ctx;
         fcAPI.fcStream m_stream;
-        
+
         protected internal override bool BeginRecording(RecordingSession session)
         {
             if (!base.BeginRecording(session)) { return false; }
@@ -15,7 +15,7 @@ namespace UnityEditor.Recorder.FrameCapturer
             Settings.fileNameGenerator.CreateDirectory(session);
 
             return true;
-        } 
+        }
 
         protected internal override void EndRecording(RecordingSession session)
         {
@@ -41,7 +41,7 @@ namespace UnityEditor.Recorder.FrameCapturer
                 webmSettings.videoHeight = frame.height;
                 if (Settings.m_AutoSelectBR)
                 {
-                    webmSettings.videoTargetBitrate = (int)(( (frame.width * frame.height/1000.0) / 245 + 1.16) * (webmSettings.videoTargetFramerate / 48.0 + 0.5) * 1000000);
+                    webmSettings.videoTargetBitrate = (int)(((frame.width * frame.height / 1000.0) / 245 + 1.16) * (webmSettings.videoTargetFramerate / 48.0 + 0.5) * 1000000);
                 }
 
                 webmSettings.videoTargetFramerate = (int)Math.Ceiling(Settings.FrameRate);
@@ -56,6 +56,5 @@ namespace UnityEditor.Recorder.FrameCapturer
                 fcAPI.fcWebMAddVideoFramePixels(m_ctx, data, fmt, session.recorderTime);
             });
         }
-
     }
 }

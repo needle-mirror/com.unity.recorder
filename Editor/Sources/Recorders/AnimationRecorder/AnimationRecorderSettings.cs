@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
@@ -60,8 +60,8 @@ namespace UnityEditor.Recorder
             get
             {
                 return Application.platform == RuntimePlatform.LinuxEditor ||
-                       Application.platform == RuntimePlatform.OSXEditor ||
-                       Application.platform == RuntimePlatform.WindowsEditor;
+                    Application.platform == RuntimePlatform.OSXEditor ||
+                    Application.platform == RuntimePlatform.WindowsEditor;
             }
         }
 

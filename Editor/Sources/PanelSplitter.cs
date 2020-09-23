@@ -47,9 +47,9 @@ namespace UnityEditor.Recorder
 
         void OnMouseDown(MouseDownEvent evt)
         {
-            if (evt.button != (int) MouseButton.LeftMouse)
+            if (evt.button != (int)MouseButton.LeftMouse)
                 return;
-            
+
             if (m_Grabbed)
                 return;
 
@@ -78,24 +78,24 @@ namespace UnityEditor.Recorder
             var delta = evt.mousePosition.x - m_GrabbedMousePosition.x;
 
             #if UNITY_2019_1_OR_NEWER
-                var minWidth = m_AffectedElement.resolvedStyle.minWidth.value;
-                var maxWidth = m_AffectedElement.resolvedStyle.maxWidth.value;
+            var minWidth = m_AffectedElement.resolvedStyle.minWidth.value;
+            var maxWidth = m_AffectedElement.resolvedStyle.maxWidth.value;
             #else
-                var minWidth = m_AffectedElement.style.minWidth;
-                var maxWidth = m_AffectedElement.style.maxWidth;
+            var minWidth = m_AffectedElement.style.minWidth;
+            var maxWidth = m_AffectedElement.style.maxWidth;
             #endif
-            
+
             var newWidth = Mathf.Max(m_ElementOriginalWidth + delta, minWidth);
-           
+
             if (maxWidth > 0.0f)
                 newWidth = Mathf.Min(newWidth, maxWidth);
 
             SetWidth(newWidth);
         }
-        
+
         void OnMouseUp(MouseUpEvent evt)
         {
-            if (evt.button != (int) MouseButton.LeftMouse)
+            if (evt.button != (int)MouseButton.LeftMouse)
                 return;
 
             if (!m_Grabbed)
@@ -108,7 +108,7 @@ namespace UnityEditor.Recorder
 #else
             this.ReleaseMouseCapture();
 #endif
-            
+
             evt.StopImmediatePropagation();
         }
     }

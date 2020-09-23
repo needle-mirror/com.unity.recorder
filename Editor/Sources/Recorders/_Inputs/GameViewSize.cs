@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Reflection;
 using UnityEngine;
@@ -55,7 +55,7 @@ namespace UnityEditor.Recorder.Input
             }
 
             var prop = gameView.GetType().GetProperty("targetSize", BindingFlags.NonPublic | BindingFlags.Instance);
-            var size = (Vector2)prop.GetValue(gameView, new object[] { });
+            var size = (Vector2)prop.GetValue(gameView, new object[] {});
             width = (int)size.x;
             height = (int)size.y;
         }
@@ -64,10 +64,10 @@ namespace UnityEditor.Recorder.Input
         {
             var T = Type.GetType("UnityEditor.GameViewSizes,UnityEditor");
             var sizes = T.BaseType.GetProperty("instance", BindingFlags.Public | BindingFlags.Static);
-            var instance = sizes.GetValue(null, new object[] { });
+            var instance = sizes.GetValue(null, new object[] {});
 
             var currentGroup = instance.GetType().GetProperty("currentGroup", BindingFlags.Public | BindingFlags.Instance);
-            var group = currentGroup.GetValue(instance, new object[] { });
+            var group = currentGroup.GetValue(instance, new object[] {});
             return group;
         }
 
@@ -76,8 +76,8 @@ namespace UnityEditor.Recorder.Input
             var sizeObj = FindRecorderSizeObj();
             if (sizeObj != null)
             {
-                sizeObj.GetType().GetField("m_Width",BindingFlags.NonPublic | BindingFlags.Instance).SetValue(sizeObj,width);
-                sizeObj.GetType().GetField("m_Height", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(sizeObj,height);
+                sizeObj.GetType().GetField("m_Width", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(sizeObj, width);
+                sizeObj.GetType().GetField("m_Height", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(sizeObj, height);
             }
             else
             {
@@ -108,16 +108,16 @@ namespace UnityEditor.Recorder.Input
         {
             var group = Group();
             var method = group.GetType().GetMethod("IndexOf", BindingFlags.Public | BindingFlags.Instance);
-            var index = (int)method.Invoke(group, new[] {sizeObj}) ;
+            var index = (int)method.Invoke(group, new[] {sizeObj});
 
             var builtinList = group.GetType().GetField("m_Builtin", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(group);
 
             method = builtinList.GetType().GetMethod("Contains");
-            if ((bool)method.Invoke(builtinList, new [] { sizeObj }))
+            if ((bool)method.Invoke(builtinList, new[] { sizeObj }))
                 return index;
 
             method = group.GetType().GetMethod("GetBuiltinCount");
-            index += (int)method.Invoke(group, new object[] { });
+            index += (int)method.Invoke(group, new object[] {});
 
             return index;
         }
@@ -127,8 +127,8 @@ namespace UnityEditor.Recorder.Input
             var T = Type.GetType("UnityEditor.GameViewSize,UnityEditor");
             var tt = Type.GetType("UnityEditor.GameViewSizeType,UnityEditor");
 
-            var c = T.GetConstructor( new[] {tt, typeof(int), typeof(int), typeof(string)} );
-            var sizeObj = c.Invoke(new object[] {1,width, height,  "(Recording resolution)"});
+            var c = T.GetConstructor(new[] {tt, typeof(int), typeof(int), typeof(string)});
+            var sizeObj = c.Invoke(new object[] {1, width, height,  "(Recording resolution)"});
             return sizeObj;
         }
 
@@ -138,7 +138,7 @@ namespace UnityEditor.Recorder.Input
 
             var group = Group();
             var obj = group.GetType().GetMethod("AddCustomSize", BindingFlags.Public | BindingFlags.Instance);
-            obj.Invoke(group, new[] {sizeObj}) ;
+            obj.Invoke(group, new[] {sizeObj});
 
             return sizeObj;
         }
@@ -160,9 +160,9 @@ namespace UnityEditor.Recorder.Input
             {
                 var gv = GetMainGameView();
                 if (gv == null)
-                    return new [] {miscSize, miscSize};
+                    return new[] {miscSize, miscSize};
                 var prop = gv.GetType().GetProperty("currentGameViewSize", BindingFlags.NonPublic | BindingFlags.Instance);
-                return prop.GetValue(gv, new object[] { });
+                return prop.GetValue(gv, new object[] {});
             }
         }
 

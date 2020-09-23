@@ -14,12 +14,12 @@ namespace UnityEditor.Recorder
             get
             {
                 if (s_PresetIcon == null)
-                    s_PresetIcon = (Texture2D) EditorGUIUtility.Load(EditorGUIUtility.isProSkin ? "d_Preset.Context" : "Preset.Context");
+                    s_PresetIcon = (Texture2D)EditorGUIUtility.Load(EditorGUIUtility.isProSkin ? "d_Preset.Context@2x" : "Preset@2x.Context");
 
                 return s_PresetIcon;
             }
         }
-        
+
         internal static GUIStyle presetButtonStyle
         {
             get
@@ -55,7 +55,7 @@ namespace UnityEditor.Recorder
                     Undo.RecordObject(m_Target, "Cancel Preset");
                     m_InitialValue.ApplyTo(m_Target);
                 }
-                
+
                 if (m_OnSelectionChanged != null)
                     m_OnSelectionChanged.Invoke();
             }
@@ -63,12 +63,12 @@ namespace UnityEditor.Recorder
             public override void OnSelectionClosed(Preset selection)
             {
                 OnSelectionChanged(selection);
-                
+
                 m_Target.OnAfterDuplicate();
-                
+
                 if (m_OnSelectionClosed != null)
                     m_OnSelectionClosed.Invoke();
-                
+
                 DestroyImmediate(this);
             }
         }

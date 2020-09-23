@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
@@ -22,7 +22,7 @@ namespace UnityEditor.Recorder
                 return s_ErrorIcon;
             }
         }
-        
+
         public static Texture2D warningIcon
         {
             get
@@ -44,7 +44,7 @@ namespace UnityEditor.Recorder
                 return s_InfoIcon;
             }
         }
-            
+
         public static GUIStyle errorStyle
         {
             get
@@ -52,7 +52,7 @@ namespace UnityEditor.Recorder
                 return s_ErrorStyle ?? (s_ErrorStyle = new GUIStyle("CN StatusError"));
             }
         }
-        
+
         public static GUIStyle warningStyle
         {
             get
@@ -68,7 +68,5 @@ namespace UnityEditor.Recorder
                 return s_InfoStyle ?? (s_InfoStyle = new GUIStyle("CN StatusInfo"));
             }
         }
-
-
     }
 }

@@ -88,7 +88,10 @@ namespace UnityEditor.Recorder
         {
             base.EndRecording(session);
             if (m_OngoingAsyncGPURequestsCount > 0)
+            {
+                Recording = true;
                 m_DelayedEncoderDispose = true;
+            }
             else
                 DisposeEncoder();
         }
@@ -124,6 +127,7 @@ namespace UnityEditor.Recorder
         protected virtual void DisposeEncoder()
         {
             UnityHelpers.Destroy(m_ReadbackTexture);
+            Recording = false;
         }
     }
 }

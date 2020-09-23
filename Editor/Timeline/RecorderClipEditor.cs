@@ -38,12 +38,12 @@ namespace UnityEditor.Recorder.Timeline
                 {
                     m_RecorderSelector = new RecorderSelector();
                     m_RecorderSelector.OnSelectionChanged += OnRecorderSelected;
-                    m_RecorderSelector.Init(((RecorderClip) target).settings);
+                    m_RecorderSelector.Init(((RecorderClip)target).settings);
                 }
 
                 using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
                 {
-                    var clip = (RecorderClip) target;
+                    var clip = (RecorderClip)target;
                     if (m_Timeline == null)
                         m_Timeline = clip.FindTimelineAsset();
 
@@ -70,7 +70,7 @@ namespace UnityEditor.Recorder.Timeline
 
                         clip.needsDuplication = false;
                     }
-                    
+
                     m_RecorderSelector.OnGui();
 
                     if (m_Editor != null)
@@ -120,7 +120,7 @@ namespace UnityEditor.Recorder.Timeline
             UnityHelpers.Destroy(m_Editor);
             m_Editor = null;
             m_RecorderSelector = null;
-            UnityHelpers.Destroy(((RecorderClip) target).settings, true);
+            UnityHelpers.Destroy(((RecorderClip)target).settings, true);
         }
 
         void OnRecorderSelected(Type selectedRecorder)
@@ -148,7 +148,7 @@ namespace UnityEditor.Recorder.Timeline
                 AssetDatabase.AddObjectToAsset(clip.settings, clip);
             }
 
-            m_Editor = (RecorderEditor) CreateEditor(clip.settings);
+            m_Editor = (RecorderEditor)CreateEditor(clip.settings);
             AssetDatabase.Refresh();
         }
     }

@@ -19,13 +19,13 @@ namespace UnityEditor.Recorder
 
         Action<string> m_OnValueChangedCallback;
         Focusable m_PreviouslyFocused;
-        
+
         internal string text
         {
             get { return m_Label.text; }
             set { m_Label.text = value; }
         }
-        
+
         internal void SetLabelEnabled(bool value)
         {
             m_Label.SetEnabled(value);
@@ -36,14 +36,14 @@ namespace UnityEditor.Recorder
             m_IsEditing = false;
             m_Label = new Label();
             m_TextField = new TextField();
-            
+
             UIElementHelper.SetFlex(this, 1.0f);
             UIElementHelper.SetFlex(m_TextField, 1.0f);
-            
+
             Add(m_Label);
-            
+
             UIElementHelper.RegisterTrickleDownCallback<KeyUpEvent>(this, OnKeyUpCallback);
-            
+
             m_TextField.RegisterCallback<FocusOutEvent>(OnTextFieldLostFocus);
         }
 
@@ -56,7 +56,7 @@ namespace UnityEditor.Recorder
                 return;
 
             m_Label.text = newValue;
-            
+
             if (m_OnValueChangedCallback != null)
                 m_OnValueChangedCallback.Invoke(newValue);
         }
@@ -65,7 +65,7 @@ namespace UnityEditor.Recorder
         {
             m_OnValueChangedCallback = callback;
         }
-        
+
         internal void StartEditing()
         {
             if (m_IsEditing)
@@ -79,7 +79,7 @@ namespace UnityEditor.Recorder
 #if UNITY_2019_1_OR_NEWER
             m_TextField.delegatesFocus = true;
 #endif
-            m_PreviouslyFocused = focusController.focusedElement;    
+            m_PreviouslyFocused = focusController.focusedElement;
             m_TextField.Focus();
         }
 
@@ -89,7 +89,7 @@ namespace UnityEditor.Recorder
                 return;
 
             SetValueAndNotify(m_TextField.text);
-            
+
             m_IsEditing = false;
             Remove(m_TextField);
             Add(m_Label);
@@ -104,7 +104,7 @@ namespace UnityEditor.Recorder
             Remove(m_TextField);
             Add(m_Label);
         }
-        
+
         void OnTextFieldLostFocus(FocusOutEvent evt)
         {
             ApplyEditing();
@@ -119,14 +119,14 @@ namespace UnityEditor.Recorder
             {
                 ApplyEditing();
                 RestorePreviousFocus();
-                
+
                 evt.StopImmediatePropagation();
             }
             else if (evt.keyCode == KeyCode.Escape)
             {
                 CancelEditing();
                 RestorePreviousFocus();
-                
+
                 evt.StopImmediatePropagation();
             }
         }

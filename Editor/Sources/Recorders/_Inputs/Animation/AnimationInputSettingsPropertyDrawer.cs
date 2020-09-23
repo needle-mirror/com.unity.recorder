@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -7,31 +7,39 @@ namespace UnityEditor.Recorder.Input
     [CustomPropertyDrawer(typeof(AnimationInputSettings))]
     class AnimationInputSettingsPropertyDrawer : InputPropertyDrawer<AnimationInputSettings>
     {
-        SerializedProperty m_Recursive;
-        
+        SerializedProperty m_Recursive, m_ClampedTangents;
+#if UNITY_2019_3_OR_NEWER
+        SerializedProperty m_SimplifyCurve;
+#endif
+
         protected override void Initialize(SerializedProperty prop)
         {
             base.Initialize(prop);
 
             m_Recursive = prop.FindPropertyRelative("recursive");
+            m_ClampedTangents = prop.FindPropertyRelative("clampedTangents");
+#if UNITY_2019_3_OR_NEWER
+            m_SimplifyCurve = prop.FindPropertyRelative("simplifyCurves");
+#endif
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Initialize(property);
-                              
+
+
             EditorGUI.BeginChangeCheck();
-            
-            var gameObject = EditorGUILayout.ObjectField("Game Object", target.gameObject, typeof(GameObject), true) as GameObject;
-            
+
+            var gameObject = EditorGUILayout.ObjectField(new GUIContent("GameObject", "The reference to the GameObject to record the data from"), target.gameObject, typeof(GameObject), true) as GameObject;
+
             if (EditorGUI.EndChangeCheck())
             {
                 target.gameObject = gameObject;
-                
+
                 if (gameObject != null)
                     target.AddComponentToRecord(gameObject.GetComponent<Component>().GetType());
-            }                     
-            
+            }
+
             if (gameObject != null)
             {
                 var compos = gameObject.GetComponents<Component>()
@@ -43,7 +51,7 @@ namespace UnityEditor.Recorder.Input
                         .Where(x => x != null)
                         .Select(x => x.GetType()));
                 }
-                
+
                 var distinctCompos = compos.Distinct()
                     .Where(x => !typeof(MonoBehaviour).IsAssignableFrom(x) && x != typeof(Animator)) // black list
                     .ToList();
@@ -56,17 +64,17 @@ namespace UnityEditor.Recorder.Input
                     if (found != -1)
                         flags |= 1 << found;
                 }
-                
+
                 EditorGUI.BeginChangeCheck();
-                
-                flags = EditorGUILayout.MaskField("Recorded Target(s)", flags, distinctCompos.Select(x => x.Name).ToArray());
-                
+
+                flags = EditorGUILayout.MaskField(new GUIContent("Recorded Components", "The components of the GameObject to record. You can select more than one component."), flags, distinctCompos.Select(x => x.Name).ToArray());
+
                 if (EditorGUI.EndChangeCheck())
                 {
                     target.bindingTypeNames = new List<string>();
-                    for (int i=0; i<compoNames.Count; ++i)                               
+                    for (int i = 0; i < compoNames.Count; ++i)
                     {
-                        if ((flags & (1 << i )) == 1 << i )
+                        if ((flags & (1 << i)) == 1 << i)
                         {
                             target.bindingTypeNames.Add(compoNames[i]);
                         }
@@ -74,7 +82,15 @@ namespace UnityEditor.Recorder.Input
                 }
             }
 
-            EditorGUILayout.PropertyField(m_Recursive, new GUIContent("Record Hierarchy"));   
+            EditorGUILayout.PropertyField(m_Recursive, new GUIContent("Record Hierarchy", "To include all children of the targeted GameObject in the recording."));
+#if UNITY_2019_3_OR_NEWER
+            EditorGUILayout.PropertyField(m_ClampedTangents,
+                new GUIContent("Clamped Tangents",
+                    "When enabled, sets the generated animation key tangents to ClampedAuto, else to Auto (legacy)."));
+            EditorGUILayout.PropertyField(m_SimplifyCurve,
+                new GUIContent("Anim. Compression",
+                    "The keyframe reduction level to use to compress the recorded animation curve data."));
+#endif
         }
     }
 }

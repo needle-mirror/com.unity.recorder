@@ -5,16 +5,21 @@ using UnityEngine.Rendering;
 using UnityEditor.Recorder;
 using UnityEditor.Recorder.Input;
 using UnityEditor.Media;
+using Unity.Media;
+using static UnityEditor.Recorder.MovieRecorderSettings;
 
 namespace UnityEditor.Recorder
 {
     class MovieRecorder : BaseTextureRecorder<MovieRecorderSettings>
     {
-        MediaEncoder m_Encoder;
+        MediaEncoderHandle m_EncoderHandle = new MediaEncoderHandle();
 
         protected override TextureFormat ReadbackTextureFormat
         {
-            get { return TextureFormat.RGBA32; }
+            get
+            {
+                return Settings.GetCurrentEncoder().GetTextureFormat(Settings);
+            }
         }
 
         protected internal override bool BeginRecording(RecordingSession session)
@@ -28,7 +33,7 @@ namespace UnityEditor.Recorder
             }
             catch (Exception)
             {
-                Debug.LogError(string.Format( "Movie recorder output directory \"{0}\" could not be created.", Settings.fileNameGenerator.BuildAbsolutePath(session)));
+                Debug.LogError(string.Format("Movie recorder output directory \"{0}\" could not be created.", Settings.fileNameGenerator.BuildAbsolutePath(session)));
                 return false;
             }
 
@@ -47,28 +52,21 @@ namespace UnityEditor.Recorder
                 return false;
             }
 
-            if (Settings.OutputFormat == MovieRecorderSettings.VideoRecorderOutputFormat.MP4)
+            var currentEncoderReg = Settings.GetCurrentEncoder();
+            string erroMessage;
+            if (!currentEncoderReg.SupportsResolution(Settings, width, height, out erroMessage))
             {
-                if (width > 4096 || height > 4096)
-                {
-                    Debug.LogWarning(string.Format("Mp4 format might not support resolutions bigger than 4096. Current resolution: {0} x {1}.", width, height));
-                }
-
-                if (width % 2 != 0 || height % 2 != 0)
-                {
-                    Debug.LogError(string.Format("Mp4 format does not support odd values in resolution. Current resolution: {0} x {1}.", width, height));
-                    return false;
-                }
+                Debug.LogError(erroMessage);
+                return false;
             }
 
             var imageInputSettings = m_Inputs[0].settings as ImageInputSettings;
 
-            var includeAlphaFromTexture = imageInputSettings != null && imageInputSettings.SupportsTransparent && imageInputSettings.AllowTransparency;
-
-            if (includeAlphaFromTexture && Settings.OutputFormat == MovieRecorderSettings.VideoRecorderOutputFormat.MP4)
+            var alphaWillBeInImage = imageInputSettings != null && imageInputSettings.SupportsTransparent && imageInputSettings.RecordTransparency;
+            if (alphaWillBeInImage && !currentEncoderReg.SupportsTransparency(Settings, out erroMessage))
             {
-                Debug.LogWarning("Mp4 format does not support alpha.");
-                includeAlphaFromTexture = false;
+                Debug.LogError(erroMessage);
+                return false;
             }
 
             var videoAttrs = new VideoTrackAttributes
@@ -76,7 +74,7 @@ namespace UnityEditor.Recorder
                 frameRate = RationalFromDouble(session.settings.FrameRate),
                 width = (uint)width,
                 height = (uint)height,
-                includeAlpha = includeAlphaFromTexture,
+                includeAlpha = alphaWillBeInImage,
                 bitRateMode = Settings.VideoBitRateMode
             };
 
@@ -96,7 +94,7 @@ namespace UnityEditor.Recorder
                 // Special case with WebM and audio on older Apple computers: deactivate async GPU readback because there
                 // is a risk of not respecting the WebM standard and receiving audio frames out of sync (see "monotonically
                 // increasing timestamps"). This happens only with Target Cameras.
-                if (m_Inputs[0].settings is CameraInputSettings && Settings.OutputFormat == MovieRecorderSettings.VideoRecorderOutputFormat.WebM)
+                if (m_Inputs[0].settings is CameraInputSettings && Settings.OutputFormat == VideoRecorderOutputFormat.WebM)
                 {
                     UseAsyncGPUReadback = false;
                 }
@@ -127,16 +125,43 @@ namespace UnityEditor.Recorder
             {
                 var path =  Settings.fileNameGenerator.BuildAbsolutePath(session);
 
-                m_Encoder = new MediaEncoder( path, videoAttrs, audioAttrsList.ToArray() );
+                // If an encoder already exist destroy it
+                Settings.DestroyIfExists(m_EncoderHandle);
+
+                // Get the currently selected encoder register and create an encoder
+                m_EncoderHandle = currentEncoderReg.Register(Settings.m_EncoderManager);
+
+                // Create the list of attributes for the encoder, Video, Audio and preset
+                // TODO: Query the list of attributes from the encoder attributes
+                var attr = new List<IMediaEncoderAttribute>();
+                attr.Add(new VideoTrackMediaEncoderAttribute("VideoAttributes", videoAttrs));
+
+                if (audioInput.audioSettings.PreserveAudio)
+                {
+                    if (audioAttrsList.Count > 0)
+                    {
+                        attr.Add(new AudioTrackMediaEncoderAttribute("AudioAttributes", audioAttrsList.ToArray()[0]));
+                    }
+                }
+
+                attr.Add(new IntAttribute(AttributeLabels[MovieRecorderSettingsAttributes.CodecFormat], Settings.encoderPresetSelected));
+                attr.Add(new IntAttribute(AttributeLabels[MovieRecorderSettingsAttributes.ColorDefinition], Settings.encoderColorDefinitionSelected));
+
+                if (Settings.encoderPresetSelectedName == "Custom")
+                {
+                    // For custom
+                    attr.Add(new StringAttribute(AttributeLabels[MovieRecorderSettingsAttributes.CustomOptions], Settings.encoderCustomOptions));
+                }
+                // Construct the encoder given the list of attributes
+                Settings.m_EncoderManager.Construct(m_EncoderHandle, path, attr);
+
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                if (RecorderOptions.VerboseMode)
-                    Debug.LogError("MovieRecorder unable to create MovieEncoder.");
+                Debug.LogError("MovieRecorder unable to create MovieEncoder. " + ex.Message);
+                return false;
             }
-
-            return false;
         }
 
         protected internal override void RecordFrame(RecordingSession session)
@@ -147,30 +172,33 @@ namespace UnityEditor.Recorder
             base.RecordFrame(session);
             var audioInput = (AudioInput)m_Inputs[1];
             if (audioInput.audioSettings.PreserveAudio)
-                m_Encoder.AddSamples(audioInput.mainBuffer);
+                Settings.m_EncoderManager.AddSamples(m_EncoderHandle, audioInput.mainBuffer);
         }
 
         protected override void WriteFrame(Texture2D t)
         {
-            m_Encoder.AddFrame(t);
+            Settings.m_EncoderManager.AddFrame(m_EncoderHandle, t);
         }
 
 #if UNITY_2019_1_OR_NEWER
         protected override void WriteFrame(AsyncGPUReadbackRequest r)
         {
-            m_Encoder.AddFrame(r.width, r.height, 0, TextureFormat.RGBA32, r.GetData<byte>());
+            var format = Settings.GetCurrentEncoder().GetTextureFormat(Settings);
+            Settings.m_EncoderManager.AddFrame(m_EncoderHandle, r.width, r.height, 0, format, r.GetData<byte>());
         }
+
 #endif
 
         protected override void DisposeEncoder()
         {
-            base.DisposeEncoder();
-
-            if (m_Encoder == null)
+            if (!Settings.m_EncoderManager.Exists(m_EncoderHandle))
+            {
+                base.DisposeEncoder();
                 return;
+            }
 
-            m_Encoder.Dispose();
-            m_Encoder = null;
+            Settings.m_EncoderManager.Destroy(m_EncoderHandle);
+            base.DisposeEncoder();
 
             // When adding a file to Unity's assets directory, trigger a refresh so it is detected.
             if (Settings.fileNameGenerator.Root == OutputPath.Root.AssetsFolder || Settings.fileNameGenerator.Root == OutputPath.Root.StreamingAssets)

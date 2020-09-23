@@ -20,7 +20,7 @@ namespace UnityEditor.Recorder.Input
         /// <inheritdoc/>
         protected internal override void BeginRecording(RecordingSession session)
         {
-            var aniSettings = (AnimationInputSettings) settings;
+            var aniSettings = (AnimationInputSettings)settings;
 
             var srcGO = aniSettings.gameObject;
 

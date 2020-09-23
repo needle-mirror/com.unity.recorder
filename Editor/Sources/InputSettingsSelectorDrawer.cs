@@ -10,7 +10,7 @@ namespace UnityEditor.Recorder
     class InputSettingsSelectorDrawer : TargetedPropertyDrawer<InputSettingsSelector>
     {
         bool m_Initialized;
-        
+
         GUIContent[] m_DisplayNames;
         Dictionary<string, int> m_NameToIndex;
         Dictionary<int, SerializedProperty> m_IndexToProperty;
@@ -21,7 +21,7 @@ namespace UnityEditor.Recorder
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-        {           
+        {
             if (!m_Initialized)
             {
                 Initialize(property);
@@ -36,7 +36,7 @@ namespace UnityEditor.Recorder
 
             var newIndex = 0;
             var selected = property.FindPropertyRelative("m_Selected");
-            
+
             if (m_DisplayNames.Length > 1)
             {
                 int index;
@@ -45,7 +45,7 @@ namespace UnityEditor.Recorder
 
                 newIndex = EditorGUILayout.Popup(label, index, m_DisplayNames);
             }
-            
+
             var sp = m_IndexToProperty[newIndex];
             selected.stringValue = sp.name;
 
@@ -57,17 +57,17 @@ namespace UnityEditor.Recorder
         protected override void Initialize(SerializedProperty property)
         {
             base.Initialize(property);
-                
+
             m_NameToIndex = new Dictionary<string, int>();
             m_IndexToProperty = new Dictionary<int, SerializedProperty>();
-            
+
             var displayNames = new List<GUIContent>();
-            
+
             int i = 0;
             foreach (var field in target.InputSettingFields())
             {
                 var sp = property.FindPropertyRelative(field.Name);
-                
+
                 m_NameToIndex.Add(sp.name, i);
                 m_IndexToProperty.Add(i, sp);
                 displayNames.Add(new GUIContent(GetTypeDisplayName(field.FieldType)));
@@ -76,7 +76,7 @@ namespace UnityEditor.Recorder
 
             m_DisplayNames = displayNames.ToArray();
         }
-        
+
         static string GetTypeDisplayName(Type type)
         {
             var displayNameAttribute = type.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;

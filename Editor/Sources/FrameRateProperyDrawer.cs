@@ -20,15 +20,15 @@ namespace UnityEditor.Recorder
                 case FrameRateType.FR_50:
                     return "50";
                 case FrameRateType.FR_59:
-                    return "59.94" ;
+                    return "59.94";
                 case FrameRateType.FR_60:
                     return "60";
                 case FrameRateType.FR_CUSTOM:
                     return "Custom";
-                    
+
                 default:
                     return "unknown";
             }
-        }       
+        }
     }
 }

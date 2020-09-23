@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.Recorder.Input;
 
@@ -12,16 +12,9 @@ namespace UnityEditor.Recorder.FrameCapturer
         protected internal override bool ValidityCheck(List<string> errors)
         {
             var ok = base.ValidityCheck(errors);
-            
-            if (string.IsNullOrEmpty(fileNameGenerator.FileName))
-            {
-                ok = false;
-                errors.Add("missing file name");
-            }
-
             return ok;
         }
-        
+
         public ImageInputSettings imageInputSettings
         {
             get { return m_ImageInputSelector.imageInputSettings; }
@@ -32,12 +25,12 @@ namespace UnityEditor.Recorder.FrameCapturer
         {
             get
             {
-                return Application.platform == RuntimePlatform.WindowsEditor || 
-                       Application.platform == RuntimePlatform.WindowsPlayer ||
-                       Application.platform == RuntimePlatform.OSXEditor ||
-                       Application.platform == RuntimePlatform.OSXPlayer ||
-                       Application.platform == RuntimePlatform.LinuxEditor ||
-                       Application.platform == RuntimePlatform.LinuxPlayer;
+                return Application.platform == RuntimePlatform.WindowsEditor ||
+                    Application.platform == RuntimePlatform.WindowsPlayer ||
+                    Application.platform == RuntimePlatform.OSXEditor ||
+                    Application.platform == RuntimePlatform.OSXPlayer ||
+                    Application.platform == RuntimePlatform.LinuxEditor ||
+                    Application.platform == RuntimePlatform.LinuxPlayer;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using UnityEditor.Recorder;
+using System;
+using UnityEditor.Recorder;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -20,9 +21,35 @@ namespace UnityEditor.Recorder.Input
             Profiler.BeginSample("GameViewInput.NewFrameReady");
 #if UNITY_2019_1_OR_NEWER
             ScreenCapture.CaptureScreenshotIntoRenderTexture(m_CaptureTexture);
-            m_VFlipper?.Flip(m_CaptureTexture);
+            var movieRecorderSettings = session.settings as MovieRecorderSettings;
+            bool needToFlip = scSettings.FlipFinalOutput;
+            if (movieRecorderSettings != null)
+            {
+                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
+                needToFlip &= encoderAlreadyFlips;
+            }
+            if (needToFlip)
+                m_VFlipper?.Flip(m_CaptureTexture);
 #else
             ReadbackTexture = ScreenCapture.CaptureScreenshotAsTexture();
+            var movieRecorderSettings = session.settings as MovieRecorderSettings;
+            if (movieRecorderSettings != null)
+            {
+                var currEncoder = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected];
+                var requiredFormat = currEncoder.GetTextureFormat(movieRecorderSettings);
+                var isGameView = movieRecorderSettings.ImageInputSettings is GameViewInputSettings;
+                if (!currEncoder.PerformsVerticalFlip)
+                {
+                    ReadbackTexture = UnityHelpers.FlipTextureVertically(ReadbackTexture, movieRecorderSettings.CaptureAlpha);
+                }
+                if (requiredFormat != ReadbackTexture.format)
+                {
+                    if (requiredFormat == TextureFormat.RGB24 && ReadbackTexture.format == TextureFormat.RGBA32)
+                        ReadbackTexture = UnityHelpers.RGBA32_to_RGB24(ReadbackTexture);
+                    else
+                        throw new Exception($"Unexpected conversion requested: from {ReadbackTexture.format} to {requiredFormat}.");
+                }
+            }
 #endif
             Profiler.EndSample();
         }
@@ -31,7 +58,7 @@ namespace UnityEditor.Recorder.Input
         {
             OutputWidth = scSettings.OutputWidth;
             OutputHeight = scSettings.OutputHeight;
-            
+
             int w, h;
             GameViewSize.GetGameRenderSize(out w, out h);
             if (w != OutputWidth || h != OutputHeight)
@@ -43,7 +70,7 @@ namespace UnityEditor.Recorder.Input
                 {
                     if (size != GameViewSize.currentSize)
                     {
-                        Debug.LogError("Requestion a resultion change while a recorder's input has already requested one! Undefined behaviour.");
+                        Debug.LogError("Requesting a resolution change while a recorder's input has already requested one! Undefined behaviour.");
                     }
                 }
                 GameViewSize.modifiedResolutionCount++;
@@ -52,7 +79,7 @@ namespace UnityEditor.Recorder.Input
             }
 
 #if !UNITY_2019_1_OR_NEWER
-            // Before 2019.1, we capture syncrhonously into a Texture2D, so we don't need to create
+            // Before 2019.1, we capture synchronously into a Texture2D, so we don't need to create
             // a RenderTexture that is used for reading asynchronously.
             return;
 #else
@@ -62,7 +89,15 @@ namespace UnityEditor.Recorder.Input
             };
             m_CaptureTexture.Create();
 
-            if (scSettings.FlipFinalOutput)
+            var movieRecorderSettings = session.settings as MovieRecorderSettings;
+            bool needToFlip = scSettings.FlipFinalOutput;
+            if (movieRecorderSettings != null)
+            {
+                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
+                needToFlip &= encoderAlreadyFlips;
+            }
+
+            if (needToFlip)
             {
                 m_VFlipper = new TextureFlipper(false);
                 m_VFlipper.Init(m_CaptureTexture);
@@ -85,7 +120,8 @@ namespace UnityEditor.Recorder.Input
             {
                 if (m_ModifiedResolution)
                 {
-                    GameViewSize.modifiedResolutionCount--;
+                    if (GameViewSize.modifiedResolutionCount > 0)
+                        GameViewSize.modifiedResolutionCount--; // don't allow negative if called twice
                     if (GameViewSize.modifiedResolutionCount == 0)
                         GameViewSize.RestoreSize();
                 }

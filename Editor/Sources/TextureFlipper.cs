@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -26,7 +26,7 @@ namespace UnityEditor.Recorder
 
             var sRGBWrite = GL.sRGBWrite;
             GL.sRGBWrite = PlayerSettings.colorSpace == ColorSpace.Linear;
-            
+
             Graphics.Blit(target, workTexture, new Vector2(1.0f, -1.0f), new Vector2(0.0f, 1.0f));
             if (inPlace)
                 Graphics.Blit(workTexture, target);

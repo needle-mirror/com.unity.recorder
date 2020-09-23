@@ -48,18 +48,18 @@ namespace UnityEditor.Recorder
             {
                 switch (Settings.OutputFormat)
                 {
-                case ImageRecorderSettings.ImageRecorderOutputFormat.PNG:
-                    bytes = tex.EncodeToPNG();
-                    break;
-                case ImageRecorderSettings.ImageRecorderOutputFormat.JPEG:
-                    bytes = tex.EncodeToJPG();
-                    break;
-                case ImageRecorderSettings.ImageRecorderOutputFormat.EXR:
-                    bytes = tex.EncodeToEXR();
-                    break;
-                default:
-                    Profiler.EndSample();
-                    throw new ArgumentOutOfRangeException();
+                    case ImageRecorderSettings.ImageRecorderOutputFormat.PNG:
+                        bytes = tex.EncodeToPNG();
+                        break;
+                    case ImageRecorderSettings.ImageRecorderOutputFormat.JPEG:
+                        bytes = tex.EncodeToJPG();
+                        break;
+                    case ImageRecorderSettings.ImageRecorderOutputFormat.EXR:
+                        bytes = tex.EncodeToEXR();
+                        break;
+                    default:
+                        Profiler.EndSample();
+                        throw new ArgumentOutOfRangeException();
                 }
             }
             finally
@@ -67,7 +67,7 @@ namespace UnityEditor.Recorder
                 Profiler.EndSample();
             }
 
-            if(m_Inputs[0] is BaseRenderTextureInput || Settings.OutputFormat != ImageRecorderSettings.ImageRecorderOutputFormat.JPEG)
+            if (m_Inputs[0] is BaseRenderTextureInput || Settings.OutputFormat != ImageRecorderSettings.ImageRecorderOutputFormat.JPEG)
                 UnityHelpers.Destroy(tex);
 
             WriteToFile(bytes);

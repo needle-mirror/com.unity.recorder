@@ -1,29 +1,48 @@
-#  Configuring GIF Animation Recorders
+#  GIF Animation Recorder properties
 
-The **GIF Animation Recorder** generates an animated .gif file.
+The **GIF Animation Recorder** generates an animated GIF file.
 
-This page covers properties specific to GIF Animation Recorders. To fully configure a GIF Animation Recorder, you must also set:
+This page covers all properties specific to the GIF Animation Recorder type.
 
-- The Recorder's [Output properties](RecorderProperties.md).
-- The [Recording Properties](Recording.md) for the capture.
-
-## GIF Animation Recorder properties
+> **Note:** To fully configure any Recorder, you must also set the global [Recording Properties](Recording.md) for the capture (properties shared with the other recorders, such as the frames to record).
 
 ![](Images/RecorderGIF.png)
 
-|Property:||Function:|
-|:---|:---|:-|
-| **Capture** ||Specifies the input for the recording.|
-|| Targeted Camera |Records frames captured by a specific Camera, even if the Game View does not use that Camera.<br/><br/>Selecting this option displays the [Targeted Camera capture properties](#TargetedCamera).|
+The GIF Animation Recorder properties fall into three main categories:
+* [Capture](#capture)
+* [Format](#format)
+* [Output File](#output-file)
+
+## Capture
+
+Use this section to define the source and the content of your recording.
+
+|Property||Function|
+|:---|:---|:---|
+| **Source** || Specifies the input for the recording. |
+|| Targeted Camera |Records frames captured by a specific camera, even if the Game View does not use that camera.<br/><br/>Selecting this option displays the [Targeted Camera capture properties](#TargetedCamera).|
 || Render Texture Asset |Records frames rendered in a Render Texture.<br/><br/>Selecting this option displays the [Render Texture Asset capture properties](#RenderTextureAsset).|
-|| Texture Sampling |Supersamples the **Source** camera during the capture to generate anti-aliased images in the recording. Use this capture method when the **Rendering Resolution** has the same or higher resolution than the **Output Resolution**. <br/><br/>Selecting this option displays the [Texture Sampling capture properties](#TextureSampling).|
-| **Encoding** ||Properties for controlling the quality and size of the .gif output.|
-|| _Num Colors_ |The number of colors used in the GIF palette table. The maximum is 256 colors. Specify a smaller palette to reduce the size of the .gif file while reducing image quality.|
-|| _Keyframe Interval_ |The number of frames that share the same color palette. Increase this number to reduce the size of the .gif file while reducing image quality.|
-|| _Max Tasks_ |The number of frames to encode in parallel. If you increase this number, it might reduce the amount of time Unity takes to encode the .gif file.|
+|| Texture Sampling |Supersamples the source camera during the capture to generate anti-aliased images in the recording.<br/><br/>Selecting this option displays the [Texture Sampling capture properties](#TextureSampling).|
+| **Flip Vertical** ||When you enable this option, the Recorder flips the output image vertically.<br />This is useful to correct for systems that output video upside down.|
 
-[!include[<title>](InclCaptureOptionsTargetedCamera.md)]
+[!include[](InclCaptureOptionsTargetedCamera.md)]
 
-[!include[<title>](InclCaptureOptionsRenderTextureAsset.md)]
+[!include[](InclCaptureOptionsRenderTextureAsset.md)]
 
-[!include[<title>](InclCaptureOptionsTextureSampling.md)]
+[!include[](InclCaptureOptionsTextureSampling.md)]
+
+## Format
+
+Use this section to set up the media format in which you need to save the recorded images.
+
+|Property|Function|
+|:---|:---|
+| **Num Colors** |The number of colors used in the GIF palette table. The maximum is 256 colors. Specify a smaller palette to reduce the size of the GIF file while reducing image quality.|
+| **Keyframe Interval** |The number of frames that share the same color palette. Increase this number to reduce the size of the GIF file while reducing image quality.|
+| **Max Tasks** |The number of frames to encode in parallel. If you increase this number, it might reduce the amount of time Unity takes to encode the GIF file.|
+
+## Output File
+
+Use this section to specify the output **Path** and **File Name** pattern to save the recorded animation clip.
+
+> **Note:** [Output File properties](RecorderProperties.md) work the same for all types of recorders.

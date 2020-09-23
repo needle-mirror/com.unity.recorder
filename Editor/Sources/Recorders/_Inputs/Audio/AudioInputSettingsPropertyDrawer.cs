@@ -6,18 +6,16 @@ namespace UnityEditor.Recorder.Input
     class AudioInputSettingsPropertyDrawer : InputPropertyDrawer<AudioInputSettings>
     {
         SerializedProperty m_PreserveAudio;
-	    protected override void Initialize(SerializedProperty property)
+        protected override void Initialize(SerializedProperty property)
         {
             m_PreserveAudio = property.FindPropertyRelative("preserveAudio");
-
         }
 
-	    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-	    {
-		    Initialize(property);
-		    
-            EditorGUILayout.PropertyField(m_PreserveAudio, new GUIContent("Capture audio"));
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            Initialize(property);
 
+            EditorGUILayout.PropertyField(m_PreserveAudio, new GUIContent("Include Audio", "To Include the audio in the recording."));
         }
     }
 }

@@ -1,39 +1,56 @@
-# Configuring Image Sequence Recorders
+# Image Sequence Recorder properties
 
-The **Image Sequence Recorder** generates a sequence of image files in the .jpeg, .png, or .exr (OpenEXR) file format.
+The **Image Sequence Recorder** generates a sequence of image files in the JPEG, PNG, or EXR (OpenEXR) file format.
 
-This page covers properties specific to Image Sequence Recorders. To fully configure an Image Sequence Recorder, you must also set:
+This page covers all properties specific to the Image Sequence Recorder type.
 
-- The Recorder's [Output properties](RecorderProperties.md).
-- The [Recording Properties](Recording.md) for the capture.
-
-## Image Sequence Recorder Properties
+> **Note:** To fully configure any Recorder, you must also set the global [Recording Properties](Recording.md) for the capture (properties shared with the other recorders, such as the frames to record).
 
 ![](Images/RecorderImage.png)
 
-|Property:||Function:|
-|:---|:---|:-|
-| **Format** ||The encoding format for Recorder output. <br/><br/>Choose **.png**, **.jpeg**, or **EXR** for .exr (OpenEXR).|
-| **Capture Alpha** ||Controls whether or not the Recorder includes the Alpha channel in the recording. <br/><br/> This property is not available when you set **Format** to **.jpeg** or set **Capture** to **Game View**.|
-| **Capture** ||Specifies the input for the recording.|
+The Image Sequence Recorder properties fall into three main categories:
+* [Capture](#capture)
+* [Format](#format)
+* [Output File](#output-file)
+
+## Capture
+
+Use this section to define the source and the content of your recording.
+
+|Property||Function|
+|:---|:---|:---|
+| **Source** ||Specifies the input for the recording.|
 || Game View |Records frames rendered in the Game View.<br/><br/>Selecting this option displays the [Game View capture properties](#GameView). |
-|| Targeted Camera |Records frames captured by a specific Camera, even if the Game View does not use that Camera.<br/><br/>Selecting this option displays the [Targeted Camera capture properties](#TargetedCamera).|
-|| 360 View |Records a 360-degree frame sequence.<br/><br/>Selecting this option displays the [360 View capture properties](#360View).|
+|| Targeted Camera |Records frames captured by a specific camera, even if the Game View does not use that camera.<br/><br/>Selecting this option displays the [Targeted Camera capture properties](#TargetedCamera).|
+|| 360 View |Records a 360-degree image sequence.<br/><br/>Selecting this option displays the [360 View capture properties](#360View).|
 || Render Texture Asset |Records frames rendered in a Render Texture.<br/><br/>Selecting this option displays the [Render Texture Asset capture properties](#RenderTextureAsset).|
-|| Texture Sampling |Supersamples the **Source** camera during the capture to generate anti-aliased images in the recording. Use this capture method when the **Rendering Resolution** has the same or higher resolution than the **Output Resolution**. <br/><br/>Selecting this option displays the [Texture Sampling capture properties](#TextureSampling).|
+|| Texture Sampling |Supersamples the source camera during the capture to generate anti-aliased images in the recording.<br/><br/>Selecting this option displays the [Texture Sampling capture properties](#TextureSampling).|
+| **Flip Vertical** ||When you enable this option, the Recorder flips the output image vertically.<br />This is useful to correct for systems that output video upside down.<br /><br />This option is not available when you record the Game View.|
 
-[!include[<title>](InclCaptureOptionsGameview.md)]
+[!include[](InclCaptureOptionsGameview.md)]
 
-[!include[<title>](InclCaptureOptionsTargetedCamera.md)]
+[!include[](InclCaptureOptionsTargetedCamera.md)]
 
-[!include[<title>](InclCaptureOptions360View.md)]
+[!include[](InclCaptureOptions360View.md)]
 
-[!include[<title>](InclCaptureOptionsRenderTextureAsset.md)]
+[!include[](InclCaptureOptionsRenderTextureAsset.md)]
 
-[!include[<title>](InclCaptureOptionsTextureSampling.md)]
+[!include[](InclCaptureOptionsTextureSampling.md)]
 
+## Format
 
+Use this section to set up the media format in which you need to save the recorded images.
 
+|Property||Function|
+|:---|:---|:---|
+| **Media File Format** || The file encoding format.<br/><br/>Choose **PNG**, **JPEG**, or **EXR** ([OpenEXR](https://en.wikipedia.org/wiki/OpenEXR)). The Recorder encodes EXR in 16 bits. |
+| **Color Space** | | The color space (gamma curve and gamut) to use in the output images. |
+|  | sRGB, sRGB | Use sRGB gamma curve and sRGB gamut. |
+|  | Linear, sRGB (unclamped) | Use linear unclamped scene referred using the sRGB primaries.<br/>This option is only available when you set the **Format** to **EXR**.<br/><br/>**Important:** To get the expected unclamped values in the output images, you must:<br/><br/>• Disable any Tonemapping post-processing effects in your Scene (menu: **Edit > Project Settings > HDRP Default Settings** and deselect **Tonemapping**) and in any Volume that includes a Tonemapping override (Select the Volume, navigate in the Inspector and deselect **Tonemapping** if present).<br/><br/>• Disable Dithering on the Camera selected for the capture (in the inspector, navigate to **General** and deselect **Dithering**). |
+| **Include Alpha** || Enable this property to include the alpha channel in the recording. Disable it to only record the RGB channels.<br/><br/>This property is not available when the selected **Media File Format** doesn't support transparency, or when **Capture** is set to **Game View**. |
 
+## Output File
 
+Use this section to specify the output **Path** and **File Name** pattern to save the recorded animation clip.
 
+> **Note:** [Output File properties](RecorderProperties.md) work the same for all types of recorders.

@@ -1,12 +1,11 @@
-﻿
 namespace UnityEditor.Recorder
 {
     [CustomEditor(typeof(AnimationRecorderSettings))]
-    class AnimationRecorderSettingsEditor: RecorderEditor
+    class AnimationRecorderSettingsEditor : RecorderEditor
     {
         protected override void FileTypeAndFormatGUI()
         {
             EditorGUILayout.LabelField("Format", "Animation Clip");
-        }   
+        }
     }
 }

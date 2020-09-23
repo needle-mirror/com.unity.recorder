@@ -9,7 +9,7 @@ namespace UnityEditor.Recorder.Timeline
     {
         string[] m_RecorderNames;
         List<Type> m_RecorderTypes;
-        
+
         bool m_SettingsAreAssets;
 
         Type m_SelectedRecorder;
@@ -21,12 +21,12 @@ namespace UnityEditor.Recorder.Timeline
             if (m_RecorderTypes == null)
             {
                 var recorderList = RecordersInventory.builtInRecorderInfos.ToList();
-                
+
                 if (RecorderOptions.ShowLegacyRecorders)
                     recorderList.AddRange(RecordersInventory.legacyRecorderInfos);
-                
+
                 recorderList.AddRange(RecordersInventory.customRecorderInfos);
-                
+
                 m_RecorderTypes = recorderList.Select(x => x.settingsType).ToList();
                 m_RecorderNames = recorderList.Select(x => x.displayName).ToArray();
             }
@@ -38,7 +38,7 @@ namespace UnityEditor.Recorder.Timeline
         {
             return m_RecorderTypes.IndexOf(settingType);
         }
-        
+
         Type GetRecorderFromIndex(int index)
         {
             return m_RecorderTypes.ElementAt(index);
@@ -61,11 +61,11 @@ namespace UnityEditor.Recorder.Timeline
                 return;
 
             var recorderAttribs = newSelection.GetCustomAttributes(typeof(ObsoleteAttribute), false);
-            if (recorderAttribs.Length > 0 )
-                Debug.LogWarning( "Recorder " + ((ObsoleteAttribute)recorderAttribs[0]).Message);
+            if (recorderAttribs.Length > 0)
+                Debug.LogWarning("Recorder " + ((ObsoleteAttribute)recorderAttribs[0]).Message);
 
             m_SelectedRecorder = newSelection;
-            
+
             if (OnSelectionChanged != null)
                 OnSelectionChanged.Invoke(m_SelectedRecorder);
         }

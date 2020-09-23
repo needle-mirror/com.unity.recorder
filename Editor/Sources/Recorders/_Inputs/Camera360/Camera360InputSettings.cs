@@ -1,4 +1,4 @@
-﻿#if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
 
 using System;
 using System.Collections.Generic;
@@ -111,7 +111,7 @@ namespace UnityEditor.Recorder.Input
             if (m_OutputWidth < 128 || m_OutputWidth > 8 * 1024)
             {
                 ok = false;
-                errors.Add( string.Format( "Output width must fall between {0} and {1}.", 128, 8*1024 ));
+                errors.Add(string.Format("Output width must fall between {0} and {1}.", 128, 8 * 1024));
             }
 
             if (m_OutputHeight != (1 << (int)Math.Log(m_OutputHeight, 2)))
@@ -123,7 +123,7 @@ namespace UnityEditor.Recorder.Input
             if (m_OutputHeight < 128 || m_OutputHeight > 8 * 1024)
             {
                 ok = false;
-                errors.Add( string.Format( "Output height must fall between {0} and {1}.", 128, 8*1024 ));
+                errors.Add(string.Format("Output height must fall between {0} and {1}.", 128, 8 * 1024));
             }
 
             if (mapSize != (1 << (int)Math.Log(mapSize, 2)))
@@ -132,10 +132,10 @@ namespace UnityEditor.Recorder.Input
                 errors.Add("Cube Map size must be a power of 2.");
             }
 
-            if( mapSize < 16 || mapSize > 8 * 1024 )
+            if (mapSize < 16 || mapSize > 8 * 1024)
             {
                 ok = false;
-                errors.Add( string.Format( "Cube Map size must fall between {0} and {1}.", 16, 8*1024 ));
+                errors.Add(string.Format("Cube Map size must fall between {0} and {1}.", 16, 8 * 1024));
             }
 
             if (renderStereo && stereoSeparation < float.Epsilon)
@@ -147,7 +147,6 @@ namespace UnityEditor.Recorder.Input
             return ok;
         }
     }
-
 }
 
 #endif

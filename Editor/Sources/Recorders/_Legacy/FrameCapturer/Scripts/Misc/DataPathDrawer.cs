@@ -8,7 +8,7 @@ namespace UnityEditor.Recorder.FrameCapturer
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             bool ro = property.FindPropertyRelative("m_readOnly").boolValue;
-            if(ro) { EditorGUI.BeginDisabledGroup(true); }
+            if (ro) { EditorGUI.BeginDisabledGroup(true); }
 
             EditorGUI.BeginProperty(position, label, property);
             position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
@@ -65,15 +65,17 @@ namespace UnityEditor.Recorder.Input
         {
             var pipelineAsset = GraphicsSettings.renderPipelineAsset;
             var usingURP = pipelineAsset != null &&
-                           (pipelineAsset.GetType().FullName.Contains("Universal") ||
-                            pipelineAsset.GetType().FullName.Contains("Lightweight"));
+                (pipelineAsset.GetType().FullName.Contains("Universal") ||
+                    pipelineAsset.GetType().FullName.Contains("Lightweight"));
             return usingURP;
         }
+
         internal static bool UsingLegacyRP()
         {
             var pipelineAsset = GraphicsSettings.renderPipelineAsset;
             return pipelineAsset == null;
         }
+
         /// <summary>
         /// Default constructor.
         /// </summary>

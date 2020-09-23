@@ -9,16 +9,16 @@ namespace UnityEditor.Recorder
             {
                 case RecordMode.Manual:
                     return "Manual";
-                
+
                 case RecordMode.SingleFrame:
                     return "Single Frame";
-                
+
                 case RecordMode.FrameInterval:
                     return "Frame Interval";
-                
+
                 case RecordMode.TimeInterval:
                     return "Time Interval (sec)";
-                
+
                 default:
                     return "unknown";
             }

@@ -103,11 +103,18 @@ namespace UnityEditor.Recorder.Input
             accumulateShader = Shader.Find("Hidden/BeautyShot/Accumulate");
             normalizeShader = Shader.Find("Hidden/BeautyShot/Normalize");
 
-            if (rtsSettings.FlipFinalOutput)
+            var movieRecorderSettings = session.settings as MovieRecorderSettings;
+            bool needToFlip = rtsSettings.FlipFinalOutput;
+            if (movieRecorderSettings != null)
+            {
+                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
+                needToFlip = needToFlip ? encoderAlreadyFlips : !encoderAlreadyFlips;
+            }
+            if (needToFlip)
                 m_VFlipper = new TextureFlipper();
 
             var h = rtsSettings.OutputHeight;
-            
+
             // Below here is considered 'void Start()', but we run it for directly "various reasons".
             if (h > rtsSettings.RenderHeight)
                 throw new UnityException("Upscaling is not supported! Output dimension must be smaller or equal to render dimension.");
@@ -118,7 +125,7 @@ namespace UnityEditor.Recorder.Input
             //var aspect = rtsSettings.m_OutputAspect.GetAspect();
             m_renderHeight = Mathf.Min(16 * 1024, Mathf.RoundToInt(rtsSettings.RenderHeight)); //rtsSettings.renderHeight; //m_RenderSize;
             m_renderWidth = Mathf.Min(16 * 1024, Mathf.RoundToInt(rtsSettings.RenderWidth));
-            
+
             OutputHeight = h;
             OutputWidth = rtsSettings.OutputWidth;
 
@@ -130,17 +137,17 @@ namespace UnityEditor.Recorder.Input
 
             m_renderRT = new RenderTexture(m_renderWidth, m_renderHeight, 24, RenderTextureFormat.DefaultHDR,
                 RenderTextureReadWrite.Linear) { wrapMode = TextureWrapMode.Clamp };
-            
+
             for (int i = 0; i < 2; ++i)
             {
                 m_accumulateRTs[i] = new RenderTexture(m_renderWidth, m_renderHeight, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear)
                 {
                     wrapMode = TextureWrapMode.Clamp
                 };
-                
+
                 m_accumulateRTs[i].Create();
             }
-            
+
             var rt = new RenderTexture(OutputWidth, OutputHeight, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
             rt.Create();
             OutputRenderTexture = rt;
@@ -186,7 +193,7 @@ namespace UnityEditor.Recorder.Input
 
                     if (sort)
                     {
-                        m_hookedCameras.Sort((x, y) => x.camera.depth < y.camera.depth ? -1 : x.camera.depth > y.camera.depth ? 1 : 0);
+                        m_hookedCameras.Sort((x, y) => x.camera.depth<y.camera.depth ? -1 : x.camera.depth> y.camera.depth ? 1 : 0);
                     }
                     break;
                 }
@@ -253,7 +260,6 @@ namespace UnityEditor.Recorder.Input
                                 var hookedCam = new HookedCamera { camera = cam, textureBackup = cam.targetTexture };
                                 cam.targetTexture = m_renderRT;
                                 m_hookedCameras.Add(hookedCam);
-
                             }
                         }
                     }
@@ -288,7 +294,7 @@ namespace UnityEditor.Recorder.Input
                 UnityHelpers.Destroy(m_superMaterial);
                 UnityHelpers.Destroy(m_accumulateMaterial);
                 UnityHelpers.Destroy(m_normalizeMaterial);
-                if(m_VFlipper != null)
+                if (m_VFlipper != null)
                     m_VFlipper.Dispose();
             }
 
@@ -317,7 +323,14 @@ namespace UnityEditor.Recorder.Input
                 Graphics.Blit(m_renderRT, OutputRenderTexture, m_superMaterial);
             }
 
-            if (rtsSettings.FlipFinalOutput)
+            bool needToFlip = rtsSettings.FlipFinalOutput; // whether or not the recorder settings have the flip box checked
+            var movieRecorderSettings = session.settings as MovieRecorderSettings;
+            if (movieRecorderSettings != null)
+            {
+                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
+                needToFlip = needToFlip ? encoderAlreadyFlips : !encoderAlreadyFlips;
+            }
+            if (needToFlip)
                 m_VFlipper.Flip(OutputRenderTexture);
         }
 
@@ -349,12 +362,14 @@ namespace UnityEditor.Recorder.Input
             foreach (var hookedCam in m_hookedCameras)
             {
                 var cam = hookedCam.camera;
+                // We need to remember if the camera uses physical properties
+                bool usePhysicalProperties = cam.usePhysicalProperties;
 
                 for (int i = 0, n = (int)rtsSettings.SuperSampling; i < n; i++)
                 {
                     var oldProjectionMatrix = cam.projectionMatrix;
                     var oldRect = cam.rect;
-                    cam.rect  =new Rect(0f,0f,1f,1f);
+                    cam.rect  = new Rect(0f, 0f, 1f, 1f);
                     ShiftProjectionMatrix(cam, m_samples[i] - new Vector2(0.5f, 0.5f));
                     cam.Render();
                     cam.projectionMatrix = oldProjectionMatrix;
@@ -366,24 +381,31 @@ namespace UnityEditor.Recorder.Input
 
                     if (CameraUsingPartialViewport(cam))
                     {
-                        m_accumulateMaterial.SetFloat("_OfsX", cam.rect.x );
-                        m_accumulateMaterial.SetFloat("_OfsY", cam.rect.y );
-                        m_accumulateMaterial.SetFloat("_Width", cam.rect.width );
-                        m_accumulateMaterial.SetFloat("_Height", cam.rect.height );
-                        m_accumulateMaterial.SetFloat("_Scale", cam.targetTexture.width / (float)m_renderRT.width );
+                        m_accumulateMaterial.SetFloat("_OfsX", cam.rect.x);
+                        m_accumulateMaterial.SetFloat("_OfsY", cam.rect.y);
+                        m_accumulateMaterial.SetFloat("_Width", cam.rect.width);
+                        m_accumulateMaterial.SetFloat("_Height", cam.rect.height);
+                        m_accumulateMaterial.SetFloat("_Scale", cam.targetTexture.width / (float)m_renderRT.width);
                     }
                     else
                     {
-                        m_accumulateMaterial.SetFloat("_OfsX", 0 );
-                        m_accumulateMaterial.SetFloat("_OfsY", 0 );
-                        m_accumulateMaterial.SetFloat("_Width", 1 );
-                        m_accumulateMaterial.SetFloat("_Height", 1 );
-                        m_accumulateMaterial.SetFloat("_Scale", 1 );
+                        m_accumulateMaterial.SetFloat("_OfsX", 0);
+                        m_accumulateMaterial.SetFloat("_OfsY", 0);
+                        m_accumulateMaterial.SetFloat("_Width", 1);
+                        m_accumulateMaterial.SetFloat("_Height", 1);
+                        m_accumulateMaterial.SetFloat("_Scale", 1);
                     }
                     m_accumulateMaterial.SetInt("_Pass", i);
                     Graphics.Blit(cam.targetTexture, accumulateInto, m_accumulateMaterial);
                     x++;
                 }
+                // It is really important to call ResetProjectionMatrix to insure the
+                // camera will be recomputed and reflect the normal camera's parameters.
+                // Call this to end the effect of setting projectionMatrix. FTV-824
+                cam.ResetProjectionMatrix();
+                // If the camera was using physical properties we need reset the camera
+                // to keep using physical properties.
+                cam.usePhysicalProperties = usePhysicalProperties;
             }
 
             Graphics.Blit(accumulateInto, m_renderRT);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,14 +10,14 @@ namespace UnityEditor.Recorder
     {
         SerializedProperty m_CustomAspectX;
         SerializedProperty m_CustomAspectY;
-        
+
         SerializedProperty m_ImageAspect;
 
         bool m_Initialized;
 
         const string k_Format = "0.0###";
         static GUIContent[] s_DisplayNames;
-        
+
         static readonly Dictionary<ImageAspect, string> s_AspectToName = new Dictionary<ImageAspect, string>
         {
             { ImageAspect.x19_10, "19:10 (" + AspectRatio.s_AspectToValue[ImageAspect.x19_10].ToString(k_Format) + ")"},
@@ -32,19 +32,19 @@ namespace UnityEditor.Recorder
 
         void Initialize(SerializedProperty property)
         {
-            if (m_Initialized )
+            if (m_Initialized)
                 return;
 
             m_Initialized = true;
-                
+
             m_CustomAspectX = property.FindPropertyRelative("m_CustomAspectX");
             m_CustomAspectY = property.FindPropertyRelative("m_CustomAspectY");
-        
+
             m_ImageAspect = property.FindPropertyRelative("m_ImageAspect");
 
             if (s_DisplayNames == null)
             {
-                s_DisplayNames = ((ImageAspect[]) Enum.GetValues(typeof(ImageAspect))).Select(e => new GUIContent(s_AspectToName[e])).ToArray();
+                s_DisplayNames = ((ImageAspect[])Enum.GetValues(typeof(ImageAspect))).Select(e => new GUIContent(s_AspectToName[e])).ToArray();
             }
         }
 
@@ -53,25 +53,25 @@ namespace UnityEditor.Recorder
             Initialize(property);
 
             EditorGUI.BeginProperty(position, label, property);
-            
+
             m_ImageAspect.intValue = EditorGUI.Popup(position, label, m_ImageAspect.intValue, s_DisplayNames);
-                
+
             EditorGUI.EndProperty();
 
-            var aspect = (ImageAspect) m_ImageAspect.intValue;
+            var aspect = (ImageAspect)m_ImageAspect.intValue;
             if (aspect == ImageAspect.Custom)
             {
                 CustomAspectField();
             }
         }
-        
+
         void CustomAspectField()
         {
             var r = EditorGUILayout.GetControlRect();
 
             var rContent = r;
             rContent.xMin = r.x + EditorGUIUtility.labelWidth;
-            
+
             EditorGUI.BeginChangeCheck();
 
             int indentLevel = EditorGUI.indentLevel;
@@ -84,16 +84,16 @@ namespace UnityEditor.Recorder
 
             var rCurrent = rContent;
             rCurrent.width = w;
-            
+
             var x = EditorGUI.FloatField(rCurrent, m_CustomAspectX.floatValue);
 
             rCurrent.x += w;
             rCurrent.width = columnWidth;
             EditorGUI.LabelField(rCurrent, ":");
-            
+
             rCurrent.x += columnWidth;
             rCurrent.width = w;
-            var y  = EditorGUI.FloatField(rCurrent, m_CustomAspectY.floatValue );
+            var y  = EditorGUI.FloatField(rCurrent, m_CustomAspectY.floatValue);
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -106,7 +106,7 @@ namespace UnityEditor.Recorder
             rCurrent.xMin = rCurrent.xMax + 3.0f;
             rCurrent.xMax = r.xMax;
             EditorGUI.LabelField(rCurrent, "(" + aspect.ToString(k_Format) + ")");
-            
+
             EditorGUI.indentLevel = indentLevel;
             EditorGUIUtility.labelWidth = labelWidth;
         }

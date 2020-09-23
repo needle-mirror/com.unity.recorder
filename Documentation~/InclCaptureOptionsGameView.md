@@ -1,7 +1,7 @@
 <a name="GameView"></a>
-### Game View capture properties
+### Game View
 
-These options appear when you set **Capture** to **Game View**.
+These properties appear when you set **Source** to **Game View**.
 
 >[!NOTE]
 >* If you have multiple Game Views in your project, the Recorder captures only the last one you selected in the Editor.
@@ -9,11 +9,12 @@ These options appear when you set **Capture** to **Game View**.
 
 ![](Images/CaptureOptionsGameView.png)
 
-|Property:||Function:|
+|Property||Function|
 |-|-|-|
-| **Output Resolution** ||The dimensions of the recording.|
-|   | Match Window Size  | Matches the current Game View resolution.  |
-|   |  _[PRESET RESOLUTIONS]_ | Choose from several standard video resolutions such as 1080p and 4K.  |
-|   |  Custom | Uses custom width and height values that you supply.  |
-| **Aspect Ratio** ||These options appear when you set **Output Resolution** to **Custom**.|
-|   | W/H   | Control the recording's width and height.<br/><br/>  |
+| **Output Resolution** || Allows you to set the dimensions of the recorded view using different methods. |
+|   | Match Window Size  | Matches the resolution and aspect ratio of the currently selected Game View. |
+|   | _[PRESET RESOLUTIONS]_ | Choose from several standard video resolutions such as FHD (1080p) and 4K (2160p).<br/><br/>The numeric value represents the image height. To set the image width, you must select a specific **Aspect Ratio**. |
+|   |  Custom | Uses custom width and height values that you supply in the **W** and **H** fields. |
+| **Aspect Ratio** || Specifies the ratio of width to height (w:h) of the recorded view when you set the **Output Resolution** to a preset resolution. |
+|   | _[PRESET ASPECT RATIOS]_ | Choose from several standard aspect ratios such as 16:9 (1.7778) and 4:3 (1.3333). |
+|   | Custom   | Uses custom aspect ratio that you supply in the displayed fields (w:h). |

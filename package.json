@@ -1,8 +1,8 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Unity Recorder",
-  "version": "2.2.0-preview.4",
-  "unity": "2018.3",
+  "version": "2.3.0-preview.3",
+  "unity": "2018.4",
   "unityRelease": "4f1",
   "dependencies": {
     "com.unity.timeline": "1.0.0"
@@ -18,11 +18,13 @@
     "clip",
     "images"
   ],
+  "upmCi": {
+    "footprint": "831adfc29185c302e329577ae6edefdb56ce1022"
+  },
   "repository": {
-    "footprint": "31bf4b6400f779bbdd42c58d24a552a6e46ccc3b",
-    "type": "git",
     "url": "https://github.com/Unity-Technologies/com.unity.recorder.git",
-    "revision": "b97e1ca7c4f1fc85711e4f7f24ca74a8debdd1ac"
+    "type": "git",
+    "revision": "696e9e3178c6fd110e73bcc999a7b1b9a0e95da3"
   },
   "samples": [
     {

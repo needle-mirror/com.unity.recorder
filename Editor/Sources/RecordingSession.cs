@@ -4,11 +4,11 @@ using UnityEngine;
 namespace UnityEditor.Recorder
 {
     public class RecordingSession : IDisposable
-    {   
+    {
         public Recorder recorder;
         internal GameObject recorderGameObject;
         internal RecorderComponent recorderComponent;
-        
+
         int m_FrameIndex = 0;
         int m_InitialFrame = 0;
         int m_FirstRecordedFrameCount = -1;
@@ -19,7 +19,7 @@ namespace UnityEditor.Recorder
         internal bool prepareFrameCalled { get; private set; }
         internal double currentFrameStartTS { get; private set; }
         internal double recordingStartTS { get; private set; }
-        
+
         internal DateTime sessionStartTS { get; private set; }
 
         public RecorderSettings settings
@@ -62,12 +62,11 @@ namespace UnityEditor.Recorder
             try
             {
                 AllowInBackgroundMode();
-                recordingStartTS = (Time.time / (Mathf.Approximately(Time.timeScale, 0f)? 1f : Time.timeScale));
+                recordingStartTS = (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale));
                 sessionStartTS = DateTime.Now;
                 recorder.SessionCreated(this);
                 prepareFrameCalled = false;
                 return true;
-
             }
             catch (Exception ex)
             {

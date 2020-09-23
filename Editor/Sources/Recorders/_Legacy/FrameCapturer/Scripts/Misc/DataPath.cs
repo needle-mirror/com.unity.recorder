@@ -37,7 +37,7 @@ namespace UnityEditor.Recorder.FrameCapturer
             set { m_readOnly = value; }
         }
 
-        public DataPath() { }
+        public DataPath() {}
         public DataPath(Root root, string leaf)
         {
             m_root = root;
@@ -123,12 +123,12 @@ namespace UnityEditor.Recorder.FrameCapturer
             try
             {
                 var path = GetFullPath();
-                if(path.Length > 0)
+                if (path.Length > 0)
                 {
                     System.IO.Directory.CreateDirectory(path);
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
             }
         }

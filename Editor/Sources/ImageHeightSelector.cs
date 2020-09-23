@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,7 +14,7 @@ namespace UnityEditor.Recorder
         int m_Max;
         readonly bool m_AllowCustom;
         readonly bool m_AllowWindow;
-        
+
         static readonly Dictionary<ImageHeight, string> s_HeightToName = new Dictionary<ImageHeight, string>
         {
             { ImageHeight.x4320p_8K, "8K - 4320p" },
@@ -28,20 +28,20 @@ namespace UnityEditor.Recorder
             { ImageHeight.Window, "Match Window Size" },
             { ImageHeight.Custom, "Custom" }
         };
-        
+
         public ImageHeightSelector(int max, bool allowCustom = true, bool allowWindow = true)
         {
             m_AllowCustom = allowCustom;
             m_AllowWindow = allowWindow;
             BuildPopup(max);
         }
-        
+
         void BuildPopup(int max)
         {
-            var values = (ImageHeight[]) Enum.GetValues(typeof(ImageHeight));
+            var values = (ImageHeight[])Enum.GetValues(typeof(ImageHeight));
 
             var ordered = new List<ImageHeight>();
-            
+
             if (m_AllowWindow)
                 ordered.Add(ImageHeight.Window);
 
@@ -53,7 +53,7 @@ namespace UnityEditor.Recorder
             var count = ordered.Count;
             m_ToName = new string[count];
             m_ToEnumValue = new int[count];
-            
+
             for (int i = 0; i < count; ++i)
             {
                 var e = ordered[i];
@@ -66,15 +66,15 @@ namespace UnityEditor.Recorder
         }
 
         public int Popup(GUIContent label, int value, int max)
-        {   
+        {
             if (m_Max != max)
                 BuildPopup(max);
-            
+
             int index;
-            
-            if (!m_ToIndex.TryGetValue((ImageHeight) value, out index))
+
+            if (!m_ToIndex.TryGetValue((ImageHeight)value, out index))
                 index = 0;
-            
+
             index = EditorGUILayout.Popup(label, index, m_ToName);
 
             return m_ToEnumValue[index];

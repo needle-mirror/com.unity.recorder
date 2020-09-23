@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -145,7 +145,8 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Stores the default set of tags that make up the output file name.
         /// </summary>
-        public string FileName {
+        public string FileName
+        {
             get { return m_FileName; }
             set { m_FileName = value; }
         }
@@ -210,7 +211,7 @@ namespace UnityEditor.Recorder
 
         string RecorderResolver(RecordingSession session)
         {
-            return m_RecorderSettings.name;
+            return SanitizeRecorderName(m_RecorderSettings.name);
         }
 
         static string TimeResolver(RecordingSession session)
@@ -307,16 +308,36 @@ namespace UnityEditor.Recorder
         public void CreateDirectory(RecordingSession session)
         {
             var path = ApplyWildcards(m_Path.GetFullPath(), session);
-            if(!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
                 Directory.CreateDirectory(path);
         }
 
+        /// <summary>
+        /// Replaces any invalid path character by "_".
+        /// </summary>
+        /// <param name="recorderName">The Recorder name.</param>
+        /// <returns>The recorder name with "_" replacing occurrences of invalid characters</returns>
+        internal static string SanitizeRecorderName(string recorderName)
+        {
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+            Array.ForEach<char>(invalidChars, c => recorderName = recorderName.Replace(c, '_'));
+
+            return recorderName;
+        }
+
+        /// <summary>
+        /// Replaces any occurrence of "/" or "\" in file name with "_".
+        /// </summary>
+        /// <param name="filename">The file name</param>
+        /// <returns>The file name with occurrences of "/" or "\" replaced with "_"</returns>
         internal static string SanitizeFilename(string filename)
         {
-            filename = filename.Replace("\\", "");
-            filename = Regex.Replace(filename, "/", "");
+            filename = filename.Replace("\\", "_");
+            filename = Regex.Replace(filename, "/", "_");
+
             return filename;
         }
+
         /// <summary>
         /// Makes the output file path compliant with any OS (replacing any "\" by "/").
         /// </summary>
@@ -339,6 +360,5 @@ namespace UnityEditor.Recorder
 
             return str;
         }
-
     }
 }

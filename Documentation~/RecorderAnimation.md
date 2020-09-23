@@ -1,21 +1,42 @@
-# Configuring Animation Clip Recorders
+# Animation Clip Recorder properties
 
-The **Animation Clip Recorder** generates an animation clip in the .anim file format.
+The **Animation Clip Recorder** generates an animation clip in Unity Animation file format (.anim extension).
 
-This page covers the properties specific to Animation Clip Recorders. To fully configure an Animation Clip Recorder, you must also set:
+This page covers all properties specific to the Animation Clip Recorder type.
 
-- The Recorder's [Output properties](RecorderProperties.md).
-- The [Recording Properties](Recording.md) for the capture.
-
-## Animation Clip Recorder properties
+> **Note:** To fully configure any Recorder, you must also set the global [Recording Properties](Recording.md) for the capture (properties shared with the other recorders, such as the frames to record).
 
 ![](Images/RecorderAnimation.png)
 
-|Property:|Function:|
-|:---|:---|
-| **Game Object** |The [GameObject](https://docs.unity3d.com/Manual/class-GameObject.html) to record.|
-| **Recorded Target(s)** |The components of the GameObject to record. Choose more than one item to record more than one component.|
-| **Record Hierarchy** |Enable this property to record the GameObject's children.|
+The Animation Clip Recorder properties fall into three main categories:
+* [Capture](#capture)
+* [Format](#format)
+* [Output File](#output-file)
+
+## Capture
+
+Use this section to define the source and the content of your recording.
+
+|Property||Function|
+|:---|:---|:---|
+| **GameObject** ||The [GameObject](https://docs.unity3d.com/Manual/class-GameObject.html) to record.|
+| **Recorded Component(s)** ||The components of the GameObject to record.<br />Choose more than one item to record more than one component.|
+| **Record Hierarchy** ||Enable this property to record the GameObject's children.|
+| **Clamped Tangents** || Enable this option to set all [key tangents](https://docs.unity3d.com/Manual/EditingCurves.html) of the recorded animation to "Clamped Auto". Disabling the option sets the tangents to "Auto" (legacy).<br />Clamped tangents are useful to prevent curve overshoots when the animation data is discontinuous. |
+| **Anim. Compression** || Specifies the keyframe reduction level to use to compress the recorded animation curve data. |
+| | Lossy | Applies an overall keyframe reduction. The Recorder removes animation keys based on a relative tolerance of 0.5 percent, to overall simplify the curve. This reduces the file size but directly affects the original curve accuracy. |
+| | Lossless | Applies keyframe reduction to constant curves only. The Recorder removes all unnecessary keys when the animation curve is a straight line, but keeps all recorded keys as long as the animation is not constant. |
+| | Disabled | Disables the animation compression. The Recorder saves all animation keys throughout the recording, even when the animation curve is a straight line. This might result in large files and slow playback. |
 
 >[!NOTE]
 >The Animation Clip Recorder can only record a GameObject in the current Scene. It cannot record GameObjects in other Scenes.
+
+## Format
+
+The Animation Clip Recorder always generates an animation clip in the .anim file format.
+
+## Output File
+
+Use this section to specify the output **Path** and **File Name** pattern to save the recorded animation clip.
+
+> **Note:** [Output File properties](RecorderProperties.md) work the same for all types of recorders.

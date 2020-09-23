@@ -5,7 +5,7 @@ namespace UnityEditor.Recorder.FrameCapturer
     class PNGRecorder : GenericRecorder<PNGRecorderSettings>
     {
         fcAPI.fcPngContext m_ctx;
-        
+
         protected internal override bool BeginRecording(RecordingSession session)
         {
             if (!base.BeginRecording(session)) { return false; }
@@ -36,6 +36,5 @@ namespace UnityEditor.Recorder.FrameCapturer
                 fcAPI.fcPngExportPixels(m_ctx, path, data, frame.width, frame.height, fmt, 0);
             });
         }
-
     }
 }

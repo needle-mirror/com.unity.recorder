@@ -6,7 +6,7 @@ namespace UnityEditor.Recorder.FrameCapturer
     class MP4Recorder : GenericRecorder<MP4RecorderSettings>
     {
         fcAPI.fcMP4Context m_ctx;
-        
+
         protected internal override bool BeginRecording(RecordingSession session)
         {
             if (!base.BeginRecording(session)) { return false; }
@@ -14,7 +14,7 @@ namespace UnityEditor.Recorder.FrameCapturer
             Settings.fileNameGenerator.CreateDirectory(session);
 
             var input = (BaseRenderTextureInput)m_Inputs[0];
-            if (input.OutputWidth > 4096 || input.OutputHeight > 2160 )
+            if (input.OutputWidth > 4096 || input.OutputHeight > 2160)
             {
                 Debug.LogError("Mp4 format does not support resolutions larger than 4096x2160.");
             }
@@ -36,7 +36,7 @@ namespace UnityEditor.Recorder.FrameCapturer
             var input = (BaseRenderTextureInput)m_Inputs[0];
             var frame = input.OutputRenderTexture;
 
-            if(!m_ctx)
+            if (!m_ctx)
             {
                 var s = Settings.m_MP4EncoderSettings;
                 s.video = true;
@@ -46,7 +46,7 @@ namespace UnityEditor.Recorder.FrameCapturer
                 s.videoTargetFramerate = (int)Math.Ceiling(Settings.FrameRate);
                 if (Settings.m_AutoSelectBR)
                 {
-                    s.videoTargetBitrate = (int)(( (frame.width * frame.height/1000.0) / 245 + 1.16) * (s.videoTargetFramerate / 48.0 + 0.5) * 1000000);
+                    s.videoTargetBitrate = (int)(((frame.width * frame.height / 1000.0) / 245 + 1.16) * (s.videoTargetFramerate / 48.0 + 0.5) * 1000000);
                 }
                 var path = Settings.fileNameGenerator.BuildAbsolutePath(session);
                 m_ctx = fcAPI.fcMP4OSCreateContext(ref s, path);

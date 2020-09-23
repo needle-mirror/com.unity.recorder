@@ -8,11 +8,11 @@ namespace UnityEditor.Recorder
     {
         fcAPI.fcGifContext m_ctx;
         fcAPI.fcStream m_stream;
-        
+
         protected internal override bool BeginRecording(RecordingSession session)
         {
             if (!base.BeginRecording(session)) { return false; }
-            
+
             Settings.fileNameGenerator.CreateDirectory(session);
 
             return true;
@@ -33,7 +33,7 @@ namespace UnityEditor.Recorder
             var input = (BaseRenderTextureInput)m_Inputs[0];
             var frame = input.OutputRenderTexture;
 
-            if(!m_ctx)
+            if (!m_ctx)
             {
                 var gifSettings = Settings.gifEncoderSettings;
                 gifSettings.width = frame.width;
@@ -49,6 +49,5 @@ namespace UnityEditor.Recorder
                 fcAPI.fcGifAddFramePixels(m_ctx, data, fmt, session.recorderTime);
             });
         }
-
     }
 }

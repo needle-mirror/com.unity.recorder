@@ -10,9 +10,9 @@ namespace UnityEditor.Recorder
     /// This class manages Recorder references to GameObjects in the form of key-value pairs saved inside Recorder assets.
     /// </summary>
     public static class BindingManager
-    {  
+    {
         const string k_HostGoName = "Unity-RecorderBindings";
-        
+
         /// <summary>
         /// Retrieves the GameObject bound to a specific key.
         /// </summary>
@@ -22,7 +22,7 @@ namespace UnityEditor.Recorder
         {
             var rcs = FindRecorderBindings();
             var rc = rcs.FirstOrDefault(r => r.HasBindingValue(id));
-            
+
             return rc != null ? rc.GetBindingValue(id) : null;
         }
 
@@ -39,7 +39,7 @@ namespace UnityEditor.Recorder
                 rc.DuplicateBinding(id, newId);
             }
         }
-        
+
         /// <summary>
         /// Creates a key-value pair in the Binding manager to reference a GameObject.
         /// </summary>
@@ -70,7 +70,7 @@ namespace UnityEditor.Recorder
                     rb = gameObject.AddComponent<RecorderBindings>();
                     SceneManager.MoveGameObjectToScene(rb.gameObject, scene);
                 }
-                
+
                 // Replace
                 rb.SetBindingValue(id, obj);
 
@@ -78,7 +78,7 @@ namespace UnityEditor.Recorder
                 {
                     if (r == rb)
                         continue;
-                    
+
                     RemoveBinding(id, r);
                 }
             }
@@ -87,11 +87,11 @@ namespace UnityEditor.Recorder
         static void RemoveBinding(string id, RecorderBindings rb)
         {
             rb.RemoveBinding(id);
-                    
+
             if (rb.IsEmpty())
                 Object.DestroyImmediate(rb.gameObject);
         }
-        
+
         internal static RecorderBindings[] FindRecorderBindings()
         {
             return Object.FindObjectsOfType<RecorderBindings>();
@@ -106,20 +106,20 @@ namespace UnityEditor.Recorder
             var component = obj as Component;
             if (component != null)
                 return component.gameObject.scene;
-            
+
             return SceneManager.GetActiveScene();
         }
     }
-    
+
     class SceneHook
     {
         const string k_HostGoName = "Unity-RecorderSessions";
-        
+
         static GameObject s_SessionHooksRoot;
 
         readonly string m_SessionId;
         GameObject m_SessionHook;
-        
+
         public SceneHook(string sessionId)
         {
             m_SessionId = sessionId;
@@ -128,14 +128,14 @@ namespace UnityEditor.Recorder
         static GameObject GetSessionHooksRoot(bool createIfNecessary = true)
         {
             if (s_SessionHooksRoot == null)
-            {  
+            {
                 s_SessionHooksRoot = GameObject.Find(k_HostGoName);
 
                 if (s_SessionHooksRoot == null)
                 {
                     if (!createIfNecessary)
                         return null;
-                    
+
                     s_SessionHooksRoot = UnityHelpers.CreateRecorderGameObject(k_HostGoName);
                 }
             }
@@ -147,16 +147,16 @@ namespace UnityEditor.Recorder
         {
             if (m_SessionHook != null)
                 return m_SessionHook;
-            
+
             var host = GetSessionHooksRoot();
             if (host == null)
                 return null;
-            
+
             m_SessionHook = GameObject.Find(m_SessionId);
             if (m_SessionHook == null)
             {
                 m_SessionHook = new GameObject(m_SessionId);
-                m_SessionHook.transform.parent = host.transform;   
+                m_SessionHook.transform.parent = host.transform;
             }
 
             return m_SessionHook;
@@ -171,7 +171,7 @@ namespace UnityEditor.Recorder
                 foreach (var component in components)
                 {
                     yield return component.session;
-                }      
+                }
             }
         }
 
@@ -184,11 +184,11 @@ namespace UnityEditor.Recorder
                 Object.DontDestroyOnLoad(host);
             }
         }
-        
+
         public RecordingSession CreateRecorderSessionWithRecorderComponent(RecorderSettings settings)
         {
             var component = GetRecorderComponent(settings);
-            
+
             var session = new RecordingSession
             {
                 recorder = RecordersInventory.CreateDefaultRecorder(settings),
@@ -200,13 +200,13 @@ namespace UnityEditor.Recorder
 
             return session;
         }
-        
+
         public RecordingSession CreateRecorderSession(RecorderSettings settings)
         {
             var sceneHook = GetSessionHook();
             if (sceneHook == null)
                 return null;
-            
+
             var session = new RecordingSession
             {
                 recorder = RecordersInventory.CreateDefaultRecorder(settings),
@@ -215,7 +215,7 @@ namespace UnityEditor.Recorder
 
             return session;
         }
-        
+
         RecorderComponent GetRecorderComponent(RecorderSettings settings)
         {
             var sceneHook = GetSessionHook();

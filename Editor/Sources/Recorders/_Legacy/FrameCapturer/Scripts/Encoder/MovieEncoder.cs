@@ -20,13 +20,14 @@ namespace UnityEditor.Recorder.FrameCapturer
 
         public bool supportVideo
         {
-            get {
+            get
+            {
                 return
-                  format == MovieEncoder.Type.Png ||
-                  format == MovieEncoder.Type.Exr ||
-                  format == MovieEncoder.Type.Gif ||
-                  format == MovieEncoder.Type.WebM ||
-                  format == MovieEncoder.Type.MP4;
+                    format == MovieEncoder.Type.Png ||
+                    format == MovieEncoder.Type.Exr ||
+                    format == MovieEncoder.Type.Gif ||
+                    format == MovieEncoder.Type.WebM ||
+                    format == MovieEncoder.Type.MP4;
             }
         }
 
@@ -35,8 +36,8 @@ namespace UnityEditor.Recorder.FrameCapturer
             get
             {
                 return
-                  format == MovieEncoder.Type.WebM ||
-                  format == MovieEncoder.Type.MP4;
+                    format == MovieEncoder.Type.WebM ||
+                    format == MovieEncoder.Type.MP4;
             }
         }
 
@@ -57,7 +58,7 @@ namespace UnityEditor.Recorder.FrameCapturer
             set
             {
                 webmEncoderSettings.video =
-                mp4EncoderSettings.video = value;
+                    mp4EncoderSettings.video = value;
             }
         }
         public bool captureAudio
@@ -77,29 +78,29 @@ namespace UnityEditor.Recorder.FrameCapturer
             set
             {
                 webmEncoderSettings.audio =
-                mp4EncoderSettings.audio = value;
+                    mp4EncoderSettings.audio = value;
             }
         }
 
         public void Setup(int w, int h, int ch = 4, int targetFrameRate = 60)
         {
             pngEncoderSettings.width =
-            exrEncoderSettings.width =
-            gifEncoderSettings.width = 
-            webmEncoderSettings.videoWidth =
-            mp4EncoderSettings.videoWidth = w;
+                exrEncoderSettings.width =
+                    gifEncoderSettings.width =
+                        webmEncoderSettings.videoWidth =
+                            mp4EncoderSettings.videoWidth = w;
 
             pngEncoderSettings.height =
-            exrEncoderSettings.height =
-            gifEncoderSettings.height =
-            webmEncoderSettings.videoHeight =
-            mp4EncoderSettings.videoHeight = h;
+                exrEncoderSettings.height =
+                    gifEncoderSettings.height =
+                        webmEncoderSettings.videoHeight =
+                            mp4EncoderSettings.videoHeight = h;
 
             pngEncoderSettings.channels =
-            exrEncoderSettings.channels = ch;
+                exrEncoderSettings.channels = ch;
 
             webmEncoderSettings.videoTargetFramerate =
-            mp4EncoderSettings.videoTargetFramerate = targetFrameRate;
+                mp4EncoderSettings.videoTargetFramerate = targetFrameRate;
         }
     }
 
@@ -113,7 +114,7 @@ namespace UnityEditor.Recorder.FrameCapturer
             WebM,
             MP4,
         }
-        
+
         public static Type[] GetAvailableEncoderTypes()
         {
             var ret = new List<Type>();
@@ -140,7 +141,7 @@ namespace UnityEditor.Recorder.FrameCapturer
                 case Type.Png: return new PNGEncoder();
                 case Type.Exr: return new EXREncoder();
                 case Type.Gif: return new GIFEncoder();
-                case Type.WebM:return new WEBMEncoder();
+                case Type.WebM: return new WEBMEncoder();
                 case Type.MP4: return new MP4Encoder();
             }
             return null;
