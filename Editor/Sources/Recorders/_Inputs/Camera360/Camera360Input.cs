@@ -102,7 +102,7 @@ namespace UnityEditor.Recorder.Input
             }
 
             if (needToFlip)
-                m_VFlipper.Flip(OutputRenderTexture);
+                OutputRenderTexture = m_VFlipper.Flip(OutputRenderTexture);
 
             targetCamera.stereoSeparation = eyesEyeSepBackup;
             targetCamera.stereoTargetEye = eyeMaskBackup;

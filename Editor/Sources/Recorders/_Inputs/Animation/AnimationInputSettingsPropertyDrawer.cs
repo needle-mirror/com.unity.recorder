@@ -53,7 +53,7 @@ namespace UnityEditor.Recorder.Input
                 }
 
                 var distinctCompos = compos.Distinct()
-                    .Where(x => !typeof(MonoBehaviour).IsAssignableFrom(x) && x != typeof(Animator)) // black list
+                    .Where(x =>  x != typeof(Animator)) // black list
                     .ToList();
                 var compoNames = distinctCompos.Select(x => x.AssemblyQualifiedName).ToList();
 

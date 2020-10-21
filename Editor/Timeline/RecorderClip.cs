@@ -51,7 +51,6 @@ namespace UnityEditor.Recorder.Timeline
         /// <inheritdoc/>
         public void OnDestroy()
         {
-            UnityHelpers.Destroy(settings, true);
         }
 
         /// <inheritdoc/>

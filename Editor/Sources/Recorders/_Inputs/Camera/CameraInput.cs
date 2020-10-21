@@ -74,6 +74,10 @@ namespace UnityEditor.Recorder.Input
             public virtual void ReleaseCamera()
             {
                 UnityHelpers.Destroy(m_CopyMaterial);
+                // Case REC-62 Multiple Recorder produce flipped content
+                // Important to set m_CopyMaterial to null because the getter
+                // might try to return a material that already was destroyed.
+                m_CopyMaterial = null;
             }
 
             protected abstract void SetupCommandBuffer(RenderTexture renderTexture);
@@ -124,9 +128,9 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
-        private class CaptureCallbackInputStrategy : InputStrategy
+        private class CaptureCallbackSRPInputStrategy : InputStrategy
         {
-            public CaptureCallbackInputStrategy(bool captureAlpha) : base(captureAlpha) {}
+            public CaptureCallbackSRPInputStrategy(bool captureAlpha) : base(captureAlpha) {}
 
             protected override void SetupCommandBuffer(RenderTexture renderTexture)
             {
@@ -140,11 +144,11 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
-        private class CameraCommandBufferInputStrategy : InputStrategy
+        private class CameraCommandBufferLegacyInputStrategy : InputStrategy
         {
             private CommandBuffer m_cbCopyFB;
 
-            public CameraCommandBufferInputStrategy(bool captureAlpha) : base(captureAlpha) {}
+            public CameraCommandBufferLegacyInputStrategy(bool captureAlpha) : base(captureAlpha) {}
 
             protected override void SetupCommandBuffer(RenderTexture renderTexture)
             {
@@ -194,9 +198,9 @@ namespace UnityEditor.Recorder.Input
                 m_VFlipper = new TextureFlipper();
 
             if (CameraInputSettings.UsingLegacyRP())
-                m_InputStrategy = new CameraCommandBufferInputStrategy(cbSettings.RecordTransparency);
+                m_InputStrategy = new CameraCommandBufferLegacyInputStrategy(cbSettings.RecordTransparency);
             else
-                m_InputStrategy = new CaptureCallbackInputStrategy(cbSettings.RecordTransparency);
+                m_InputStrategy = new CaptureCallbackSRPInputStrategy(cbSettings.RecordTransparency);
 
             switch (cbSettings.Source)
             {
@@ -364,7 +368,7 @@ namespace UnityEditor.Recorder.Input
             }
 
             if (cbSettings.FlipFinalOutput)
-                m_VFlipper.Flip(OutputRenderTexture);
+                OutputRenderTexture = m_VFlipper.Flip(OutputRenderTexture);
         }
 
         /// <inheritdoc/>

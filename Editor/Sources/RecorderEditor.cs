@@ -15,6 +15,9 @@ namespace UnityEditor.Recorder
         SavedBool showOutputFile;
         SavedBool showCapture;
 
+        // Used to differentiate if drawing from timeline or RecorderWindow
+        internal static bool FromRecorderWindow = true;
+
         static class Styles
         {
             internal static readonly GUIContent CaptureLabel = new GUIContent("Capture");
@@ -23,7 +26,7 @@ namespace UnityEditor.Recorder
             internal static readonly GUIContent FileNameLabel = new GUIContent("File Name", "Pattern for the name of the output files. It can include a mix of regular text and dynamic placeholders (use the “+ Wildcards” button).");
             internal static readonly GUIContent SourceLabel = new GUIContent("Source", "The input type to use for the recording.");
             internal static readonly GUIContent TakeNumberLabel = new GUIContent("Take Number", "Value that the Recorder uses to number the recordings. It increases by one after each recording.");
-            internal static readonly GUIContent RenderStepFrameLabel = new GUIContent("Render Frame Step", " The interval between every frame to render in Play mode during the recording.");
+            internal static readonly GUIContent RenderStepFrameLabel = new GUIContent("Render Frame Step", "The interval between every frame to render in Play mode during the recording.");
         }
 
         protected virtual void OnEnable()
@@ -111,16 +114,19 @@ namespace UnityEditor.Recorder
 
             EditorGUI.BeginChangeCheck();
             serializedObject.Update();
-
-            showCapture.value = DrawHeaderFoldout(Styles.CaptureLabel, showCapture, false);
-            if (showCapture)
+            if (DrawCaptureSection())
             {
-                EditorGUILayout.Separator();
-                AOVGUI();
-                ImageRenderOptionsGUI();
-                ExtraOptionsGUI();
-                EditorGUILayout.Separator();
+                showCapture.value = DrawHeaderFoldout(Styles.CaptureLabel, showCapture, false);
+                if (showCapture)
+                {
+                    EditorGUILayout.Separator();
+                    AOVGUI();
+                    ImageRenderOptionsGUI();
+                    ExtraOptionsGUI();
+                    EditorGUILayout.Separator();
+                }
             }
+
             showFormat.value = DrawHeaderFoldout(Styles.FormatLabel, showFormat, false);
             if (showFormat)
             {
@@ -159,6 +165,11 @@ namespace UnityEditor.Recorder
             }
         }
 
+        internal virtual bool DrawCaptureSection()
+        {
+            return true;
+        }
+
         protected virtual void NameAndPathGUI()
         {
             EditorGUILayout.PropertyField(m_FileNameGenerator, Styles.FileNameLabel);
@@ -168,9 +179,6 @@ namespace UnityEditor.Recorder
             EditorGUI.BeginChangeCheck();
 
             EditorGUILayout.PropertyField(m_Take, Styles.TakeNumberLabel);
-
-            if (EditorGUI.EndChangeCheck())
-                m_Take.intValue = Mathf.Max(0, m_Take.intValue);
         }
 
         protected virtual void ImageRenderOptionsGUI()
@@ -215,7 +223,9 @@ namespace UnityEditor.Recorder
         protected virtual void ExtraOptionsGUI()
         {
             if (((RecorderSettings)target).FrameRatePlayback == FrameRatePlayback.Variable)
+            {
                 EditorGUILayout.PropertyField(m_CaptureEveryNthFrame, Styles.RenderStepFrameLabel);
+            }
         }
 
         protected virtual void FileTypeAndFormatGUI()

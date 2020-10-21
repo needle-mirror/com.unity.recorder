@@ -21,7 +21,7 @@ namespace UnityEditor.Recorder.Tests
         }
 
         [UnityTest]
-        public IEnumerator StartingAndEndingRecording_IncreasesTakeByOne()
+        public IEnumerator StartAndStopRecording_IncreasesTakeByOne()
         {
             yield return new EnterPlayMode();
             var settings = ScriptableObject.CreateInstance<RecorderControllerSettings>();
@@ -39,6 +39,29 @@ namespace UnityEditor.Recorder.Tests
             Assert.AreEqual(2, movSettings.Take);
             UnityObject.DestroyImmediate(settings);
             UnityObject.DestroyImmediate(movSettings);
+        }
+
+        [UnityTest]
+        public IEnumerator StartAndStopRecordingGif_When_Pause_DoesNotCrash()
+        {
+            yield return new EnterPlayMode();
+            EditorApplication.isPaused = true;
+            yield return null;
+            Assert.AreEqual(EditorApplication.isPaused, true);
+
+            var settings = ScriptableObject.CreateInstance<RecorderControllerSettings>();
+            settings.SetRecordModeToTimeInterval(0, 20);
+            var gifSettings = ScriptableObject.CreateInstance<GIFRecorderSettings>();
+            settings.AddRecorderSettings(gifSettings);
+            var recorderController = new RecorderController(settings);
+
+            recorderController.PrepareRecording();
+            recorderController.StartRecording();
+            yield return null;
+            recorderController.StopRecording();
+            yield return new ExitPlayMode();
+            UnityObject.DestroyImmediate(settings);
+            UnityObject.DestroyImmediate(gifSettings);
         }
     }
 }

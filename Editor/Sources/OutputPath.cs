@@ -46,6 +46,8 @@ namespace UnityEditor.Recorder
 
         [SerializeField] bool m_ForceAssetFolder;
 
+        [SerializeField] string m_AbsolutePath;
+
         internal Root root
         {
             get { return m_Root; }
@@ -56,6 +58,12 @@ namespace UnityEditor.Recorder
         {
             get { return m_Leaf; }
             set { m_Leaf = value; }
+        }
+
+        internal string absolutePath
+        {
+            get { return m_AbsolutePath; }
+            set { m_AbsolutePath = value; }
         }
 
         internal bool forceAssetsFolder
@@ -108,7 +116,7 @@ namespace UnityEditor.Recorder
             return result;
         }
 
-        internal static string GetFullPath(Root root, string leaf)
+        internal static string GetFullPath(Root root, string leaf, string absolutePath)
         {
             var ret = string.Empty;
             switch (root)
@@ -128,19 +136,26 @@ namespace UnityEditor.Recorder
                 case Root.Project:
                     ret = ProjectPath();
                     break;
+                case Root.Absolute:
+                    if (absolutePath != null)
+                        ret = absolutePath;
+                    else
+                        ret = leaf; // a relative path
+                    break;
             }
 
-            if (root != Root.Absolute && !leaf.StartsWith("/"))
+            if (root != Root.Absolute)
             {
-                ret += "/";
+                if (!leaf.StartsWith("/"))
+                    ret += "/";
+                ret += leaf;
             }
-            ret += leaf;
             return ret;
         }
 
         internal string GetFullPath()
         {
-            return GetFullPath(m_Root, m_Leaf);
+            return GetFullPath(m_Root, m_Leaf, m_AbsolutePath);
         }
 
         static string ProjectPath()

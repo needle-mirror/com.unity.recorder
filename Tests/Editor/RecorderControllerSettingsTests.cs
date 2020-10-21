@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 using NUnit.Framework;
 using System.Linq;
+using UnityEditor.Recorder.Input;
 using UnityObject = UnityEngine.Object;
 
 namespace UnityEditor.Recorder.Tests
@@ -56,6 +58,14 @@ namespace UnityEditor.Recorder.Tests
             UnityObject.DestroyImmediate(recorder1);
             UnityObject.DestroyImmediate(recorder2);
             UnityObject.DestroyImmediate(settings);
+        }
+
+        [Test]
+        public void InvalidTakeNumber_ThrowsException()
+        {
+            var recorder = ScriptableObject.CreateInstance<MovieRecorderSettings>();
+            Assert.Throws<ArgumentOutOfRangeException>(() => recorder.Take = -230);
+            UnityObject.DestroyImmediate(recorder);
         }
     }
 }

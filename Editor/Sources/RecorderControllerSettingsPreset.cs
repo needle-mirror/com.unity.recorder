@@ -42,8 +42,12 @@ namespace UnityEditor.Recorder
 
             foreach (var recorder in model.RecorderSettings)
             {
-                var rp = new Preset(recorder) { name = recorder.name };
+                var settingsClone = Instantiate(recorder);
+                settingsClone.name = recorder.name;
+                settingsClone.OnAfterDuplicate(); // might need to update bindings for AnimationRecorder.
+                var rp = new Preset(settingsClone) { name = settingsClone.name };
                 data.m_RecorderPresets.Add(rp);
+                DestroyImmediate(settingsClone);
             }
 
             //var preset = new Preset(data);

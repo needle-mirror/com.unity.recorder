@@ -10,6 +10,7 @@ namespace UnityEngine.Recorder.Tests
         protected PlayableDirector director;
         protected GameObject cube;
         protected TimelineClip recorderClip;
+        protected TimelineAsset recorderTimeline;
 
         [SetUp]
         public new void SetUp()
@@ -17,18 +18,18 @@ namespace UnityEngine.Recorder.Tests
             var curve = AnimationCurve.Linear(0, 0, 10, 10);
             var clip = new AnimationClip {hideFlags = HideFlags.DontSave};
             clip.SetCurve("", typeof(Transform), "localPosition.x", curve);
-            var timeline = ScriptableObject.CreateInstance<TimelineAsset>();
-            timeline.hideFlags = HideFlags.DontSave;
-            var aTrack = timeline.CreateTrack<AnimationTrack>(null, "CubeAnimation");
+            recorderTimeline = ScriptableObject.CreateInstance<TimelineAsset>();
+            recorderTimeline.hideFlags = HideFlags.DontSave;
+            var aTrack = recorderTimeline.CreateTrack<AnimationTrack>(null, "CubeAnimation");
             aTrack.CreateClip(clip).displayName = "CubeClip";
 
             cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.AddComponent<Animator>();
             director = cube.AddComponent<PlayableDirector>();
-            director.playableAsset = timeline;
+            director.playableAsset = recorderTimeline;
             director.SetGenericBinding(aTrack, cube);
 
-            recorderClip = timeline.CreateTrack<RecorderTrack>(null, "RecorderTrack").CreateDefaultClip();
+            recorderClip = recorderTimeline.CreateTrack<RecorderTrack>(null, "RecorderTrack").CreateDefaultClip();
         }
     }
 }

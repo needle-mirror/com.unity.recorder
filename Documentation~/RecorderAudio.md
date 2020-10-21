@@ -8,18 +8,9 @@ This page covers all properties specific to the Audio Recorder type.
 
 ![](Images/RecorderAudio.png)
 
-The Audio Recorder properties fall into three main categories:
-* [Capture](#capture)
+The Audio Recorder properties fall into two main categories:
 * [Format](#format)
 * [Output File](#output-file)
-
-## Capture
-
-Use this section to define the source and the content of your recording.
-
-|Property|Function|
-|:---|:---|
-| **Include Audio** | This recorder only records audio. Keep this option enabled. |
 
 ## Format
 

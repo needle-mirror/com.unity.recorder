@@ -168,11 +168,11 @@ namespace UnityEditor.Recorder.Input
         {
             var ok = true;
 
-            if (bindingType.Count > 0 && bindingType.Any(x => typeof(MonoBehaviour).IsAssignableFrom(x) || typeof(ScriptableObject).IsAssignableFrom(x))
+            if (bindingType.Count > 0 && bindingType.Any(x => typeof(ScriptableObject).IsAssignableFrom(x))
             )
             {
                 ok = false;
-                errors.Add("MonoBehaviours and ScriptableObjects are not supported inputs.");
+                errors.Add("ScriptableObjects are not supported inputs.");
             }
 
             return ok;
@@ -204,10 +204,6 @@ namespace UnityEditor.Recorder.Input
         /// </summary>
         public void ClearExposedReference()
         {
-            if (string.IsNullOrEmpty(m_BindingId))
-                return;
-
-            BindingManager.Set(m_BindingId, null);
         }
     }
 }

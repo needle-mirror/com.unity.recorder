@@ -60,3 +60,7 @@ To install this package, follow the instructions in the [Package Manager documen
 This version of the Unity Recorder is compatible with the following versions of the Unity Editor:
 
 * 2018.4 and later (recommended)
+
+### Known issues and limitations
+
+See the list of current [known issues and limitations](KnownIssues.md) that you might experience with the Unity Recorder – and their workarounds.

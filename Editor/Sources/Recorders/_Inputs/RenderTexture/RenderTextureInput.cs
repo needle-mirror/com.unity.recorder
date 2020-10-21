@@ -42,7 +42,7 @@ namespace UnityEditor.Recorder.Input
                 needToFlip = needToFlip ? encoderAlreadyFlips : !encoderAlreadyFlips;
             }
             if (needToFlip)
-                m_VFlipper.Flip(OutputRenderTexture);
+                OutputRenderTexture =  m_VFlipper.Flip(OutputRenderTexture);
 
             base.NewFrameReady(session);
         }

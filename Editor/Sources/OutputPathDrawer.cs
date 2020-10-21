@@ -9,6 +9,7 @@ namespace UnityEditor.Recorder
         SerializedProperty m_RootProperty;
         SerializedProperty m_LeafProperty;
         SerializedProperty m_ForceAssetFolder;
+        SerializedProperty m_AbsolutePathProperty;
 
         protected override void Initialize(SerializedProperty property)
         {
@@ -22,6 +23,9 @@ namespace UnityEditor.Recorder
 
             if (m_ForceAssetFolder == null)
                 m_ForceAssetFolder = property.FindPropertyRelative("m_ForceAssetFolder");
+
+            if (m_AbsolutePathProperty == null)
+                m_AbsolutePathProperty = property.FindPropertyRelative("m_AbsolutePath");
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -43,19 +47,22 @@ namespace UnityEditor.Recorder
             var leafRect = new Rect(position.x + rootWidth + 5, position.y, leafWidth, position.height);
             var btnRect = new Rect(position.x + rootWidth  + leafWidth + 10, position.y, btnWidth, position.height);
 
+            var pathType = (OutputPath.Root)m_RootProperty.intValue;
             if (target.forceAssetsFolder)
             {
-                var root = (OutputPath.Root)m_RootProperty.intValue;
-                GUI.Label(rootRect, root + " " + Path.DirectorySeparatorChar);
+                GUI.Label(rootRect, pathType + " " + Path.DirectorySeparatorChar);
             }
             else
             {
                 EditorGUI.PropertyField(rootRect, m_RootProperty, GUIContent.none);
             }
 
-            EditorGUI.PropertyField(leafRect, m_LeafProperty, GUIContent.none);
+            if (pathType == OutputPath.Root.Absolute)
+                EditorGUI.PropertyField(leafRect, m_AbsolutePathProperty, GUIContent.none); // Show the absolute path
+            else
+                EditorGUI.PropertyField(leafRect, m_LeafProperty, GUIContent.none); // Show the leaf
 
-            var fullPath = OutputPath.GetFullPath((OutputPath.Root)m_RootProperty.intValue, m_LeafProperty.stringValue);
+            var fullPath = OutputPath.GetFullPath((OutputPath.Root)m_RootProperty.intValue, m_LeafProperty.stringValue, m_AbsolutePathProperty.stringValue);
 
             if (!target.forceAssetsFolder)
             {
@@ -66,7 +73,10 @@ namespace UnityEditor.Recorder
                     {
                         var newValue = OutputPath.FromPath(newPath);
                         m_RootProperty.intValue = (int)newValue.root;
-                        m_LeafProperty.stringValue = newValue.leaf;
+                        if (pathType == OutputPath.Root.Absolute)
+                            m_AbsolutePathProperty.stringValue = newValue.leaf;
+                        else
+                            m_LeafProperty.stringValue = newValue.leaf;
                     }
                 }
             }

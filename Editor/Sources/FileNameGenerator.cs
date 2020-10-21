@@ -170,6 +170,15 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
+        /// Indicates the absolute path (without the extension).
+        /// </summary>
+        internal string AbsolutePath
+        {
+            get { return m_Path.absolutePath; }
+            set { m_Path.absolutePath = value; }
+        }
+
+        /// <summary>
         /// Use this property to ensure that the generated file is saved in the Assets folder.
         /// </summary>
         public bool ForceAssetsFolder

@@ -96,10 +96,5 @@ namespace UnityEditor.Recorder
         {
             m_AnimationInputSettings.DuplicateExposedReference();
         }
-
-        void OnDestroy()
-        {
-            m_AnimationInputSettings.ClearExposedReference();
-        }
     }
 }

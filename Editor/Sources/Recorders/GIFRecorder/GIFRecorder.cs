@@ -20,8 +20,20 @@ namespace UnityEditor.Recorder
 
         protected internal override void EndRecording(RecordingSession session)
         {
-            m_ctx.Release();
-            m_stream.Release();
+            // Case REC-98 crash gif animation when start/stop recording in playmode
+            // If you start recording while in playmode pause the RecordFrame
+            // will never be called and m_ctx and m_stream will de-reference null
+            // pointers that will crash unity.
+            if (m_ctx)
+            {
+                m_ctx.Release();
+            }
+
+            if (m_stream)
+            {
+                m_stream.Release();
+            }
+
             base.EndRecording(session);
         }
 

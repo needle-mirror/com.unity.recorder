@@ -20,7 +20,7 @@ namespace UnityEditor.Recorder
             foreach (var v in Enum.GetValues(typeof(MovieRecorderSettings.VideoRecorderOutputFormat)))
             {
                 var value = (MovieRecorderSettings.VideoRecorderOutputFormat)v;
-                if (value.ToString() == format)
+                if (value.FormatToName() == format)
                     return value;
             }
             throw new Exception($"The video recorder output format '{format}' was not found in the list of supported formats");
@@ -28,7 +28,17 @@ namespace UnityEditor.Recorder
 
         internal static string FormatToName(this MovieRecorderSettings.VideoRecorderOutputFormat format)
         {
-            return format.ToString();
+            switch (format)
+            {
+                case MovieRecorderSettings.VideoRecorderOutputFormat.MP4:
+                    return "H.264 MP4";
+                case MovieRecorderSettings.VideoRecorderOutputFormat.WebM:
+                    return "VP9 WebM";
+                case MovieRecorderSettings.VideoRecorderOutputFormat.MOV:
+                    return "ProRes QuickTime";
+                default:
+                    throw new ArgumentOutOfRangeException($"Unexpected video format {format}");
+            }
         }
     }
 

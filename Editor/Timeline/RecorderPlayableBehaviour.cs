@@ -67,7 +67,6 @@ namespace UnityEditor.Recorder.Timeline
 
             if (session.isRecording && m_PlayState == PlayState.Playing)
             {
-                session.EndRecording();
                 session.Dispose();
                 session = null;
             }

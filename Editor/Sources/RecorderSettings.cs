@@ -111,7 +111,12 @@ namespace UnityEditor.Recorder
         public int Take
         {
             get { return take; }
-            set { take = value; }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException($"The take number must be positive");
+                take = value;
+            }
         }
 
         [SerializeField] internal int take = 1;
@@ -191,12 +196,6 @@ namespace UnityEditor.Recorder
                 errors.Add("Invalid frame rate");
             }
 
-            if (captureEveryNthFrame <= 0)
-            {
-                ok = false;
-                errors.Add("Invalid frame skip value");
-            }
-
             if (!IsPlatformSupported)
             {
                 errors.Add("Current platform is not supported");
@@ -241,6 +240,15 @@ namespace UnityEditor.Recorder
         internal virtual bool HasWarnings()
         {
             return !ValidityCheck(new List<string>());
+        }
+
+        /// <summary>
+        /// Validation of serialized value.
+        /// </summary>
+        internal void OnValidate()
+        {
+            captureEveryNthFrame = Mathf.Max(1, captureEveryNthFrame);
+            take = Mathf.Max(0, take);
         }
     }
 }

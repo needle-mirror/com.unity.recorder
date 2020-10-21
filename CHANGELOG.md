@@ -4,6 +4,24 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.4.0-preview.1] - 2020-10-21
+### Features
+- Added MonoBehaviour recording support in the Animation Recorder. 
+### Bugfixes
+- Fixed a bug where the animation recorder settings game object bindings were not saved properly when saving as a recorder preset.
+- Reset the window without having to close it when a version upgrade happens while the Recorder Window is open.
+- Fixed a bug where switching from an absolute path to any other path type would create an invalid output path.
+- Log a warning when multiple concurrent Movie Recorder instances are concurrent, because this is not supported.
+- Fixed a visual glitch with the "Cap FPS" checkbox extending outside its GUI element.
+- Forced the "Render Frame Step" values in Recorders to be larger than zero. 
+- Fixed a bug causing excessive Timeline updates while changing the output file.
+- Remove superfluous "CaptureAudio" option from the AudioRecorder.
+- Fixed a bug that caused Copy/Pasted RecorderClips to lose the settings when entering in playmode.
+- Fixed a visual glitch with very long paths when inspecting RecorderClips.
+- Fixed a bug where in a Scriptable Render Pipeline, the GameView recordings would export transparency for PNG files if the camera background had transparency.
+- Fixed a crash issue when starting and stopping a GIF animation recording while the Play Mode is paused.
+- Fixed an issue where multiple recorders with various camera targets would produce flipped content.
+
 ## [2.3.0-preview.3] - 2020-09-23
 ### Features
 - Added animation curve data compression setting with keyframe reduction options in the Animation Recorder.

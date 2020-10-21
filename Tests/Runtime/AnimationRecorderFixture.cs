@@ -6,15 +6,17 @@ using UnityEditor;
 using UnityEditor.Recorder;
 using UnityEditor.Recorder.Input;
 using UnityEditor.Recorder.Timeline;
+using UnityEngine.Playables;
 using UnityEngine.TestTools;
+using UnityEngine.Timeline;
 
 namespace UnityEngine.Recorder.Tests
 {
     class AnimationRecorderFixture : TimelineFixture
     {
-        AnimationRecorderSettings aniSettings;
+        protected AnimationRecorderSettings aniSettings;
         [SetUp]
-        public void SetUp()
+        public new void SetUp()
         {
             var recorderAsset = recorderClip.asset as RecorderClip;
             aniSettings =  ScriptableObject.CreateInstance<AnimationRecorderSettings>();

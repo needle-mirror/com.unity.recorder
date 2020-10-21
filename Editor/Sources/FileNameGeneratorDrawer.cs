@@ -51,13 +51,18 @@ namespace UnityEditor.Recorder
             EditorGUI.BeginProperty(position, label, property);
             position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
+            var indent = EditorGUI.indentLevel;
+            EditorGUI.indentLevel = 0;
+
             const float tagWidth = 88;
             var txtWidth = position.width - tagWidth - 5;
             var txtRect = new Rect(position.x, position.y, txtWidth, position.height);
             var tagRect = new Rect(position.x + txtWidth + 5, position.y, tagWidth, position.height);
 
             GUI.SetNextControlName("FileNameField");
-            m_FileName.stringValue = GUI.TextField(txtRect, m_FileName.stringValue);
+            m_FileName.stringValue = RecorderEditor.FromRecorderWindow
+                ? EditorGUI.TextField(txtRect, m_FileName.stringValue)
+                : EditorGUI.DelayedTextField(txtRect, m_FileName.stringValue);
             var editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
 
             if (GUI.GetNameOfFocusedControl().Equals("FileNameField") &&
@@ -76,8 +81,10 @@ namespace UnityEditor.Recorder
                 }
             }
 
+            GUI.SetNextControlName("FileNameTagPopup");
             if (EditorGUI.DropdownButton(tagRect, new GUIContent("+ Wildcards", "Insert a placeholder at the cursor position to include auto-generated text data from your current recording context"), FocusType.Passive))
             {
+                GUI.FocusControl("FileNameTagPopup");
                 var menu = new GenericMenu();
 
                 foreach (var w in target.wildcards)
@@ -100,7 +107,9 @@ namespace UnityEditor.Recorder
                 GUI.changed = true;
             }
 
+            EditorGUI.indentLevel = indent;
             EditorGUILayout.PropertyField(m_Path);
+            EditorGUI.indentLevel = 0;
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel(" ");
@@ -116,11 +125,27 @@ namespace UnityEditor.Recorder
             var r = GUILayoutUtility.GetRect(new GUIContent(path), s_PathPreviewStyle, op);
             EditorGUI.SelectableLabel(r, path, s_PathPreviewStyle);
 
-            if (GUILayout.Button(new GUIContent(s_OpenPathIcon, "Open the output location in your file browser"), s_OpenPathButtonStyle))
+            if (GUILayout.Button(new GUIContent(s_OpenPathIcon, "Open the output location in your file browser"),
+                s_OpenPathButtonStyle))
+            {
+                try
+                {
+                    var fiOutput = new FileInfo(path);
+                    var dir = fiOutput.Directory;
+                    if (!dir.Exists)
+                        dir.Create();
+                }
+                catch (ArgumentNullException)
+                {
+                    // An error occured, most likely because the path was null
+                    Debug.LogWarning($"Error opening location {path} in the file browser.");
+                }
                 OpenInFileBrowser.Open(path);
+            }
 
             EditorGUILayout.EndHorizontal();
 
+            EditorGUI.indentLevel = indent;
             EditorGUI.EndProperty();
         }
 

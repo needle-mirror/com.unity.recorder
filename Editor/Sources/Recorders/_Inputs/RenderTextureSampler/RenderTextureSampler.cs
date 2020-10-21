@@ -331,7 +331,7 @@ namespace UnityEditor.Recorder.Input
                 needToFlip = needToFlip ? encoderAlreadyFlips : !encoderAlreadyFlips;
             }
             if (needToFlip)
-                m_VFlipper.Flip(OutputRenderTexture);
+                OutputRenderTexture = m_VFlipper.Flip(OutputRenderTexture);
         }
 
         void ShiftProjectionMatrix(Camera camera, Vector2 sample)

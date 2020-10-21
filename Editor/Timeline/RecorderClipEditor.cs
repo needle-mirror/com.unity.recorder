@@ -94,8 +94,10 @@ namespace UnityEditor.Recorder.Timeline
                     if (m_Editor != null)
                     {
                         EditorGUILayout.Separator();
-
+                        var prevValue = RecorderEditor.FromRecorderWindow;
+                        RecorderEditor.FromRecorderWindow = false;
                         m_Editor.OnInspectorGUI();
+                        RecorderEditor.FromRecorderWindow = prevValue;
 
                         serializedObject.Update();
                     }

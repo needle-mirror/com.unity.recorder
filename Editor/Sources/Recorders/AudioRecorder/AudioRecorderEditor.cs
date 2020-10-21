@@ -26,5 +26,14 @@ namespace UnityEditor.Recorder
         {
             EditorGUILayout.PropertyField(m_OutputFormat, Styles.FormatLabel);
         }
+
+        protected override void ImageRenderOptionsGUI()
+        {
+        }
+
+        internal override bool DrawCaptureSection()
+        {
+            return false;
+        }
     }
 }

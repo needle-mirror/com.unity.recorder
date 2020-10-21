@@ -11,3 +11,4 @@
   * [GIF Animation Recorder](RecorderGif.md)
   * [Audio Recorder](RecorderAudio.md)
 * [Debugging recorders](RecorderDebugging.md)
+* [Known issues](KnownIssues.md)

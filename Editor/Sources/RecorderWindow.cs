@@ -37,10 +37,12 @@ namespace UnityEditor.Recorder
         public const int MenuRootIndex = 2050;
     #endif
 
+        private const string k_DefaultPackageVersion = "1.0.0-preview.1";
         private static bool s_PackageVersionInitialized = false;
-        private static string s_PackageVersionNumber = "1.0.0-preview.1";
+        private static string s_PackageVersionNumber = k_DefaultPackageVersion;
         private static string s_PackageShortVersionNumber = "1.0";
         private static ListRequest s_Request;
+        private static bool s_NeedToResetView = false;
 
         [MenuItem(MenuRoot + "Recorder Window", false, MenuRootIndex)]
         static void ShowRecorderWindow()
@@ -65,6 +67,21 @@ namespace UnityEditor.Recorder
 
         static void Progress()
         {
+            if (s_NeedToResetView)
+            {
+                var windows = Resources.FindObjectsOfTypeAll<RecorderWindow>();
+                if (windows != null && windows.Length > 0)
+                {
+                    RecorderWindow win = windows[0];
+                    win.ClearView();
+                    win.UnregisterCallbacks();
+                    win.CreateView();
+                    win.RegisterCallbacks();
+                }
+                s_NeedToResetView = false;
+                return;
+            }
+
             if (s_Request.IsCompleted)
             {
                 if (s_Request.Status == StatusCode.Success)
@@ -75,9 +92,16 @@ namespace UnityEditor.Recorder
                         var name = package.name;
                         if (name.Contains("com.unity.recorder"))
                         {
-                            s_PackageVersionNumber = package.version;
-                            s_PackageShortVersionNumber = s_PackageVersionNumber.Substring(0, 3);
+                            var newPackageVersion = package.version;
+                            s_PackageShortVersionNumber = newPackageVersion.Substring(0, 3);
                             s_PackageVersionInitialized = true;
+
+                            if (newPackageVersion != s_PackageVersionNumber && s_PackageVersionNumber != k_DefaultPackageVersion)
+                            {
+                                // Reset the view when we detect a version upgrade but not the default that gets triggered at startup
+                                s_NeedToResetView = true;
+                            }
+                            s_PackageVersionNumber = newPackageVersion;
                             return;
                         }
                     }
@@ -186,19 +210,49 @@ namespace UnityEditor.Recorder
             ReloadRecordings();
         }
 
-        void OnEnable()
+        void ClearView()
+        {
+#if UNITY_2019_1_OR_NEWER
+            var root = rootVisualElement;
+#else
+            var root = this.GetRootVisualContainer();
+#endif
+            root.Clear();
+        }
+
+        void RegisterCallbacks()
+        {
+            Undo.undoRedoPerformed += SaveAndRepaint;
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            EditorApplication.update += UpdateInternal;
+        }
+
+        void UnregisterCallbacks()
+        {
+            Undo.undoRedoPerformed -= SaveAndRepaint;
+            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            EditorApplication.update -= UpdateInternal;
+        }
+
+        void CreateView()
         {
             minSize = new Vector2(560.0f, 200.0f);
-            if (!s_PackageVersionInitialized)
-            {
-                s_Request = Client.List(); // List packages installed for the Project
-                EditorApplication.update += Progress;
-            }
 
 #if UNITY_2019_1_OR_NEWER
             var root = rootVisualElement;
-            root.styleSheets.Add(Resources.Load<StyleSheet>(s_StylesFolder + "recorder"));
-            root.styleSheets.Add(Resources.Load<StyleSheet>(s_StylesFolder + (EditorGUIUtility.isProSkin ? "recorder_darkSkin" : "recorder_lightSkin")));
+            var sheet1 = Resources.Load<StyleSheet>(s_StylesFolder + "recorder");
+            var sheet2 = Resources.Load<StyleSheet>(s_StylesFolder +
+                (EditorGUIUtility.isProSkin
+                    ? "recorder_darkSkin"
+                    : "recorder_lightSkin"));
+            bool sheetNotFound = sheet1 == null || sheet2 == null;
+            if (sheetNotFound)
+            {
+                s_NeedToResetView = true;
+                return;
+            }
+            root.styleSheets.Add(sheet1);
+            root.styleSheets.Add(sheet2);
 #else
             var root = this.GetRootVisualContainer();
             root.AddStyleSheetPath(s_StylesFolder + "recorder");
@@ -213,7 +267,7 @@ namespace UnityEditor.Recorder
                 style =
                 {
                     flexDirection = FlexDirection.Row,
-                    minHeight = 110.0f
+                    minHeight = 120.0f
                 }
             };
             root.Add(mainControls);
@@ -444,7 +498,6 @@ namespace UnityEditor.Recorder
 
             m_SettingsPanel.Add(m_ParametersControl);
 
-
 #if UNITY_2018_2_OR_NEWER
             m_RecordingListItem.RegisterCallback<ValidateCommandEvent>(OnRecorderListValidateCommand);
             m_RecordingListItem.RegisterCallback<ExecuteCommandEvent>(OnRecorderListExecuteCommand);
@@ -455,11 +508,18 @@ namespace UnityEditor.Recorder
             m_RecordingListItem.RegisterCallback<KeyUpEvent>(OnRecorderListKeyUp);
 
             SetRecorderControllerSettings(RecorderControllerSettings.GetGlobalSettings());
+        }
 
-            Undo.undoRedoPerformed += SaveAndRepaint;
-
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-            EditorApplication.update += UpdateInternal;
+        void OnEnable()
+        {
+            // Register a callback listener to get the version of the package
+            if (!s_PackageVersionInitialized)
+            {
+                s_Request = Client.List(); // List packages installed for the Project
+                EditorApplication.update += Progress;
+            }
+            CreateView();
+            RegisterCallbacks();
         }
 
         /// <summary>
@@ -966,7 +1026,10 @@ namespace UnityEditor.Recorder
                         EditorGUI.BeginChangeCheck();
                         EditorGUILayout.Separator();
 
+                        var prevValue = RecorderEditor.FromRecorderWindow;
+                        RecorderEditor.FromRecorderWindow = true;
                         editor.OnInspectorGUI();
+                        RecorderEditor.FromRecorderWindow = prevValue;
 
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -1064,9 +1127,7 @@ namespace UnityEditor.Recorder
             if (m_RecorderSettingsPrefsEditor != null)
                 DestroyImmediate(m_RecorderSettingsPrefsEditor);
 
-            Undo.undoRedoPerformed -= SaveAndRepaint;
-            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
-            EditorApplication.update -= UpdateInternal;
+            UnregisterCallbacks();
         }
 
         void AddLastAndSelect(RecorderSettings recorder, string desiredName, bool enabled)

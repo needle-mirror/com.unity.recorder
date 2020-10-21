@@ -21,7 +21,7 @@ namespace UnityEditor.Recorder
         public static Object Get(string id)
         {
             var rcs = FindRecorderBindings();
-            var rc = rcs.FirstOrDefault(r => r.HasBindingValue(id));
+            var rc = rcs.FirstOrDefault(r => r.HasBindingValue(id) && r.GetBindingValue(id) != null);
 
             return rc != null ? rc.GetBindingValue(id) : null;
         }
