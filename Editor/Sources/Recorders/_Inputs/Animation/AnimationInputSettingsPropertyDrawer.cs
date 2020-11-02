@@ -8,9 +8,7 @@ namespace UnityEditor.Recorder.Input
     class AnimationInputSettingsPropertyDrawer : InputPropertyDrawer<AnimationInputSettings>
     {
         SerializedProperty m_Recursive, m_ClampedTangents;
-#if UNITY_2019_3_OR_NEWER
         SerializedProperty m_SimplifyCurve;
-#endif
 
         protected override void Initialize(SerializedProperty prop)
         {
@@ -18,9 +16,7 @@ namespace UnityEditor.Recorder.Input
 
             m_Recursive = prop.FindPropertyRelative("recursive");
             m_ClampedTangents = prop.FindPropertyRelative("clampedTangents");
-#if UNITY_2019_3_OR_NEWER
             m_SimplifyCurve = prop.FindPropertyRelative("simplifyCurves");
-#endif
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -83,14 +79,12 @@ namespace UnityEditor.Recorder.Input
             }
 
             EditorGUILayout.PropertyField(m_Recursive, new GUIContent("Record Hierarchy", "To include all children of the targeted GameObject in the recording."));
-#if UNITY_2019_3_OR_NEWER
             EditorGUILayout.PropertyField(m_ClampedTangents,
                 new GUIContent("Clamped Tangents",
                     "When enabled, sets the generated animation key tangents to ClampedAuto, else to Auto (legacy)."));
             EditorGUILayout.PropertyField(m_SimplifyCurve,
                 new GUIContent("Anim. Compression",
                     "The keyframe reduction level to use to compress the recorded animation curve data."));
-#endif
         }
     }
 }

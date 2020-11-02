@@ -109,33 +109,8 @@ namespace UnityEditor.Recorder
                 if (m_PackageVersion.Length == 0)
                 {
                     // Read the package version
-#if UNITY_2019_2_OR_NEWER
                     var packageInfo = PackageManager.PackageInfo.FindForAssetPath("Packages/com.unity.recorder");
                     m_PackageVersion = packageInfo.version;
-#else
-                    m_PackageVersion = "N/A"; // can't read the version
-
-                    if (LsPackages.IsCompleted)
-                    {
-                        if (LsPackages.Status == StatusCode.Success)
-                        {
-                            foreach (var package in LsPackages.Result)
-                            {
-                                if (package.name.Contains("com.unity.recorder"))
-                                {
-                                    m_PackageVersion = package.version;
-                                    break;
-                                }
-                            }
-                        }
-                        else if (LsPackages.Status >= StatusCode.Failure)
-                            Debug.LogError(LsPackages.Error.message);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Could not get list of packages for version");
-                    }
-#endif
                 }
                 return m_PackageVersion;
             }

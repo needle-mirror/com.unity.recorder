@@ -29,16 +29,12 @@ namespace UnityEditor.Recorder
                 var clipName = absolutePath.Replace(FileNameGenerator.SanitizePath(Application.dataPath), "Assets");
 
                 AssetDatabase.CreateAsset(clip, clipName);
-#if UNITY_2019_3_OR_NEWER
                 var aniSettings = (aInput.settings as AnimationInputSettings);
                 aInput.GameObjectRecorder.SaveToClip(clip, ars.FrameRate, aniSettings.CurveFilterOptions);
                 if (aniSettings.ClampedTangents)
                 {
                     FilterClip(clip);
                 }
-#else
-                aInput.GameObjectRecorder.SaveToClip(clip, ars.FrameRate);
-#endif
 
                 aInput.GameObjectRecorder.ResetRecording();
             }
@@ -47,7 +43,6 @@ namespace UnityEditor.Recorder
             UnityEditor.AssetDatabase.SaveAssets();
         }
 
-#if UNITY_2019_3_OR_NEWER
         void FilterClip(AnimationClip clip)
         {
             foreach (var bind in AnimationUtility.GetCurveBindings(clip))
@@ -61,7 +56,5 @@ namespace UnityEditor.Recorder
                 AnimationUtility.SetEditorCurve(clip, bind , curve);
             }
         }
-
-#endif
     }
 }

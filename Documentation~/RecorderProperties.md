@@ -22,8 +22,8 @@ Each type of Recorder has specific **Capture** and **Format** properties you mus
 
 - [**Audio Recorder properties**](RecorderAudio.md)
 
-## Recorder presets
+## Recorder Presets
 
-After you set Recorder properties, you can save them as a [Recorder Preset](RecorderManage.md#creating-recorder-presets). If you've already saved the configuration you want as a Recorder Preset, you can load it instead of setting the Recorder properties.
+After you set Recorder properties, you can save them as a [Preset](https://docs.unity3d.com/Manual/Presets.html): use the Preset icon ![](Images/IconPreset.png) in the Recorder properties pane.
 
->**Note:** Recorder properties are not available in standalone Unity Players or builds.
+If you've already saved the configuration you want as a Recorder Preset, you can load it instead of setting the Recorder properties.

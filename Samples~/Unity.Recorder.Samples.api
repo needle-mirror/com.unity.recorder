@@ -8,6 +8,13 @@ namespace UnityEngine.Recorder.Examples
         public CaptureScreenShotExample() {}
     }
 
+    public class MovieRecorderExample : UnityEngine.MonoBehaviour
+    {
+        public bool m_RecordAudio;
+        public System.IO.FileInfo OutputFile { get; }
+        public MovieRecorderExample() {}
+    }
+
     public class MultipleRecordingsExample : UnityEngine.MonoBehaviour
     {
         public MultipleRecordingsExample() {}

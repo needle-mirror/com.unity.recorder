@@ -30,13 +30,21 @@ namespace UnityEditor.Recorder.Timeline
             get { return settings == null ? null : RecordersInventory.GetRecorderInfo(settings.GetType()).recorderType; }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Unity Recorder does not support any clip features.
+        /// For more information see: https://docs.unity3d.com/2018.1/Documentation/ScriptReference/Timeline.ClipCaps.html
+        /// </summary>
         public ClipCaps clipCaps
         {
             get { return ClipCaps.None; }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// For more information see: https://docs.unity3d.com/ScriptReference/Playables.PlayableAsset.CreatePlayable.html
+        /// </summary>
+        /// <param name="graph">The Playable Graph.</param>
+        /// <param name="owner">The GameObject containing the PlayableDirector.</param>
+        /// <returns>The playable that drives the AlembicStreamPlayer.</returns>
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
             var playable = ScriptPlayable<RecorderPlayableBehaviour>.Create(graph);
@@ -48,12 +56,18 @@ namespace UnityEditor.Recorder.Timeline
             return playable;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// This is called when the Recorder Clip is being destroyed.
+        /// For more information see: https://docs.unity3d.com/ScriptReference/ScriptableObject.OnDestroy.html
+        /// </summary>
         public void OnDestroy()
         {
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// This is called before the Recorder Clip object is serialized.
+        /// For more information see: https://docs.unity3d.com/ScriptReference/ISerializationCallbackReceiver.OnBeforeSerialize.html
+        /// </summary>
         public void OnBeforeSerialize()
         {
             if (settings != null)
@@ -104,7 +118,10 @@ namespace UnityEditor.Recorder.Timeline
             PushTimelineIntoRecorder(FindTimelineAsset());
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// This is called after the Recorder Clip object has been deserialized.
+        /// For more information see: https://docs.unity3d.com/ScriptReference/ISerializationCallbackReceiver.OnAfterDeserialize.html
+        /// </summary>
         public void OnAfterDeserialize()
         {
             // Nothing

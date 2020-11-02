@@ -2,12 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
-#if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
-#else
-using UnityEngine.Experimental.UIElements;
-using UnityEngine.Experimental.UIElements.StyleEnums;
-#endif
 
 namespace UnityEditor.Recorder
 {
@@ -164,7 +159,7 @@ namespace UnityEditor.Recorder
             if (settings != null)
             {
                 editor = Editor.CreateEditor(settings);
-                ((RecorderEditor) editor).OnRecorderValidated += OnRecorderValidated;
+                ((RecorderEditor)editor).OnRecorderValidated += OnRecorderValidated;
             }
 
 
@@ -173,13 +168,7 @@ namespace UnityEditor.Recorder
 
             m_Toggle = new Toggle();
 
-#if UNITY_2019_1_OR_NEWER
             m_Toggle.RegisterValueChangedCallback(evt =>
-#elif UNITY_2018_3_OR_NEWER
-            m_Toggle.OnValueChanged(evt =>
-#else
-            m_Toggle.OnToggle(() =>
-#endif
             {
                 SetItemEnabled(prefs, UIElementHelper.GetToggleValue(m_Toggle));
             });

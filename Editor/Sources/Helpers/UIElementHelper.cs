@@ -2,11 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-#if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
-#else
-using UnityEngine.Experimental.UIElements;
-#endif
 
 namespace UnityEditor.Recorder
 {
@@ -14,22 +10,13 @@ namespace UnityEditor.Recorder
     {
         internal static void SetFocusable(VisualElement element)
         {
-            #if UNITY_2019_1_OR_NEWER
             element.focusable = true;
-            #else
-            element.focusIndex = 0;
-            #endif
         }
 
         internal static void ResetStylePosition(IStyle style)
         {
-            #if UNITY_2019_1_OR_NEWER
             style.left = 0;
             style.right = 0;
-            #else
-            style.positionLeft = 0;
-            style.positionRight = 0;
-            #endif
         }
 
         internal static void SetDirty(VisualElement element)
@@ -41,40 +28,22 @@ namespace UnityEditor.Recorder
 
         internal static void RegisterTrickleDownCallback<T>(VisualElement element, EventCallback<T> callback) where T : EventBase<T>, new()
         {
-            #if UNITY_2018_3_OR_NEWER
             element.RegisterCallback(callback, TrickleDown.TrickleDown);
-            #else
-            element.RegisterCallback(callback, Capture.Capture);
-            #endif
         }
 
         internal static void SetFlex(VisualElement element, float value)
         {
-            #if UNITY_2019_1_OR_NEWER
             element.style.flexGrow = value;
-            #elif UNITY_2018_3_OR_NEWER
-            element.style.flex = new Flex(value);
-            #else
-            element.style.flex = value;
-            #endif
         }
 
         internal static bool GetToggleValue(Toggle toggle)
         {
-            #if UNITY_2018_2_OR_NEWER
             return toggle.value;
-            #else
-            return toggle.on;
-            #endif
         }
 
         internal static void SetToggleValue(Toggle toggle, bool value)
         {
-            #if UNITY_2018_2_OR_NEWER
             toggle.value = value;
-            #else
-            toggle.on = value;
-            #endif
         }
 
         internal static bool MultiIntField(GUIContent label, GUIContent[] subLabels, int[] values)

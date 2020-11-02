@@ -55,7 +55,6 @@ namespace UnityEditor.Recorder.Input
         protected internal override void NewFrameReady(RecordingSession session)
         {
             Profiler.BeginSample("GameViewInput.NewFrameReady");
-#if UNITY_2019_1_OR_NEWER
             ScreenCapture.CaptureScreenshotIntoRenderTexture(m_CaptureTexture);
             var movieRecorderSettings = session.settings as MovieRecorderSettings;
             bool needToFlip = scSettings.FlipFinalOutput;
@@ -70,30 +69,6 @@ namespace UnityEditor.Recorder.Input
 
             // Force opaque alpha channel
             MakeFullyOpaque(OutputRenderTexture);
-#else
-            ReadbackTexture = ScreenCapture.CaptureScreenshotAsTexture();
-            var movieRecorderSettings = session.settings as MovieRecorderSettings;
-            if (movieRecorderSettings != null)
-            {
-                var currEncoder = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected];
-                var requiredFormat = currEncoder.GetTextureFormat(movieRecorderSettings);
-                var isGameView = movieRecorderSettings.ImageInputSettings is GameViewInputSettings;
-                if (!currEncoder.PerformsVerticalFlip)
-                {
-                    ReadbackTexture = UnityHelpers.FlipTextureVertically(ReadbackTexture, movieRecorderSettings.CaptureAlpha);
-                }
-                if (requiredFormat != ReadbackTexture.format)
-                {
-                    if (requiredFormat == TextureFormat.RGB24 && ReadbackTexture.format == TextureFormat.RGBA32)
-                        ReadbackTexture = UnityHelpers.RGBA32_to_RGB24(ReadbackTexture);
-                    else
-                        throw new Exception($"Unexpected conversion requested: from {ReadbackTexture.format} to {requiredFormat}.");
-                }
-            }
-
-            // Force opaque alpha channel
-            MakeFullyOpaque(ReadbackTexture);
-#endif
             Profiler.EndSample();
         }
 

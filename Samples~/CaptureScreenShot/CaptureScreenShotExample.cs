@@ -7,8 +7,8 @@ using UnityEditor.Recorder.Input;
 namespace UnityEngine.Recorder.Examples
 {
     /// <summary>
-    /// This example shows how to setup a recording session via script.
-    /// To use this example. Simply add the CaptureScreenShotExample component to a GameObject.
+    /// This example shows how to set up a recording session via script.
+    /// To use this example, add the CaptureScreenShotExample component to a GameObject.
     ///
     /// Entering playmode will display a "Capture ScreenShot" button.
     ///
@@ -56,4 +56,4 @@ namespace UnityEngine.Recorder.Examples
     }
 }
 
- #endif
+#endif

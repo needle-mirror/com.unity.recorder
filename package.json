@@ -1,13 +1,13 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Unity Recorder",
-  "version": "2.4.0-preview.1",
-  "unity": "2018.4",
-  "unityRelease": "4f1",
+  "version": "2.5.0-pre.1",
+  "unity": "2019.4",
+  "unityRelease": "12f1",
   "dependencies": {
-    "com.unity.timeline": "1.0.0"
+    "com.unity.timeline": "1.2.17"
   },
-  "description": "Unity Recorder allows the recording of Animation clips, Videos and Images directly from the Unity Editor.",
+  "description": "The Unity Recorder allows you to capture and save data from the Unity Editor during Play Mode: animations, videos, images, audio, and more.",
   "keywords": [
     "unity",
     "recorder",
@@ -18,23 +18,31 @@
     "clip",
     "images"
   ],
+  "relatedPackages": {
+    "com.unity.recorder.tests": "2.5.0-pre.1"
+  },
   "upmCi": {
-    "footprint": "7d3cf193732bd6fb260728a3c2c8f28767f67956"
+    "footprint": "2e6f58a837a956d4ee27f352715e076dfa18441a"
   },
   "repository": {
     "url": "https://github.com/Unity-Technologies/com.unity.recorder.git",
     "type": "git",
-    "revision": "ef969cea4748dd7791643afcad54e6e69a3811a0"
+    "revision": "61c8cb4df0666d4544c404608a92d1355ce24ba4"
   },
   "samples": [
     {
       "displayName": "Screenshot Capture Sample",
-      "description": "This example shows how to setup a recording session via script.",
+      "description": "This example shows how to set up a recording session via script.",
       "path": "Samples~/CaptureScreenShot"
     },
     {
+      "displayName": "Movie Recorder Sample",
+      "description": "This example shows how to set up a movie recording session via script.",
+      "path": "Samples~/MovieRecorder"
+    },
+    {
       "displayName": "Multiple Recordings Sample",
-      "description": "This example shows how to setup a multiple recording session via script.",
+      "description": "This example shows how to set up a multiple recording session via script.",
       "path": "Samples~/MultipleRecordings"
     },
     {

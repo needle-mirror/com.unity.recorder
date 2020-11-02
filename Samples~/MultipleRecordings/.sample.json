@@ -1,5 +1,5 @@
 {
   "displayName":"Multiple Recordings Sample",
-  "description": "This example shows how to setup a multiple recording session via script.",
+  "description": "This example shows how to set up a multiple recording session via script.",
   "createSeparatePackage": false
 }

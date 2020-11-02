@@ -1,6 +1,3 @@
-<a name="RenderTextureAsset"></a>
-### Render Texture Asset
-
 These properties appear when you set **Source** to **Render Texture Asset**.
 
 ![](Images/CaptureOptionsRenderTextureAsset.png)

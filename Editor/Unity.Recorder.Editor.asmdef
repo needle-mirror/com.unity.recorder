@@ -1,13 +1,26 @@
 {
     "name": "Unity.Recorder.Editor",
     "references": [
-      "Unity.Recorder.Base",
-      "Unity.Recorder",
-	  "Unity.Timeline"
+        "Unity.Recorder.Base",
+        "Unity.Recorder",
+        "Unity.Timeline",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": true
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.core",
+            "expression": "7.1.1",
+            "define": "CAPTURE_ACTION"
+        }
+    ],
+    "noEngineReferences": false
 }

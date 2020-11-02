@@ -134,12 +134,20 @@ namespace UnityEditor.Recorder.Input
 
             protected override void SetupCommandBuffer(RenderTexture renderTexture)
             {
+#if CAPTURE_ACTION
+                CameraCaptureBridge.AddCaptureAction(targetCamera, AddCaptureCommands);
+#else
                 CameraCapture.AddCaptureAction(targetCamera, AddCaptureCommands);
+#endif
             }
 
             public override void ReleaseCamera()
             {
+#if CAPTURE_ACTION
+                CameraCaptureBridge.RemoveCaptureAction(targetCamera, AddCaptureCommands);
+#else
                 CameraCapture.RemoveCaptureAction(targetCamera, AddCaptureCommands);
+#endif
                 base.ReleaseCamera();
             }
         }

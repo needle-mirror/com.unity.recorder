@@ -1,6 +1,3 @@
-<a name="GameView"></a>
-### Game View
-
 These properties appear when you set **Source** to **Game View**.
 
 >[!NOTE]
@@ -17,4 +14,4 @@ These properties appear when you set **Source** to **Game View**.
 |   |  Custom | Uses custom width and height values that you supply in the **W** and **H** fields. |
 | **Aspect Ratio** || Specifies the ratio of width to height (w:h) of the recorded view when you set the **Output Resolution** to a preset resolution. |
 |   | _[PRESET ASPECT RATIOS]_ | Choose from several standard aspect ratios such as 16:9 (1.7778) and 4:3 (1.3333). |
-|   | Custom   | Uses custom aspect ratio that you supply in the displayed fields (w:h). |
+|   | Custom   | Uses a custom aspect ratio that you supply in the displayed fields (w:h). |

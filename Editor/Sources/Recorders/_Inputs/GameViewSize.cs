@@ -11,13 +11,8 @@ namespace UnityEditor.Recorder.Input
         public static int modifiedResolutionCount;
         const int miscSize = 1; // Used when no main GameView exists (ex: batchmode)
 
-#if UNITY_2019_3_OR_NEWER
         static Type s_GameViewType = Type.GetType("UnityEditor.PlayModeView,UnityEditor");
         static string s_GetGameViewFuncName = "GetMainPlayModeView";
-#else
-        static Type s_GameViewType = Type.GetType("UnityEditor.GameView,UnityEditor");
-        static string s_GetGameViewFuncName = "GetMainGameView";
-#endif
         static EditorWindow GetMainGameView()
         {
             var getMainGameView = s_GameViewType.GetMethod(s_GetGameViewFuncName, BindingFlags.NonPublic | BindingFlags.Static);

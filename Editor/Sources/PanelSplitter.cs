@@ -1,12 +1,6 @@
 using System;
 using UnityEngine;
-#if UNITY_2019_1_OR_NEWER
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-#else
-using UnityEditor.Experimental.UIElements;
-using UnityEngine.Experimental.UIElements;
-#endif
 
 
 namespace UnityEditor.Recorder
@@ -53,20 +47,12 @@ namespace UnityEditor.Recorder
             if (m_Grabbed)
                 return;
 
-#if UNITY_2018_3_OR_NEWER
             this.CaptureMouse();
-#else
-            this.TakeMouseCapture();
-#endif
 
             m_Grabbed = true;
             m_GrabbedMousePosition = evt.mousePosition;
 
-#if UNITY_2019_1_OR_NEWER
             m_ElementOriginalWidth = m_AffectedElement.resolvedStyle.width;
-#else
-            m_ElementOriginalWidth = m_AffectedElement.style.width;
-#endif
             evt.StopImmediatePropagation();
         }
 
@@ -77,13 +63,8 @@ namespace UnityEditor.Recorder
 
             var delta = evt.mousePosition.x - m_GrabbedMousePosition.x;
 
-            #if UNITY_2019_1_OR_NEWER
             var minWidth = m_AffectedElement.resolvedStyle.minWidth.value;
             var maxWidth = m_AffectedElement.resolvedStyle.maxWidth.value;
-            #else
-            var minWidth = m_AffectedElement.style.minWidth;
-            var maxWidth = m_AffectedElement.style.maxWidth;
-            #endif
 
             var newWidth = Mathf.Max(m_ElementOriginalWidth + delta, minWidth);
 
@@ -103,11 +84,7 @@ namespace UnityEditor.Recorder
 
             m_Grabbed = false;
 
-#if UNITY_2018_3_OR_NEWER
             this.ReleaseMouse();
-#else
-            this.ReleaseMouseCapture();
-#endif
 
             evt.StopImmediatePropagation();
         }

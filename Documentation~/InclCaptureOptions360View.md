@@ -1,6 +1,3 @@
-<a name="360View"></a>
-### 360 View
-
 These properties appear when you set **Source** to **360 View**.
 
 To capture 360 degree recordings, the Recorder rotates the **Camera** 360 degrees around its **Y** axis.

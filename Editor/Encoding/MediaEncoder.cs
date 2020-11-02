@@ -263,13 +263,9 @@ namespace Unity.Media
         void Construct(string path, VideoTrackAttributes vAttr, NativeArray<AudioTrackAttributes> aAttr);
 
         bool AddFrame(Texture2D texture);
-#if UNITY_2019_1_OR_NEWER
         bool AddFrame(int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data);
-#endif
-#if UNITY_2019_2_OR_NEWER
         bool AddFrame(int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data, MediaTime time);
         bool AddFrame(Texture2D texture, MediaTime time);
-#endif
         bool AddSamples(ushort trackIndex, NativeArray<float> interleavedSamples);
         bool AddSamples(NativeArray<float> interleavedSamples);
     }
@@ -386,36 +382,30 @@ namespace Unity.Media
             m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.Construct(path, vAttr, aAttr);
         }
 
-#if UNITY_2019_1_OR_NEWER
         public bool AddFrame(MediaEncoderHandle handle, int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data)
         {
             DisposeCheck(handle);
             return m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.AddFrame(width, height, rowBytes, format, data);
         }
 
-#endif
-#if UNITY_2019_2_OR_NEWER
         public bool AddFrame(MediaEncoderHandle handle, int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data, MediaTime time)
         {
             DisposeCheck(handle);
             return m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.AddFrame(width, height, rowBytes, format, data, time);
         }
 
-#endif
         public bool AddFrame(MediaEncoderHandle handle, Texture2D texture)
         {
             DisposeCheck(handle);
             return m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.AddFrame(texture);
         }
 
-#if UNITY_2019_2_OR_NEWER
         public bool AddFrame(MediaEncoderHandle handle, Texture2D texture, MediaTime time)
         {
             DisposeCheck(handle);
             return m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.AddFrame(texture, time);
         }
 
-#endif
         public bool AddSamples(MediaEncoderHandle handle, ushort trackIndex, NativeArray<float> interleavedSamples)
         {
             DisposeCheck(handle);

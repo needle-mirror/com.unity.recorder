@@ -14,20 +14,17 @@ namespace UnityEditor.Recorder
     {
         MediaEncoderHandle m_EncoderHandle = new MediaEncoderHandle();
 
-        /// <summary>
-        /// The count of concurrent Movie Recorder instances. It is used to log a warning.
-        /// </summary>
+        // The count of concurrent Movie Recorder instances. It is used to log a warning.
         static private int s_ConcurrentCount = 0;
 
-        /// <summary>
-        /// Whether or not a warning was logged for concurrent movie recorders.
-        /// </summary>
+        // Whether or not a warning was logged for concurrent movie recorders.
         static private bool s_WarnedUserOfConcurrentCount = false;
 
-        /// <summary>
-        /// Whether or not recording was started properly.
-        /// </summary>
+        // Whether or not recording was started properly.
         private bool m_RecordingStartedProperly = false;
+
+        // Whether or not the recording has already been ended. To avoid messing with the count of concurrent recorders.
+        private bool m_RecordingAlreadyEnded = false;
 
         protected override TextureFormat ReadbackTextureFormat
         {
@@ -174,6 +171,7 @@ namespace UnityEditor.Recorder
                 s_ConcurrentCount++;
 
                 m_RecordingStartedProperly = true;
+                m_RecordingAlreadyEnded = false;
                 return true;
             }
             catch (Exception ex)
@@ -197,13 +195,14 @@ namespace UnityEditor.Recorder
         protected internal override void EndRecording(RecordingSession session)
         {
             base.EndRecording(session);
-            if (m_RecordingStartedProperly)
+            if (m_RecordingStartedProperly && !m_RecordingAlreadyEnded)
             {
                 s_ConcurrentCount--;
                 if (s_ConcurrentCount < 0)
                     Debug.LogError($"Recording ended with no matching beginning recording.");
                 if (s_ConcurrentCount <= 1 && s_WarnedUserOfConcurrentCount)
                     s_WarnedUserOfConcurrentCount = false; // reset so that we can warn at the next occurence
+                m_RecordingAlreadyEnded = true;
             }
         }
 
@@ -225,15 +224,12 @@ namespace UnityEditor.Recorder
             WarnOfConcurrentRecorders();
         }
 
-#if UNITY_2019_1_OR_NEWER
         protected override void WriteFrame(AsyncGPUReadbackRequest r)
         {
             var format = Settings.GetCurrentEncoder().GetTextureFormat(Settings);
             Settings.m_EncoderManager.AddFrame(m_EncoderHandle, r.width, r.height, 0, format, r.GetData<byte>());
             WarnOfConcurrentRecorders();
         }
-
-#endif
 
         protected override void DisposeEncoder()
         {

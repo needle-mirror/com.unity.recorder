@@ -49,8 +49,8 @@ namespace UnityEditor.Recorder.Input
         }
 
         [SerializeField] bool recursive = true;
-#if UNITY_2019_3_OR_NEWER
         [SerializeField] bool clampedTangents = true;
+
         /// <summary>
         /// If true, the Recorder sets the generated animation key tangents to ClampedAuto, else to Auto (legacy). Clamped tangents are useful to prevent curve overshoots when the animation data is discontinuous.
         /// </summary>
@@ -126,7 +126,7 @@ namespace UnityEditor.Recorder.Input
                 }
             }
         }
-#endif
+
         /// <summary>
         /// Adds a Component to record from the GameObject.
         /// </summary>

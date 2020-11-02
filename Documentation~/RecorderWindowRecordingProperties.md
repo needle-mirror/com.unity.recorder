@@ -1,15 +1,15 @@
 # General recording properties
 
-Use general recording properties to simultaneously start or stop recordings for all active Recorders of the Recorder List in the [Recorder window](RecordingRecorderWindow.md). You can specify the recording duration and frame rate.
+Use the general recording properties to simultaneously start or stop recordings for all active Recorders in the Recorder List (listed in the [Recorder window](RecordingRecorderWindow.md)). You can specify the recording duration and frame rate.
 
 ![](Images/RecordingControls.png)
 
-## Recorder controls and recording mode
+## Recorder controls and Recording Mode
 
 |Property||Function|
 |:---|:---|:---|
-|![](Images/BtnRecord.png)<br/>**[Record Button]**   | | [Starts](#starting-a-recording) or [stops](stopping-a-recording) a recording session.  |
-| **Start Recording**/<br/>**Stop Recording** | | This button has the exact same function and behavior as the Record Button (see above)|
+|![](Images/BtnRecord.png)<br/>**[Record Button]**   | | [Starts](#starting-a-recording) or [stops](#stopping-a-recording) a recording session.  |
+| **Start Recording**/<br/>**Stop Recording** | | This button has exactly the same function and behavior as the Record Button (see above). |
 |**Exit Play Mode**   | | When you enable this option, the Unity Recorder automatically exits Play mode when it finishes recording.  |
 | **Recording Mode** ||Allows you to specify the frames or time interval to record.|
 ||_Manual_ |Start or stop recording when you manually click **Start Recording** or **Stop Recording**, respectively.|
@@ -17,7 +17,7 @@ Use general recording properties to simultaneously start or stop recordings for 
 || _Frame Interval_ |Record a set of consecutive frames during Play mode. Use the **Start** and **End** properties to specify when to start and stop.|
 || _Time Interval_ |Record a specific duration, in seconds, during Play mode. Use the **Start** and **End** properties to specify when to start and stop.|
 | **Target Frame** ||Specifies the number of the frame to capture when in **Single Frame** mode.|
-| **Start**/ <br/> **End** ||• When in **Frame Interval** mode, specifies the range of frames to capture.<br/>• When in **Time Interval** mode, specifies the time, in seconds, to start and stop recording.|
+| **Start**/ <br/> **End** ||• In **Frame Interval** mode, these values specify the range of frames to capture.<br/>• In **Time Interval** mode, these values specify the time, in seconds, to start and stop recording.|
 
 ## Frame Rate properties
 
@@ -34,7 +34,7 @@ Use the **Frame Rate** properties to specify how to constrain the frame rate dur
 
 ## Starting a recording
 
-When you use the Recorder window, you must always start the recording manually. When you start a recording, the Unity Recorder activates Play mode (if it is not already active) and starts to capture Play-mode data using all active Recorders.
+When you use the Recorder window, you must always start the recording manually. When you start a recording, the Unity Recorder activates Play mode (if it is not already active) and starts to capture Play mode data using all active Recorders.
 
 To start recording, you can do any of the following:
   - In the Recorder window, select the Record button or the **START RECORDING** button.
@@ -53,4 +53,4 @@ To stop recording, you can do any of the following:
   - Close the Recorder window.
   - Exit Play mode.
 
-> **Note:** When a recording stops, the Editor remains in Play mode unless you enable the **Exit PlayMode** property in the [recording controls](#setting-up-a-recording).
+> **Note:** When a recording stops, the Editor remains in Play mode unless you enable the **Exit PlayMode** property in the [recorder controls](#recorder-controls-and-recording-mode).

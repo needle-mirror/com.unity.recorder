@@ -1,6 +1,6 @@
 # Recording from a Timeline track
 
-If you installed [Timeline](https://docs.unity3d.com/Packages/com.unity.timeline@latest), you can control your recordings through [Recorder Clips](RecordingTimelineTrack.md) in Timeline Tracks.
+If you installed [Timeline](https://docs.unity3d.com/Packages/com.unity.timeline@latest), you can control your recordings through Recorder Clips in Timeline Tracks.
 
 > **Note:** If you want to record from the Recorder window, see [Recording from the Recorder window](RecordingRecorderWindow.md).
 
@@ -49,6 +49,6 @@ Use this section to [set up the properties of the selected Recorder](RecorderPro
 
 - The recording automatically starts when the Timeline plays the Recorder Clip, according to the **Start** setting value of the clip.
 
-- The recording automatically stops when the Recorder Clip reaches its **End** setting value or if you manually stop the Timeline before.
+- The recording automatically stops when the Recorder Clip reaches its **End** setting value or if you manually stop the Timeline.
 
 See the [Timeline](https://docs.unity3d.com/Packages/com.unity.timeline@latest) documentation for more information about managing and playing Timeline tracks and clips.

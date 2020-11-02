@@ -1,8 +1,4 @@
-#if UNITY_2018_3_OR_NEWER
 using UnityEditor.Animations;
-#else
-using UnityEditor.Experimental.Animations;
-#endif
 
 namespace UnityEditor.Recorder.Input
 {

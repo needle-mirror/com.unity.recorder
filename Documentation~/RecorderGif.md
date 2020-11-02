@@ -4,7 +4,7 @@ The **GIF Animation Recorder** generates an animated GIF file.
 
 This page covers all properties specific to the GIF Animation Recorder type.
 
-> **Note:** To fully configure any Recorder, you must also set the global [Recording Properties](Recording.md) for the capture (properties shared with the other recorders, such as the frames to record).
+> **Note:** To fully configure any Recorder, you must also set the general recording properties according to the recording interface you are using: the [Recorder window](RecorderWindowRecordingProperties.md) or a [Recorder Clip](RecordingTimelineTrack.md#recorder-clip-properties).
 
 ![](Images/RecorderGIF.png)
 
@@ -20,20 +20,23 @@ Use this section to define the source and the content of your recording.
 |Property||Function|
 |:---|:---|:---|
 | **Source** || Specifies the input for the recording. |
-|| Targeted Camera |Records frames captured by a specific camera, even if the Game View does not use that camera.<br/><br/>Selecting this option displays the [Targeted Camera capture properties](#TargetedCamera).|
-|| Render Texture Asset |Records frames rendered in a Render Texture.<br/><br/>Selecting this option displays the [Render Texture Asset capture properties](#RenderTextureAsset).|
-|| Texture Sampling |Supersamples the source camera during the capture to generate anti-aliased images in the recording.<br/><br/>Selecting this option displays the [Texture Sampling capture properties](#TextureSampling).|
+|| Targeted Camera |Records frames captured by a specific camera, even if the Game View does not use that camera.<br/><br/>Selecting this option displays the [Targeted Camera capture properties](#targeted-camera).|
+|| Render Texture Asset |Records frames rendered in a Render Texture.<br/><br/>Selecting this option displays the [Render Texture Asset capture properties](#render-texture-asset).|
+|| Texture Sampling |Supersamples the source camera during the capture to generate anti-aliased images in the recording.<br/><br/>Selecting this option displays the [Texture Sampling capture properties](#texture-sampling).|
 | **Flip Vertical** ||When you enable this option, the Recorder flips the output image vertically.<br />This is useful to correct for systems that output video upside down.|
 
+### Targeted Camera
 [!include[](InclCaptureOptionsTargetedCamera.md)]
 
+### Render Texture Asset
 [!include[](InclCaptureOptionsRenderTextureAsset.md)]
 
+### Texture Sampling
 [!include[](InclCaptureOptionsTextureSampling.md)]
 
 ## Format
 
-Use this section to set up the media format in which you need to save the recorded images.
+Use this section to set up the media format you need to save the recorded images in.
 
 |Property|Function|
 |:---|:---|
@@ -45,4 +48,4 @@ Use this section to set up the media format in which you need to save the record
 
 Use this section to specify the output **Path** and **File Name** pattern to save the recorded animation clip.
 
-> **Note:** [Output File properties](RecorderProperties.md) work the same for all types of recorders.
+> **Note:** [Output File properties](OutputFileProperties.md) work the same for all types of recorders.

@@ -148,7 +148,6 @@ namespace Unity.Media
             }
         }
 
-#if UNITY_2019_1_OR_NEWER
         public bool AddFrame(int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data)
         {
             CoreMediaEncoderLog("AddFrame(w,h,r,f,d)");
@@ -157,9 +156,6 @@ namespace Unity.Media
             return false;
         }
 
-#endif
-
-#if UNITY_2019_2_OR_NEWER
         public bool AddFrame(int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data, MediaTime time)
         {
             CoreMediaEncoderLog("AddFrame(w,h,r,f,d,t)");
@@ -167,8 +163,6 @@ namespace Unity.Media
                 return Encoder.Target.AddFrame(width, height, rowBytes, format, data, time);
             return false;
         }
-
-#endif
 
         public bool AddFrame(Texture2D texture)
         {
@@ -178,7 +172,6 @@ namespace Unity.Media
             return false;
         }
 
-#if UNITY_2019_2_OR_NEWER
         public bool AddFrame(Texture2D texture, MediaTime time)
         {
             CoreMediaEncoderLog("AddFrame(tex, time)");
@@ -186,8 +179,6 @@ namespace Unity.Media
                 return Encoder.Target.AddFrame(texture, time);
             return false;
         }
-
-#endif
 
         public bool AddSamples(ushort trackIndex, NativeArray<float> interleavedSamples)
         {

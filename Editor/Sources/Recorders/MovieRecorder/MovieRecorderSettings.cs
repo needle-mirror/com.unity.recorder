@@ -102,11 +102,7 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// The list of registered encoders.
         /// </summary>
-#if UNITY_2019_3_OR_NEWER
         [SerializeReference]
-#else
-        [SerializeField]
-#endif
         internal List<MediaEncoderRegister> encodersRegistered;
 
         /// <summary>

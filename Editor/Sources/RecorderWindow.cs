@@ -9,13 +9,7 @@ using UnityEditor.Recorder.Input;
 using UnityObject = UnityEngine.Object;
 using UnityEditor.PackageManager;
 
-#if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
-#else
-using UnityEditor.Experimental.UIElements;
-using UnityEngine.Experimental.UIElements;
-using UnityEngine.Experimental.UIElements.StyleEnums;
-#endif
 
 namespace UnityEditor.Recorder
 {
@@ -29,13 +23,8 @@ namespace UnityEditor.Recorder
         static readonly string s_WindowTitle = "Recorder";
         static readonly string s_StylesFolder = "Styles/";
 
-    #if UNITY_2018_2_OR_NEWER
         public const string MenuRoot = "Window/General/Recorder/";
         public const int MenuRootIndex = 1000;
-    #else
-        public const string MenuRoot = "Window/Recorder/";
-        public const int MenuRootIndex = 2050;
-    #endif
 
         private const string k_DefaultPackageVersion = "1.0.0-preview.1";
         private static bool s_PackageVersionInitialized = false;
@@ -201,7 +190,7 @@ namespace UnityEditor.Recorder
         /// Set the RecorderWindow controller settings and update the UI. This allow to set settings even if
         /// the window is open.
         /// </summary>
-        /// <param name="settings">The new <see cref="RenderControllerSettings"/> to set.</param>
+        /// <param name="settings">The new <see cref="RecorderControllerSettings"/> to set.</param>
         public void SetRecorderControllerSettings(RecorderControllerSettings settings)
         {
             m_ControllerSettings = settings;
@@ -212,11 +201,7 @@ namespace UnityEditor.Recorder
 
         void ClearView()
         {
-#if UNITY_2019_1_OR_NEWER
             var root = rootVisualElement;
-#else
-            var root = this.GetRootVisualContainer();
-#endif
             root.Clear();
         }
 
@@ -238,7 +223,6 @@ namespace UnityEditor.Recorder
         {
             minSize = new Vector2(560.0f, 200.0f);
 
-#if UNITY_2019_1_OR_NEWER
             var root = rootVisualElement;
             var sheet1 = Resources.Load<StyleSheet>(s_StylesFolder + "recorder");
             var sheet2 = Resources.Load<StyleSheet>(s_StylesFolder +
@@ -253,11 +237,6 @@ namespace UnityEditor.Recorder
             }
             root.styleSheets.Add(sheet1);
             root.styleSheets.Add(sheet2);
-#else
-            var root = this.GetRootVisualContainer();
-            root.AddStyleSheetPath(s_StylesFolder + "recorder");
-            root.AddStyleSheetPath(s_StylesFolder + (EditorGUIUtility.isProSkin ? "recorder_darkSkin" : "recorder_lightSkin"));
-#endif
 
             root.style.flexDirection = FlexDirection.Column;
             UIElementHelper.SetFocusable(root);
@@ -276,11 +255,7 @@ namespace UnityEditor.Recorder
             {
                 style =
                 {
-#if UNITY_2018_1
-                    minWidth = 350.0f,
-#else
                     minWidth = 180.0f,
-#endif
                     maxWidth = 450.0f,
                     flexDirection = FlexDirection.Row,
                 }
@@ -498,13 +473,8 @@ namespace UnityEditor.Recorder
 
             m_SettingsPanel.Add(m_ParametersControl);
 
-#if UNITY_2018_2_OR_NEWER
             m_RecordingListItem.RegisterCallback<ValidateCommandEvent>(OnRecorderListValidateCommand);
             m_RecordingListItem.RegisterCallback<ExecuteCommandEvent>(OnRecorderListExecuteCommand);
-#else
-            m_RecordingListItem.RegisterCallback<IMGUIEvent>(OnRecorderListIMGUI);
-#endif
-
             m_RecordingListItem.RegisterCallback<KeyUpEvent>(OnRecorderListKeyUp);
 
             SetRecorderControllerSettings(RecorderControllerSettings.GetGlobalSettings());
@@ -629,7 +599,6 @@ namespace UnityEditor.Recorder
             m_RecordingListItem.Reload(recorderItems);
         }
 
-#if UNITY_2018_2_OR_NEWER
         void OnRecorderListValidateCommand(ValidateCommandEvent evt)
         {
             RecorderListValidateCommand(evt, evt.commandName);
@@ -639,21 +608,6 @@ namespace UnityEditor.Recorder
         {
             RecorderListExecuteCommand(evt, evt.commandName);
         }
-
-#else
-        void OnRecorderListIMGUI(IMGUIEvent evt)
-        {
-            if (evt.imguiEvent.type == EventType.ValidateCommand)
-            {
-                RecorderListValidateCommand(evt, evt.imguiEvent.commandName);
-            }
-            else if (evt.imguiEvent.type == EventType.ExecuteCommand)
-            {
-                RecorderListExecuteCommand(evt, evt.imguiEvent.commandName);
-            }
-        }
-
-#endif
 
         void RecorderListValidateCommand(EventBase evt, string commandName)
         {
