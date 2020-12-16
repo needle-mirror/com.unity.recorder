@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
+    /// <summary>
+    /// The user interface to set up a Recorder.
+    /// </summary>
     public abstract class RecorderEditor : Editor
     {
         SerializedProperty m_CaptureEveryNthFrame;
@@ -29,6 +32,9 @@ namespace UnityEditor.Recorder
             internal static readonly GUIContent RenderStepFrameLabel = new GUIContent("Render Frame Step", "The interval between every frame to render in Play mode during the recording.");
         }
 
+        /// <summary>
+        /// Initializes the attributes and styling of the editor based on the serialized data, when the object becomes active.
+        /// </summary>
         protected virtual void OnEnable()
         {
             if (target != null)
@@ -44,11 +50,14 @@ namespace UnityEditor.Recorder
             }
         }
 
+        /// <summary>
+        /// Draws a delimiter between different GUI elements.
+        /// </summary>
         protected static void DrawSeparator()
         {
         }
 
-        /// <summary> Draws a foldout header </summary>
+        /// <summary>Draws a foldout header.</summary>
         /// <param name="title"> The title of the header </param>
         /// <param name="state"> The state of the header </param>
         /// <param name="isBoxed"> Specifies whether to contain the header in a box style [optional]. </param>
@@ -107,6 +116,9 @@ namespace UnityEditor.Recorder
             return state;
         }
 
+        /// <summary>
+        /// This is the main entry point for drawing the Recorder editor in the inspector.
+        /// </summary>
         public override void OnInspectorGUI()
         {
             if (target == null)
@@ -154,6 +166,9 @@ namespace UnityEditor.Recorder
             OnValidateSettingsGUI();
         }
 
+        /// <summary>
+        /// Validates the settings of the Recorder.
+        /// </summary>
         protected virtual void OnValidateSettingsGUI()
         {
             var errors = new List<string>();
@@ -170,6 +185,9 @@ namespace UnityEditor.Recorder
             return true;
         }
 
+        /// <summary>
+        /// Displays the information related to the output file(s).
+        /// </summary>
         protected virtual void NameAndPathGUI()
         {
             EditorGUILayout.PropertyField(m_FileNameGenerator, Styles.FileNameLabel);
@@ -181,6 +199,9 @@ namespace UnityEditor.Recorder
             EditorGUILayout.PropertyField(m_Take, Styles.TakeNumberLabel);
         }
 
+        /// <summary>
+        /// Displays the information related to the source of the capture and its rendering options.
+        /// </summary>
         protected virtual void ImageRenderOptionsGUI()
         {
             var recorder = (RecorderSettings)target;
@@ -220,6 +241,9 @@ namespace UnityEditor.Recorder
             return null;
         }
 
+        /// <summary>
+        /// Displays extra options below the capture information, under certain conditions.
+        /// </summary>
         protected virtual void ExtraOptionsGUI()
         {
             if (((RecorderSettings)target).FrameRatePlayback == FrameRatePlayback.Variable)
@@ -228,14 +252,23 @@ namespace UnityEditor.Recorder
             }
         }
 
+        /// <summary>
+        /// Displays options related to the output format of the recording.
+        /// </summary>
         protected virtual void FileTypeAndFormatGUI()
         {
         }
 
+        /// <summary>
+        /// Displays properties related to the encoding of the file.
+        /// </summary>
         protected virtual void OnEncodingGui()
         {
         }
 
+        /// <summary>
+        /// Displays the properties of the AOV Recorder.
+        /// </summary>
         protected virtual void AOVGUI()
         {
         }

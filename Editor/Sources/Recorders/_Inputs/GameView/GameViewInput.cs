@@ -97,7 +97,7 @@ namespace UnityEditor.Recorder.Input
             }
 
             // Initialize the temporary texture for forcing opacity
-            m_TempCaptureTextureOpaque = RenderTexture.GetTemporary(w, h);
+            m_TempCaptureTextureOpaque = RenderTexture.GetTemporary(OutputWidth, OutputHeight);
 
 #if !UNITY_2019_1_OR_NEWER
             // Before 2019.1, we capture synchronously into a Texture2D, so we don't need to create

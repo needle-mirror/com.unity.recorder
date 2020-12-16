@@ -32,7 +32,7 @@ namespace UnityEditor.Recorder
                 if (EditorGUIUtility.isProSkin)
                     iconName = "d_" + iconName;
 
-                s_OpenPathIcon = Resources.Load<Texture2D>(iconName);
+                s_OpenPathIcon = UnityHelpers.LoadLocalPackageAsset<Texture2D>($"{iconName}.png");
             }
 
             if (target != null)

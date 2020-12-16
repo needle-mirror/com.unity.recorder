@@ -3,13 +3,16 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
+    /// <summary>
+    /// A class that represents the settings of a GIF Recorder.
+    /// </summary>
     [RecorderSettings(typeof(GIFRecorder), "GIF Animation", "imagesequence_16")]
     public class GIFRecorderSettings : BaseFCRecorderSettings
     {
         [SerializeField] internal fcAPI.fcGifConfig gifEncoderSettings = fcAPI.fcGifConfig.default_value;
 
         /// <summary>
-        /// Use this property to set the number of colors used in the GIF palette for the output. Maximum is 256.
+        /// The number of colors used in the GIF palette for the output. Maximum is 256.
         /// </summary>
         public int NumColors
         {
@@ -18,7 +21,7 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
-        /// Use this property to set the frame interval between keyframes (value between 1 and 120). This defines how many frames share the same color palette.
+        /// The frame interval between keyframes (value between 1 and 120). This defines how many frames share the same color palette.
         /// </summary>
         public int KeyframeInterval
         {
@@ -28,7 +31,7 @@ namespace UnityEditor.Recorder
 
 
         /// <summary>
-        /// Use this property to set the maximum number of threads to use to encode output frames (value between 1 and 32).
+        /// The maximum number of threads to use to encode output frames (value between 1 and 32).
         /// </summary>
         public int MaxTasks
         {

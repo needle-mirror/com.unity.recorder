@@ -23,6 +23,12 @@ namespace UnityEditor.Recorder
             this.displayName = displayName;
         }
 
+        /// <summary>
+        /// Constructor for the attribute.
+        /// </summary>
+        /// <param name="recorderType">The type of Recorder that uses this Recorder Settings instance.</param>
+        /// <param name="displayName">The Recorder's display name.</param>
+        /// <param name="iconName">The name of the icon.</param>
         public RecorderSettingsAttribute(Type recorderType, string displayName, string iconName)
         {
             this.iconName = iconName;

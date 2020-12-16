@@ -43,7 +43,7 @@ namespace UnityEditor.Recorder
     }
 
     /// <summary>
-    /// Sets which time or frame interval to record.
+    /// The mode that defines the way to manage the starting point and duration of the recording.
     /// </summary>
     public enum RecordMode
     {
@@ -130,29 +130,63 @@ namespace UnityEditor.Recorder
 
         [SerializeField] internal FileNameGenerator fileNameGenerator;
 
+        /// <summary>
+        /// The object that resolves wildcards into a final path for output files.
+        /// </summary>
         public FileNameGenerator FileNameGenerator => fileNameGenerator;
 
+        /// <summary>
+        /// The mode that defines the way to manage the starting point and duration of the recording: either manually
+        /// or within a specific time or frame interval.
+        /// </summary>
         public RecordMode RecordMode { get; set; }
 
+        /// <summary>
+        /// The type of frame rate to use in the recording: constant or variable.
+        /// </summary>
         public FrameRatePlayback FrameRatePlayback { get; set; }
 
         float frameRate = 30;
+
+        /// <summary>
+        /// The number of recorded frames per second. In constant frame rate mode, this represent a target value, while
+        /// in variable frame rate mode, this represents a maximum value.
+        /// </summary>
+        /// <seealso cref="FrameRatePlayback"/>
         public float FrameRate
         {
             get => frameRate;
             set => frameRate = value;
         }
 
+        /// <summary>
+        /// The start frame of the recording.
+        /// </summary>
         public int StartFrame { get; set; }
 
+        /// <summary>
+        /// The end frame of the recording.
+        /// </summary>
         public int EndFrame { get; set; }
 
+        /// <summary>
+        /// The start time of the recording.
+        /// </summary>
         public float StartTime { get; set; }
 
+        /// <summary>
+        /// The end time of the recording.
+        /// </summary>
         public float EndTime { get; set; }
 
+        /// <summary>
+        /// Specifies whether or not to limit the frame rate when it is above the target frame rate.
+        /// </summary>
         public bool CapFrameRate { get; set; }
 
+        /// <summary>
+        /// The constructor of the class.
+        /// </summary>
         protected RecorderSettings()
         {
             fileNameGenerator = new FileNameGenerator(this)
@@ -219,14 +253,15 @@ namespace UnityEditor.Recorder
         public abstract IEnumerable<RecorderInputSettings> InputsSettings { get; }
 
         /// <summary>
-        /// This method is automatically called each time a Recorder Settings group has changed in the Recorder Window and before starting recording.
+        /// Performs additional changes on the selected input's settings based on the context of the recording,
+        /// such as enforcing limitations due to file formats.
         /// </summary>
         internal virtual void SelfAdjustSettings()
         {
         }
 
         /// <summary>
-        /// Override this method if any post treatement needs to be done after this Recorder is duplicated in the Recorder Window.
+        /// Override this method if any post treatment needs to be done after this Recorder is duplicated in the Recorder Window.
         /// </summary>
         public virtual void OnAfterDuplicate()
         {

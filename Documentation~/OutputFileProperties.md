@@ -30,7 +30,7 @@ The **+Wildcards** menu helps you quickly append them to the file name string, b
 
 | Placeholder | Description | Resolved value example |
 |--|--|--|
-| `<Recorder>` |The Recorder name, as it appears in the Recorder list. | `My Recorder` |
+| `<Recorder>` | • In Recorder window: the Recorder name from the Recorder list.<br />• In Timeline track: the name of the Recorder clip. | `My Recorder` |
 | `<Time>` | The time the recording is generated. Uses the `00h00m` format. | `16h52m` |
 | `<Take>` | The **Take Number** value. Uses the `000` format.  | `002` |
 | `<Date>` | The date the recording is generated. Uses the `yyyy-MM-dd` format. | `2020-11-03` |
@@ -40,3 +40,7 @@ The **+Wildcards** menu helps you quickly append them to the file name string, b
 | `<Resolution>` | The output image dimensions (width by height) in pixels. Uses the `WxH` format. | `1920x1080` |
 | `<Frame>` | The current frame number. Uses the `0000` format.<br/><br/>This is useful for Image Sequence Recorders which output each frame as a separate file. | `0154` |
 | `<Extension>` | The file extension of the output format (without the period). | `png` |
+| `<GameObject>` | The name of the GameObject being recorded. | `My GameObject` |
+| `<GameObjectScene>` | The name of the Scene containing the GameObject being Recorded. | `My Scene` |
+
+**Note:** Some placeholders might not be available depending on the Recorder type you are using.

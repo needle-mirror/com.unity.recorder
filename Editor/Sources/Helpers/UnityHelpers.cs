@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEditor.Recorder.Input;
@@ -5,6 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Recorder;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 using UnityObject = UnityEngine.Object;
 
 namespace UnityEditor.Recorder
@@ -163,6 +165,25 @@ namespace UnityEditor.Recorder
             newTex.Apply();
 
             return newTex;
+        }
+
+        /// <summary>
+        /// Load an asset from the current package's Editor/Assets folder.
+        /// </summary>
+        /// <param name="relativeFilePathWithExtension">The relative filename inside the Editor/Assets folder, without
+        /// leading slash.</param>
+        /// <typeparam name="T">The type of asset to load</typeparam>
+        /// <returns></returns>
+        internal static T LoadLocalPackageAsset<T>(string relativeFilePathWithExtension) where T : Object
+        {
+            T result = default(T);
+            var fullPathInProject = $"Packages/com.unity.recorder/Editor/Assets/{relativeFilePathWithExtension}";
+
+            if (File.Exists(fullPathInProject))
+                result = AssetDatabase.LoadAssetAtPath(fullPathInProject, typeof(T)) as T;
+            else
+                Debug.LogError($"Local asset file {fullPathInProject} not found.");
+            return result;
         }
     }
 }

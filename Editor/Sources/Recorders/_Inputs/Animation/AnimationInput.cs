@@ -11,7 +11,7 @@ namespace UnityEditor.Recorder.Input
         /// Indicates the internal GameObject Recorder to use for the capture.
         /// </summary>
         public GameObjectRecorder GameObjectRecorder { get; private set; }
-        float m_Time;
+        double m_Time;
 
         /// <inheritdoc/>
         protected internal override void BeginRecording(RecordingSession session)
@@ -30,7 +30,7 @@ namespace UnityEditor.Recorder.Input
                 GameObjectRecorder.BindComponentsOfType(srcGO, binding, aniSettings.Recursive);
             }
 
-            m_Time = session.recorderTime;
+            m_Time = session.currentFrameStartTS;
         }
 
         /// <inheritdoc/>
@@ -38,8 +38,9 @@ namespace UnityEditor.Recorder.Input
         {
             if (GameObjectRecorder != null && session.isRecording)
             {
-                GameObjectRecorder.TakeSnapshot(session.recorderTime - m_Time);
-                m_Time = session.recorderTime;
+                var dt = (float)(session.currentFrameStartTS - m_Time);
+                GameObjectRecorder.TakeSnapshot(dt);
+                m_Time = session.currentFrameStartTS;
             }
         }
     }

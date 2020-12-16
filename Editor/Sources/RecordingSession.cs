@@ -3,9 +3,17 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
+    /// <summary>
+    /// A class that represents a Recorder session, with support for processing incoming data and preparing as
+    /// well as cleaning up resources.
+    /// </summary>
     public class RecordingSession : IDisposable
     {
+        /// <summary>
+        /// The Recorder associated with this session.
+        /// </summary>
         public Recorder recorder;
+
         internal GameObject recorderGameObject;
         internal RecorderComponent recorderComponent;
 
@@ -16,12 +24,20 @@ namespace UnityEditor.Recorder
         float m_FPSNextTimeStart;
         int m_FPSNextFrameCount;
 
-        internal bool prepareFrameCalled { get; private set; }
         internal double currentFrameStartTS { get; private set; }
         internal double recordingStartTS { get; private set; }
 
         internal DateTime sessionStartTS { get; private set; }
 
+        /// <summary>
+        /// The settings of the Recorder.
+        /// </summary>
+        /// <seealso cref="AnimationRecorderSettings"/>
+        /// <seealso cref="FrameCapturer.BaseFCRecorderSettings"/>
+        /// <seealso cref="AudioRecorderSettings"/>
+        /// <seealso cref="ImageRecorderSettings"/>
+        /// <seealso cref="MovieRecorderSettings"/>
+        /// <seealso cref="AudioRecorderSettings"/>
         public RecorderSettings settings
         {
             get { return recorder.settings; }
@@ -32,6 +48,9 @@ namespace UnityEditor.Recorder
             get { return recorder.Recording; }
         }
 
+        /// <summary>
+        /// The index of the current frame being processed.
+        /// </summary>
         public int frameIndex
         {
             get { return m_FrameIndex; }
@@ -42,6 +61,9 @@ namespace UnityEditor.Recorder
             get { return m_FirstRecordedFrameCount == -1 ? 0 : Time.renderedFrameCount - m_FirstRecordedFrameCount; }
         }
 
+        /// <summary>
+        /// The time (in seconds) of the current frame.
+        /// </summary>
         public float recorderTime
         {
             get { return (float)(currentFrameStartTS - settings.StartTime); }
@@ -65,7 +87,6 @@ namespace UnityEditor.Recorder
                 recordingStartTS = (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale));
                 sessionStartTS = DateTime.Now;
                 recorder.SessionCreated(this);
-                prepareFrameCalled = false;
                 return true;
             }
             catch (Exception ex)
@@ -124,15 +145,15 @@ namespace UnityEditor.Recorder
         {
             try
             {
-                recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameReady, this);
                 if (!recorder.SkipFrame(this))
                 {
+                    recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameReady, this);
                     recorder.RecordFrame(this);
                     recorder.RecordedFramesCount++;
                     if (recorder.RecordedFramesCount == 1)
                         m_FirstRecordedFrameCount = Time.renderedFrameCount;
+                    recorder.SignalInputsOfStage(ERecordingSessionStage.FrameDone, this);
                 }
-                recorder.SignalInputsOfStage(ERecordingSessionStage.FrameDone, this);
             }
             catch (Exception ex)
             {
@@ -184,7 +205,6 @@ namespace UnityEditor.Recorder
 
                 recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameStarting, this);
                 recorder.PrepareNewFrame(this);
-                prepareFrameCalled = true;
             }
             catch (Exception ex)
             {
@@ -192,6 +212,9 @@ namespace UnityEditor.Recorder
             }
         }
 
+        /// <summary>
+        /// Cleans up the object's resources.
+        /// </summary>
         public void Dispose()
         {
             if (recorder != null)

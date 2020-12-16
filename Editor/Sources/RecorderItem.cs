@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 using UnityEngine.UIElements;
@@ -142,10 +143,14 @@ namespace UnityEditor.Recorder
                 return icon;
 
             if (EditorGUIUtility.isProSkin)
-                icon = Resources.Load<Texture2D>("d_" + iconName);
+            {
+                icon = UnityHelpers.LoadLocalPackageAsset<Texture2D>($"d_{iconName}.png");
+            }
 
             if (icon == null)
-                icon = Resources.Load<Texture2D>(iconName);
+            {
+                icon = UnityHelpers.LoadLocalPackageAsset<Texture2D>($"{iconName}.png");
+            }
 
             s_IconCache[iconName] = icon;
 

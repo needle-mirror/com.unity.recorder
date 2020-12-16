@@ -27,6 +27,9 @@ namespace UnityEditor.Recorder
         /// </summary>
         protected internal int RecordedFramesCount { get; internal set; }
 
+        /// <summary>
+        /// The list of inputs to the Recorder, representing the sources of the captured data.
+        /// </summary>
         protected List<RecorderInput> m_Inputs;
 
         void Awake()

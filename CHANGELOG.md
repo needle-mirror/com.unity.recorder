@@ -4,6 +4,14 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.5.2] - 2020-12-16
+### Fixed
+- Fixed an issue where changing the active camera would be recorded one frame too late.
+- Fixed an exception that would occur when undoing a Timeline Recorder Clip copy-paste action while the Inspector is active.
+- Made the Animation Clip Recorder respect the Start Frame/Time setting instead of always recording from the first frame.
+- Fixed Game View recording to get the expected rendering resolution, regardless of the current Game View dimensions.
+- Fixed missing descriptions in Scripting API documentation.
+
 ## [2.5.0-pre.1] - 2020-11-02
 ### Added
 - Added a new sample showing how to set up a movie recording session via script.

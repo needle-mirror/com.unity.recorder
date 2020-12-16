@@ -21,9 +21,15 @@ namespace UnityEditor.Recorder
     public class RecorderWindow : EditorWindow
     {
         static readonly string s_WindowTitle = "Recorder";
-        static readonly string s_StylesFolder = "Styles/";
 
+        /// <summary>
+        /// The location in the Unity Editor menu for the Recorder Window.
+        /// </summary>
         public const string MenuRoot = "Window/General/Recorder/";
+
+        /// <summary>
+        /// The priority of the Recorder Window entries in the menu.
+        /// </summary>
         public const int MenuRootIndex = 1000;
 
         private const string k_DefaultPackageVersion = "1.0.0-preview.1";
@@ -223,12 +229,12 @@ namespace UnityEditor.Recorder
         {
             minSize = new Vector2(560.0f, 200.0f);
 
+            var pathPrefix1 = $"Styles/recorder.uss";
+            var lightOrDark = EditorGUIUtility.isProSkin ? "recorder_darkSkin" : "recorder_lightSkin";
+            var pathPrefix2 = $"Styles/{lightOrDark}.uss";
             var root = rootVisualElement;
-            var sheet1 = Resources.Load<StyleSheet>(s_StylesFolder + "recorder");
-            var sheet2 = Resources.Load<StyleSheet>(s_StylesFolder +
-                (EditorGUIUtility.isProSkin
-                    ? "recorder_darkSkin"
-                    : "recorder_lightSkin"));
+            var sheet1 = UnityHelpers.LoadLocalPackageAsset<StyleSheet>(pathPrefix1);
+            var sheet2 = UnityHelpers.LoadLocalPackageAsset<StyleSheet>(pathPrefix2);
             bool sheetNotFound = sheet1 == null || sheet2 == null;
             if (sheetNotFound)
             {
@@ -284,7 +290,7 @@ namespace UnityEditor.Recorder
                 name = "recorderIcon",
                 style =
                 {
-                    backgroundImage = Resources.Load<Texture2D>("recorder_icon"),
+                    backgroundImage = UnityHelpers.LoadLocalPackageAsset<Texture2D>("recorder_icon.png"),
                 },
                 tooltip = "Start the recording for all active recorders of the list\n\n This automatically activates the Play mode first (if not activated yet)."
             };

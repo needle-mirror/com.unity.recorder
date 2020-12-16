@@ -53,7 +53,7 @@ namespace UnityEditor.Recorder
 
         /// <inheritdoc/>
         /// <remarks>
-        ///  Animation Recorder currently supports the following platforms: LinuxEditor, OSXEditor, WindowsEditor.
+        /// Animation Recorder currently supports the following platforms: LinuxEditor, OSXEditor, WindowsEditor.
         /// </remarks>
         public override bool IsPlatformSupported
         {

@@ -4,6 +4,7 @@
         "Unity.Recorder.Base",
         "Unity.Recorder",
         "Unity.Timeline",
+        "Unity.Timeline.Editor",
         "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [

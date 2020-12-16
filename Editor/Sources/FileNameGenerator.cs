@@ -63,7 +63,8 @@ namespace UnityEditor.Recorder
         /// </summary>
         public static readonly string Project = GeneratePattern("Project");
         /// <summary>
-        /// The product name from the build settings (a combination of the Unity Project name and the output file extension).
+        /// The product name from the build settings:
+        /// [PlayerSettings.productName](https://docs.unity3d.com/ScriptReference/PlayerSettings-productName.html).
         /// </summary>
         public static readonly string Product = GeneratePattern("Product");
         /// <summary>
@@ -78,17 +79,26 @@ namespace UnityEditor.Recorder
         /// The current frame ID (a four-digit zero-padded number).
         /// </summary>
         public static readonly string Frame = GeneratePattern("Frame");
+
         /// <summary>
         /// The file extension of the output format.
         /// </summary>
         public static readonly string Extension = GeneratePattern("Extension");
 
+        /// <summary>
+        /// Formats a tag to be recognized as a wildcard.
+        /// </summary>
+        /// <param name="tag">The name of the tag.</param>
+        /// <returns>The formatted tag.</returns>
         public static string GeneratePattern(string tag)
         {
             return "<" + tag + ">";
         }
     }
 
+    /// <summary>
+    /// A class that provides a way to generate names of output files, with support for wildcards.
+    /// </summary>
     [Serializable]
     public class FileNameGenerator
     {
@@ -179,7 +189,7 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
-        /// Use this property to ensure that the generated file is saved in the Assets folder.
+        /// Specifies whether the generated file is saved in the Assets folder or not.
         /// </summary>
         public bool ForceAssetsFolder
         {

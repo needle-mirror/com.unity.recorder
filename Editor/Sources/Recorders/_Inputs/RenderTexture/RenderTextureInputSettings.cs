@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder.Input
 {
+    /// <summary>
+    /// The settings of a Render Texture input.
+    /// </summary>
     [DisplayName("Render Texture Asset")]
     [Serializable]
     public class RenderTextureInputSettings : ImageInputSettings
@@ -20,7 +23,7 @@ namespace UnityEditor.Recorder.Input
         }
 
         /// <summary>
-        /// Use this property if you need to vertically flip the final output.
+        /// Specifies whether to vertically flip the final output or not.
         /// </summary>
         public bool FlipFinalOutput
         {

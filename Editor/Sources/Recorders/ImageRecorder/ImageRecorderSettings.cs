@@ -7,6 +7,9 @@ using UnityEngine.Serialization;
 
 namespace UnityEditor.Recorder
 {
+    /// <summary>
+    /// A class that represents the settings of an Image Recorder.
+    /// </summary>
     [RecorderSettings(typeof(ImageRecorder), "Image Sequence", "imagesequence_16")]
     public class ImageRecorderSettings : RecorderSettings
     {
@@ -98,6 +101,9 @@ namespace UnityEditor.Recorder
             }
         }
 
+        /// <summary>
+        /// The settings of the input image.
+        /// </summary>
         public ImageInputSettings imageInputSettings
         {
             get { return m_ImageInputSelector.ImageInputSettings; }
@@ -110,6 +116,9 @@ namespace UnityEditor.Recorder
             return ok;
         }
 
+        /// <summary>
+        /// The list of settings of the Recorder Inputs.
+        /// </summary>
         public override IEnumerable<RecorderInputSettings> InputsSettings
         {
             get { yield return m_ImageInputSelector.Selected; }

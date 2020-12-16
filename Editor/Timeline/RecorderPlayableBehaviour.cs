@@ -30,14 +30,6 @@ namespace UnityEditor.Recorder.Timeline
             }
         }
 
-        public override void PrepareFrame(Playable playable, FrameData info)
-        {
-            if (session != null && session.isRecording)
-            {
-                session.PrepareNewFrame();
-            }
-        }
-
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             if (session != null)
@@ -47,6 +39,11 @@ namespace UnityEditor.Recorder.Timeline
                     endOfFrameComp = session.recorderGameObject.AddComponent<WaitForEndOfFrameComponent>();
                     endOfFrameComp.m_playable = this;
                 }
+            }
+
+            if (session != null && session.isRecording)
+            {
+                session.PrepareNewFrame();
             }
         }
 

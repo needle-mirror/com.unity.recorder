@@ -60,17 +60,6 @@ namespace UnityEditor.Recorder.Timeline
 
                     EditorGUILayout.BeginHorizontal();
 
-                    if (clip.needsDuplication)
-                    {
-                        if (clip.settings != null)
-                        {
-                            clip.settings = Instantiate(clip.settings);
-                            AssetDatabase.AddObjectToAsset(clip.settings, clip);
-                        }
-
-                        clip.needsDuplication = false;
-                    }
-
                     m_RecorderSelector.OnGui();
 
                     if (m_Editor != null)
@@ -140,18 +129,18 @@ namespace UnityEditor.Recorder.Timeline
 
             if (clip.settings != null && RecordersInventory.GetRecorderInfo(selectedRecorder).settingsType != clip.settings.GetType())
             {
-                UnityHelpers.Destroy(clip.settings, true);
+                Undo.DestroyObjectImmediate(clip.settings);
                 clip.settings = null;
             }
 
             if (clip.settings == null)
             {
                 clip.settings = RecordersInventory.CreateDefaultRecorderSettings(selectedRecorder);
+                Undo.RegisterCreatedObjectUndo(clip.settings, "Recorder Create Settings");
                 AssetDatabase.AddObjectToAsset(clip.settings, clip);
             }
 
             m_Editor = (RecorderEditor)CreateEditor(clip.settings);
-            AssetDatabase.Refresh();
         }
     }
 }

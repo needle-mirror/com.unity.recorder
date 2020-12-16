@@ -5,16 +5,23 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder.Input
 {
+    /// <summary>
+    /// A class that represents the settings of a 360 View.
+    /// </summary>
     [DisplayName("360 View")]
     [Serializable]
     public class Camera360InputSettings : ImageInputSettings
     {
+        /// <summary>
+        /// The source camera for the 360 View.
+        /// </summary>
         public ImageSource Source
         {
             get { return source; }
             set { source = value; }
         }
         [SerializeField] ImageSource source = ImageSource.MainCamera;
+
         /// <summary>
         /// Indicates the GameObject tag of the Camera used for the capture.
         /// </summary>
@@ -67,8 +74,8 @@ namespace UnityEditor.Recorder.Input
             get => mapSize;
             set => mapSize = value;
         }
-
         [SerializeField] int mapSize = 1024;
+
 
         [SerializeField] int m_OutputWidth = 1024;
         [SerializeField] int m_OutputHeight = 2048;
@@ -78,12 +85,18 @@ namespace UnityEditor.Recorder.Input
             get { return typeof(Camera360Input); }
         }
 
+        /// <summary>
+        /// The width in pixels of the 360 View image.
+        /// </summary>
         public override int OutputWidth
         {
             get { return m_OutputWidth; }
             set { m_OutputWidth = value; }
         }
 
+        /// <summary>
+        /// The height in pixels of the 360 View image.
+        /// </summary>
         public override int OutputHeight
         {
             get { return m_OutputHeight; }

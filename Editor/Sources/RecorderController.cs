@@ -25,10 +25,9 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
-        /// A RecorderController requires a RecorderControllerSettings.
+        /// The constructor of the RecorderController.
         /// </summary>
-        /// <param name="settings">The RecorderControllerSettings to be used by this RecorderController.</param>
-        /// <see cref="RecorderControllerSettings"/>
+        /// <param name="settings">The settings to be used by this RecorderController.</param>
         public RecorderController(RecorderControllerSettings settings)
         {
             m_Settings = settings;
@@ -40,7 +39,7 @@ namespace UnityEditor.Recorder
         /// To start recording once you've called this method, you must call <see cref="StartRecording"/>.
         /// </summary>
         /// <remarks>
-        /// This method sets up the internal data for the recording session and pauses the simulation to ensure a proper synchronization between the Recorder and the Unity Editor.
+        /// Sets up the internal data for the recording session and pauses the simulation to ensure a proper synchronization between the Recorder and the Unity Editor.
         /// </remarks>
         public void PrepareRecording()
         {
@@ -140,7 +139,7 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
-        ///  Use this method to know if all recorders are done recording.
+        /// Use this method to know if all recorders are done recording.
         /// A recording stops:
         /// 1. The settings is set to a time (or frame) interval and the end time (or last frame) was reached.
         /// 2. Calling the StopRecording method.

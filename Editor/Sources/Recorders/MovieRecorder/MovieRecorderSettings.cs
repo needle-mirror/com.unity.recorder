@@ -42,6 +42,9 @@ namespace UnityEditor.Recorder
         }
     }
 
+    /// <summary>
+    /// A class that represents the settings of a Movie Recorder.
+    /// </summary>
     [RecorderSettings(typeof(MovieRecorder), "Movie", "movie_16")]
     public class MovieRecorderSettings : RecorderSettings
     {
@@ -117,7 +120,7 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
-        ///  Gets the currently selected encoder.
+        /// Gets the currently selected encoder.
         /// </summary>
         /// <returns></returns>
         internal MediaEncoderRegister GetCurrentEncoder()

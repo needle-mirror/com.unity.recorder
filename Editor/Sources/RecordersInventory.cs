@@ -160,7 +160,7 @@ namespace UnityEditor.Recorder
             if (recorderinfo != null)
             {
                 var settings = (RecorderSettings)ObjectFactory.CreateInstance(recorderinfo.settingsType);
-                settings.name = settingsType.Name;
+                settings.name = recorderinfo.displayName;
 
                 return settings;
             }

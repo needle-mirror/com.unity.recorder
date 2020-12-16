@@ -10,10 +10,29 @@ namespace UnityEditor.Recorder
     [Serializable]
     public class ImageInputSelector : InputSettingsSelector
     {
+        /// <summary>
+        /// The settings when the input is set to Game View.
+        /// </summary>
         [SerializeField] public GameViewInputSettings gameViewInputSettings = new GameViewInputSettings();
+
+        /// <summary>
+        /// The settings when the input is set to Targeted Camera.
+        /// </summary>
         [SerializeField] public CameraInputSettings cameraInputSettings = new CameraInputSettings();
+
+        /// <summary>
+        /// The settings when the input is set to 360 View.
+        /// </summary>
         [SerializeField] public Camera360InputSettings camera360InputSettings = new Camera360InputSettings();
+
+        /// <summary>
+        /// The settings when the input is set to Render Texture Asset.
+        /// </summary>
         [SerializeField] public RenderTextureInputSettings renderTextureInputSettings = new RenderTextureInputSettings();
+
+        /// <summary>
+        /// The settings when the input is set to Texture Sampling.
+        /// </summary>
         [SerializeField] public RenderTextureSamplerSettings renderTextureSamplerSettings = new RenderTextureSamplerSettings();
 
         /// <summary>

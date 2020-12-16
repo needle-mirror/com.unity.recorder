@@ -32,6 +32,9 @@ namespace UnityEditor.Recorder.Input
         X16 = 16,
     }
 
+    /// <summary>
+    /// The settings of a Render Texture sampler.
+    /// </summary>
     [DisplayName("Texture Sampling")]
     [Serializable]
     public class RenderTextureSamplerSettings : ImageInputSettings
