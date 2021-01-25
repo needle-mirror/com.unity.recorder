@@ -143,14 +143,10 @@ namespace UnityEditor.Recorder
                 return icon;
 
             if (EditorGUIUtility.isProSkin)
-            {
-                icon = UnityHelpers.LoadLocalPackageAsset<Texture2D>($"d_{iconName}.png");
-            }
+                icon = UnityHelpers.LoadLocalPackageAsset<Texture2D>($"d_{iconName}.png", false);
 
             if (icon == null)
-            {
-                icon = UnityHelpers.LoadLocalPackageAsset<Texture2D>($"{iconName}.png");
-            }
+                icon = UnityHelpers.LoadLocalPackageAsset<Texture2D>($"{iconName}.png", false);
 
             s_IconCache[iconName] = icon;
 

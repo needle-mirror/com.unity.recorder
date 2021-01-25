@@ -13,7 +13,7 @@ namespace UnityEditor.Recorder
     {
         readonly SceneHook m_SceneHook;
 
-        List<RecordingSession> m_RecordingSessions;
+        internal List<RecordingSession> m_RecordingSessions;
         readonly RecorderControllerSettings m_Settings;
 
         /// <summary>

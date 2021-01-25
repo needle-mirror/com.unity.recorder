@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Unity.Recorder.Editor.Tests")]
 
 namespace UnityEditor.Recorder.Input
 {
@@ -32,10 +35,19 @@ namespace UnityEditor.Recorder.Input
             if (gameView == null)
                 return;
 
-            if (s_GameViewType.GetField("m_MaximizeOnPlay", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(gameView)  as bool? == true)
+            var getMaximizeOnPlayMethod = gameView.GetType().GetMethod("get_maximizeOnPlay",  BindingFlags.Public | BindingFlags.Instance);
+
+            bool maximizeOnPlay = false;
+            if (getMaximizeOnPlayMethod != null)
             {
-                Debug.LogWarning("'Maximize on Play' not compatible with recorder: disabling it!");
-                s_GameViewType.GetField("m_MaximizeOnPlay", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(gameView, false);
+                maximizeOnPlay = (bool)getMaximizeOnPlayMethod.Invoke(gameView, new object[] {});
+                if (maximizeOnPlay)
+                {
+                    Debug.LogWarning("'Maximize on Play' not compatible with recorder: disabling it!");
+                    var m = gameView.GetType().GetMethod("set_maximizeOnPlay",
+                        BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                    m.Invoke(gameView, new object[] {false});
+                }
             }
         }
 

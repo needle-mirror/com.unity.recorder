@@ -233,8 +233,8 @@ namespace UnityEditor.Recorder
             var lightOrDark = EditorGUIUtility.isProSkin ? "recorder_darkSkin" : "recorder_lightSkin";
             var pathPrefix2 = $"Styles/{lightOrDark}.uss";
             var root = rootVisualElement;
-            var sheet1 = UnityHelpers.LoadLocalPackageAsset<StyleSheet>(pathPrefix1);
-            var sheet2 = UnityHelpers.LoadLocalPackageAsset<StyleSheet>(pathPrefix2);
+            var sheet1 = UnityHelpers.LoadLocalPackageAsset<StyleSheet>(pathPrefix1, false);
+            var sheet2 = UnityHelpers.LoadLocalPackageAsset<StyleSheet>(pathPrefix2, false);
             bool sheetNotFound = sheet1 == null || sheet2 == null;
             if (sheetNotFound)
             {
@@ -290,7 +290,7 @@ namespace UnityEditor.Recorder
                 name = "recorderIcon",
                 style =
                 {
-                    backgroundImage = UnityHelpers.LoadLocalPackageAsset<Texture2D>("recorder_icon.png"),
+                    backgroundImage = UnityHelpers.LoadLocalPackageAsset<Texture2D>("recorder_icon.png", true),
                 },
                 tooltip = "Start the recording for all active recorders of the list\n\n This automatically activates the Play mode first (if not activated yet)."
             };
@@ -857,7 +857,8 @@ namespace UnityEditor.Recorder
                 Debug.Log("Start Recording.");
 
             m_RecorderController.PrepareRecording();
-            bool success = m_RecorderController.StartRecording();
+            var success = m_RecorderController.StartRecording();
+            RecorderAnalytics.SendStartEvent(m_RecorderController);
 
             if (success)
             {
@@ -866,7 +867,7 @@ namespace UnityEditor.Recorder
             }
             else
             {
-                StopRecordingInternal();
+                StopRecordingInternal(false);
                 m_State = State.Error;
             }
         }
@@ -910,11 +911,12 @@ namespace UnityEditor.Recorder
             m_RecordButton.text = m_State == State.Recording ? "STOP RECORDING" : "START RECORDING";
         }
 
-        void StopRecordingInternal()
+        void StopRecordingInternal(bool success = true)
         {
             if (RecorderOptions.VerboseMode)
                 Debug.Log("Stop Recording.");
 
+            RecorderAnalytics.SendStopEvent(m_RecorderController, !success);
             m_RecorderController.StopRecording();
 
             m_State = State.Idle;

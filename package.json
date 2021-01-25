@@ -1,11 +1,11 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Unity Recorder",
-  "version": "2.5.2",
+  "version": "2.5.4",
   "unity": "2019.4",
   "unityRelease": "1f1",
   "dependencies": {
-    "com.unity.timeline": "1.2.17"
+    "com.unity.timeline": "1.0.0"
   },
   "description": "The Unity Recorder allows you to capture and save data from the Unity Editor during Play Mode: animations, videos, images, audio, and more.",
   "keywords": [
@@ -19,15 +19,15 @@
     "images"
   ],
   "relatedPackages": {
-    "com.unity.recorder.tests": "2.5.2"
+    "com.unity.recorder.tests": "2.5.4"
   },
   "upmCi": {
-    "footprint": "57fbe002bc07d1dd4c0638170825b42c6637c6cf"
+    "footprint": "61bdbf8153e5cf02d153ab024a063ca4cb2f1848"
   },
   "repository": {
-    "url": "https://github.com/Unity-Technologies/com.unity.recorder.git",
+    "url": "https://github.cds.internal.unity3d.com/unity/com.unity.recorder.git",
     "type": "git",
-    "revision": "9780f9380f74708c464bbf0cf4a02b1fb7ea136f"
+    "revision": "d0d9597949e5c4e5563458d6a1af7b791b9327e1"
   },
   "samples": [
     {

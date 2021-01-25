@@ -66,15 +66,16 @@ namespace UnityEditor.Recorder
 
             settings.SelfAdjustSettings(); // ignore return value.
 
-            var fixedRate = settings.FrameRatePlayback == FrameRatePlayback.Constant ? (int)settings.FrameRate : 0;
+            var fixedRate = settings.FrameRatePlayback == FrameRatePlayback.Constant ? settings.FrameRate : 0.0f;
             if (fixedRate > 0)
             {
-                if (Time.captureFramerate != 0 && fixedRate != Time.captureFramerate)
+                var toCompare = 1.0f / fixedRate;
+                if (Time.captureFramerate != 0 && Math.Abs(toCompare - Time.captureDeltaTime) > float.Epsilon)
                     Debug.LogError(string.Format("Recorder {0} is set to record at a fixed rate and another component has already set a conflicting value for [Time.captureFramerate], new value being applied : {1}!", GetType().Name, fixedRate));
                 else if (Time.captureFramerate == 0 && RecorderOptions.VerboseMode)
                     Debug.Log("Frame recorder set fixed frame rate to " + fixedRate);
 
-                Time.captureFramerate = fixedRate;
+                Time.captureDeltaTime = 1.0f / fixedRate;
 
                 sm_CaptureFrameRateCount++;
                 m_ModifiedCaptureFR = true;

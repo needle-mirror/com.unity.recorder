@@ -43,6 +43,8 @@ namespace UnityEditor.Recorder
             m_CustomFrameRateValue = Mathf.Max(2 * float.Epsilon, m_CustomFrameRateValue); // Eps complains about the invalid frame rate.
         }
 
+        internal RecordMode RecordMode => m_RecordMode;
+
         /// <summary>
         /// Indicates the type of frame rate (constant or variable) for the current list of Recorders.
         /// </summary>

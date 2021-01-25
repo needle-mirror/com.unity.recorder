@@ -54,7 +54,14 @@ namespace UnityEditor.Recorder.Timeline
 
             // Assumption: OnPlayStateChanged( PlayState.Playing ) ONLY EVER CALLED ONCE for this type of playable.
             m_PlayState = PlayState.Playing;
-            session.BeginRecording();
+            var res = session.BeginRecording();
+#if UNITY_EDITOR
+            RecorderAnalytics.SendStartEvent(session);
+            if (!res)
+            {
+                RecorderAnalytics.SendStopEvent(session, true, false);
+            }
+#endif
         }
 
         public override void OnBehaviourPause(Playable playable, FrameData info)
@@ -64,6 +71,10 @@ namespace UnityEditor.Recorder.Timeline
 
             if (session.isRecording && m_PlayState == PlayState.Playing)
             {
+#if UNITY_EDITOR
+                const double eps = 1e-5; // end is never evaluated
+                RecorderAnalytics.SendStopEvent(session, false, playable.GetTime() >= playable.GetDuration() - eps);
+#endif
                 session.Dispose();
                 session = null;
             }

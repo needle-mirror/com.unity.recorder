@@ -172,16 +172,17 @@ namespace UnityEditor.Recorder
         /// </summary>
         /// <param name="relativeFilePathWithExtension">The relative filename inside the Editor/Assets folder, without
         /// leading slash.</param>
+        /// <param name="logError">Set this flag to true if you need to log errors when the Recorder cannot find the asset.</param>
         /// <typeparam name="T">The type of asset to load</typeparam>
         /// <returns></returns>
-        internal static T LoadLocalPackageAsset<T>(string relativeFilePathWithExtension) where T : Object
+        internal static T LoadLocalPackageAsset<T>(string relativeFilePathWithExtension, bool logError) where T : Object
         {
             T result = default(T);
             var fullPathInProject = $"Packages/com.unity.recorder/Editor/Assets/{relativeFilePathWithExtension}";
 
             if (File.Exists(fullPathInProject))
                 result = AssetDatabase.LoadAssetAtPath(fullPathInProject, typeof(T)) as T;
-            else
+            else if (logError)
                 Debug.LogError($"Local asset file {fullPathInProject} not found.");
             return result;
         }

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -45,24 +46,21 @@ namespace UnityEditor.Recorder
             var leafWidth = target.forceAssetsFolder ? position.width - rootWidth : position.width - rootWidth - btnWidth - 10;
             var rootRect = new Rect(position.x, position.y, rootWidth, position.height);
             var leafRect = new Rect(position.x + rootWidth + 5, position.y, leafWidth, position.height);
-            var btnRect = new Rect(position.x + rootWidth  + leafWidth + 10, position.y, btnWidth, position.height);
+            var btnRect = new Rect(position.x + rootWidth + leafWidth + 10, position.y, btnWidth, position.height);
 
             var pathType = (OutputPath.Root)m_RootProperty.intValue;
             if (target.forceAssetsFolder)
-            {
                 GUI.Label(rootRect, pathType + " " + Path.DirectorySeparatorChar);
-            }
             else
-            {
                 EditorGUI.PropertyField(rootRect, m_RootProperty, GUIContent.none);
-            }
 
             if (pathType == OutputPath.Root.Absolute)
                 EditorGUI.PropertyField(leafRect, m_AbsolutePathProperty, GUIContent.none); // Show the absolute path
             else
                 EditorGUI.PropertyField(leafRect, m_LeafProperty, GUIContent.none); // Show the leaf
 
-            var fullPath = OutputPath.GetFullPath((OutputPath.Root)m_RootProperty.intValue, m_LeafProperty.stringValue, m_AbsolutePathProperty.stringValue);
+            var fullPath = OutputPath.GetFullPath((OutputPath.Root)m_RootProperty.intValue, m_LeafProperty.stringValue,
+                m_AbsolutePathProperty.stringValue);
 
             if (!target.forceAssetsFolder)
             {
@@ -73,12 +71,18 @@ namespace UnityEditor.Recorder
                     {
                         var newValue = OutputPath.FromPath(newPath);
                         m_RootProperty.intValue = (int)newValue.root;
-                        if (pathType == OutputPath.Root.Absolute)
+                        if (newValue.root == OutputPath.Root.Absolute)
                             m_AbsolutePathProperty.stringValue = newValue.leaf;
                         else
                             m_LeafProperty.stringValue = newValue.leaf;
                     }
                 }
+            }
+
+            if (pathType == OutputPath.Root.Absolute && m_AbsolutePathProperty.stringValue == "")
+            {
+                // Empty absolute path: force absolute path root to the first drive found
+                m_AbsolutePathProperty.stringValue = DriveInfo.GetDrives().First().RootDirectory.FullName;
             }
 
             EditorGUI.indentLevel = indent;
