@@ -10,5 +10,6 @@
   * [Image Sequence Recorder](RecorderImage.md)
   * [GIF Animation Recorder](RecorderGif.md)
   * [Audio Recorder](RecorderAudio.md)
+  * [AOV Recorder](RecorderAOV.md)
 * [Debugging recorders](RecorderDebugging.md)
 * [Known issues](KnownIssues.md)

@@ -205,7 +205,7 @@ namespace UnityEditor.Recorder.Input
             if (cbSettings.FlipFinalOutput)
                 m_VFlipper = new TextureFlipper();
 
-            if (CameraInputSettings.UsingLegacyRP())
+            if (UnityHelpers.UsingLegacyRP())
                 m_InputStrategy = new CameraCommandBufferLegacyInputStrategy(cbSettings.RecordTransparency);
             else
                 m_InputStrategy = new CaptureCallbackSRPInputStrategy(cbSettings.RecordTransparency);
@@ -324,7 +324,7 @@ namespace UnityEditor.Recorder.Input
                 needToFlip = encoderAlreadyFlips;
             }
 
-            if (CameraInputSettings.UsingLegacyRP())
+            if (UnityHelpers.UsingLegacyRP())
                 m_InputStrategy.flipVertically = needToFlip; // regular pipeline
             else
                 m_InputStrategy.flipVertically = !needToFlip; // scriptable render pipeline already flips input

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.LowLevel;
 
 namespace UnityEditor.Recorder
 {
@@ -15,8 +16,9 @@ namespace UnityEditor.Recorder
         public Recorder recorder;
 
         internal GameObject recorderGameObject;
-        internal RecorderComponent recorderComponent;
+        internal _FrameRequestComponent recorderComponent;
 
+        int m_SubFrameIndex = 0;
         int m_FrameIndex = 0;
         int m_InitialFrame = 0;
         int m_FirstRecordedFrameCount = -1;
@@ -55,6 +57,15 @@ namespace UnityEditor.Recorder
         {
             get { return m_FrameIndex; }
         }
+
+        /// <summary>
+        /// The index of the current sub frame being processed.
+        /// </summary>
+        internal int subFrameIndex
+        {
+            get { return m_SubFrameIndex; }
+        }
+
 
         internal int RecordedFrameSpan
         {
@@ -148,10 +159,16 @@ namespace UnityEditor.Recorder
                 if (!recorder.SkipFrame(this))
                 {
                     recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameReady, this);
-                    recorder.RecordFrame(this);
-                    recorder.RecordedFramesCount++;
-                    if (recorder.RecordedFramesCount == 1)
-                        m_FirstRecordedFrameCount = Time.renderedFrameCount;
+                    if (!recorder.SkipSubFrame(this))
+                    {
+#if DEBUG_RECORDER_TIMING
+                        Debug.LogFormat("Session::RecordFrame() index # {0} sub # {1} Out at frame # {2} - {3} - {4} ", m_FrameIndex, m_SubFrameIndex, Time.renderedFrameCount, Time.time, Time.deltaTime);
+#endif
+                        recorder.RecordFrame(this);
+                        recorder.RecordedFramesCount++;
+                        if (recorder.RecordedFramesCount == 1)
+                            m_FirstRecordedFrameCount = Time.renderedFrameCount;
+                    }
                     recorder.SignalInputsOfStage(ERecordingSessionStage.FrameDone, this);
                 }
             }
@@ -193,7 +210,15 @@ namespace UnityEditor.Recorder
                     m_InitialFrame = m_FPSNextFrameCount;
                 }
             }
-            m_FrameIndex++;
+
+            if (recorder.SkipSubFrame(this))
+            {
+                // do not increment the frame index
+            }
+            else
+            {
+                m_FrameIndex++;
+            }
         }
 
         internal void PrepareNewFrame()
@@ -205,6 +230,7 @@ namespace UnityEditor.Recorder
 
                 recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameStarting, this);
                 recorder.PrepareNewFrame(this);
+                m_SubFrameIndex++;
             }
             catch (Exception ex)
             {

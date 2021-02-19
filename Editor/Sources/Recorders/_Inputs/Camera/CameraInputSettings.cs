@@ -54,27 +54,6 @@ namespace UnityEditor.Recorder.Input
             set { captureUI = value; }
         }
         [SerializeField] private bool captureUI;
-        internal static bool UsingHDRP()
-        {
-            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
-            var usingHDRP = pipelineAsset != null && pipelineAsset.GetType().FullName.Contains("High");
-            return usingHDRP;
-        }
-
-        internal static bool UsingURP()
-        {
-            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
-            var usingURP = pipelineAsset != null &&
-                (pipelineAsset.GetType().FullName.Contains("Universal") ||
-                    pipelineAsset.GetType().FullName.Contains("Lightweight"));
-            return usingURP;
-        }
-
-        internal static bool UsingLegacyRP()
-        {
-            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
-            return pipelineAsset == null;
-        }
 
         /// <summary>
         /// Default constructor.

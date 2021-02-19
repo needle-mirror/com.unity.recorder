@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Recorder.Input;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -13,6 +14,8 @@ namespace UnityEditor.Recorder
         SerializedProperty m_CaptureEveryNthFrame;
         SerializedProperty m_FileNameGenerator;
         SerializedProperty m_Take;
+
+
         internal event Action OnRecorderValidated;
         SavedBool showFormat;
         SavedBool showOutputFile;
@@ -135,6 +138,12 @@ namespace UnityEditor.Recorder
                     AOVGUI();
                     ImageRenderOptionsGUI();
                     ExtraOptionsGUI();
+#if HDRP_ACCUM_API
+                    if (UnityHelpers.UsingHDRP())
+                    {
+                        AccumulationGUI();
+                    }
+#endif
                     EditorGUILayout.Separator();
                 }
             }
@@ -213,7 +222,7 @@ namespace UnityEditor.Recorder
             }
         }
 
-        static SerializedProperty GetInputSerializedProperty(SerializedObject owner, object fieldValue)
+        internal static SerializedProperty GetInputSerializedProperty(SerializedObject owner, object fieldValue)
         {
             var targetObject = (object)owner.targetObject;
             var type = targetObject.GetType();
@@ -271,6 +280,25 @@ namespace UnityEditor.Recorder
         /// </summary>
         protected virtual void AOVGUI()
         {
+        }
+
+        /// <summary>
+        /// Displays the information related to the capture of multiframe accumulation.
+        /// </summary>
+        protected virtual void AccumulationGUI()
+        {
+#if HDRP_ACCUM_API
+            if (!FromRecorderWindow)
+                return;
+            var settings = (RecorderSettings)target;
+
+            if (settings.IsAccumulationSupported())
+            {
+                var prop = serializedObject.FindProperty("_accumulationSettings");
+                if (prop != null)
+                    EditorGUILayout.PropertyField(prop);
+            }
+#endif
         }
 
         class SavedBool

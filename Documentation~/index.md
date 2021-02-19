@@ -31,6 +31,8 @@ The Unity Recorder includes the following recorder types by default:
 
 * **Audio Recorder:** generates an audio clip in WAV format.
 
+* **AOV Recorder:** generates a sequence of image files in JPEG, PNG, or EXR (OpenEXR) format, to capture specific render pass data (for example, data related to materials, geometry, depth, motion, or lighting) in projects that use Unity's [HDRP (High Definition Render Pipeline)](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest).
+
 ### Additional recorders
 
 You can also benefit from additional Recorder types if you install specific packages along with the Unity Recorder:
@@ -38,8 +40,6 @@ You can also benefit from additional Recorder types if you install specific pack
 * The [Alembic for Unity](https://docs.unity3d.com/Packages/com.unity.formats.alembic@latest) package includes an **Alembic Clip Recorder**, which allows you to record and export GameObjects to an Alembic file.
 
 * The [FBX Exporter](https://docs.unity3d.com/Packages/com.unity.formats.fbx@latest) package includes an **FBX Recorder**, which allows you to record and export animations directly to FBX files.
-
-* The **Unity AOV Recorder** allows you to capture specific render pass data (for example, data related to materials, geometry, depth, motion, or lighting) in projects that use Unity's [HDRP (High Definition Render Pipeline)](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest).
 
 ### Legacy recorders
 

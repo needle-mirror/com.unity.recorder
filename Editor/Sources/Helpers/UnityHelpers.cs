@@ -1,13 +1,16 @@
 using System.IO;
+using System.Threading;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
-using UnityEditor.Recorder.Input;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.Recorder;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
+using UnityEngine.Rendering;
+#if HDRP_ACCUM_API
+using UnityEngine.Rendering.HighDefinition;
+#endif
 using UnityObject = UnityEngine.Object;
+
 
 namespace UnityEditor.Recorder
 {
@@ -185,6 +188,62 @@ namespace UnityEditor.Recorder
             else if (logError)
                 Debug.LogError($"Local asset file {fullPathInProject} not found.");
             return result;
+        }
+
+        /// <summary>
+        /// Are we currently using the High Definition Render Pipeline.
+        /// </summary>
+        /// <returns>bool</returns>
+        internal static bool UsingHDRP()
+        {
+            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
+            var usingHDRP = pipelineAsset != null && pipelineAsset.GetType().FullName.Contains("High");
+            return usingHDRP;
+        }
+
+        /// <summary>
+        /// Are we currently using the Universal Render Pipeline.
+        /// </summary>
+        /// <returns>bool</returns>
+        internal static bool UsingURP()
+        {
+            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
+            var usingURP = pipelineAsset != null &&
+                (pipelineAsset.GetType().FullName.Contains("Universal") ||
+                    pipelineAsset.GetType().FullName.Contains("Lightweight"));
+            return usingURP;
+        }
+
+        /// <summary>
+        /// Are we currently using the Legacy Render Pipeline.
+        /// </summary>
+        /// <returns>bool</returns>
+        internal static bool UsingLegacyRP()
+        {
+            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
+            return pipelineAsset == null;
+        }
+
+        /// <summary>
+        /// Are we currently capturing SubFrames.
+        /// </summary>
+        /// <returns>bool</returns>
+        internal static bool CaptureAccumulation(RecorderSettings settings)
+        {
+#if HDRP_ACCUM_API
+            var hdPipeline = RenderPipelineManager.currentPipeline as HDRenderPipeline;
+            if (hdPipeline != null && settings.IsAccumulationSupported())
+            {
+                IAccumulation accumulation = settings as IAccumulation;
+                if (accumulation != null)
+                {
+                    AccumulationSettings aSettings = accumulation.GetAccumulationSettings();
+                    if (aSettings != null)
+                        return aSettings.CaptureAccumulation;
+                }
+            }
+#endif
+            return false;
         }
     }
 }

@@ -1,7 +1,9 @@
-using System;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
+#if HDRP_ACCUM_API
+using UnityEngine.Rendering.HighDefinition;
+#endif
 
 namespace UnityEditor.Recorder
 {
@@ -31,7 +33,38 @@ namespace UnityEditor.Recorder
         {
             if (!base.BeginRecording(session))
                 return false;
+#if HDRP_ACCUM_API
+            var hdPipeline = RenderPipelineManager.currentPipeline as HDRenderPipeline;
+            if (hdPipeline != null)
+            {
+                if (settings.IsAccumulationSupported() && settings is IAccumulation accumulation)
+                {
+                    AccumulationSettings aSettings = accumulation.GetAccumulationSettings();
 
+                    if (aSettings != null && aSettings.CaptureAccumulation)
+                    {
+                        if (aSettings != null &&
+                            aSettings.ShutterType == AccumulationSettings.ShutterProfileType.Range)
+                        {
+                            hdPipeline.BeginRecording(
+                                aSettings.Samples,
+                                aSettings.ShutterInterval,
+                                aSettings.ShutterFullyOpen,
+                                aSettings.ShutterBeginsClosing
+                            );
+                        }
+                        else
+                        {
+                            hdPipeline.BeginRecording(
+                                aSettings.Samples,
+                                aSettings.ShutterInterval,
+                                aSettings.ShutterProfileCurve
+                            );
+                        }
+                    }
+                }
+            }
+#endif
             UseAsyncGPUReadback = SystemInfo.supportsAsyncGPUReadback;
             m_OngoingAsyncGPURequestsCount = 0;
             m_DelayedEncoderDispose = false;
@@ -83,10 +116,37 @@ namespace UnityEditor.Recorder
                 DisposeEncoder();
         }
 
+        // <summary>
+        // Prepares a frame before recording it. Callback is invoked for every frame during the recording session, before RecordFrame.
+        // </summary>
+        // <param name="ctx">The current recording session.</param>
+        protected internal override void PrepareNewFrame(RecordingSession ctx)
+        {
+            base.PrepareNewFrame(ctx);
+#if HDRP_ACCUM_API
+            if (UnityHelpers.CaptureAccumulation(settings))
+            {
+                if (RenderPipelineManager.currentPipeline is HDRenderPipeline hdPipeline)
+                {
+                    hdPipeline.PrepareNewSubFrame();
+                }
+            }
+#endif
+        }
+
         /// <inheritdoc/>
         protected internal override void EndRecording(RecordingSession session)
         {
             base.EndRecording(session);
+#if HDRP_ACCUM_API
+            if (UnityHelpers.CaptureAccumulation(settings))
+            {
+                if (RenderPipelineManager.currentPipeline is HDRenderPipeline hdPipeline)
+                {
+                    hdPipeline.EndRecording();
+                }
+            }
+#endif
             if (m_OngoingAsyncGPURequestsCount > 0)
             {
                 Recording = true;

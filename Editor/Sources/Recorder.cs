@@ -74,6 +74,8 @@ namespace UnityEditor.Recorder
                     Debug.LogError(string.Format("Recorder {0} is set to record at a fixed rate and another component has already set a conflicting value for [Time.captureFramerate], new value being applied : {1}!", GetType().Name, fixedRate));
                 else if (Time.captureFramerate == 0 && RecorderOptions.VerboseMode)
                     Debug.Log("Frame recorder set fixed frame rate to " + fixedRate);
+                // Note that Time.captureDeltaTime will be modified by HDRP SubFrameManager
+                // to implement the accumulation motion blur/path tracer support.
 
                 Time.captureDeltaTime = 1.0f / fixedRate;
 
@@ -173,6 +175,37 @@ namespace UnityEditor.Recorder
                 || settings.RecordMode == RecordMode.TimeInterval && ctx.currentFrameStartTS < settings.StartTime
                 || settings.RecordMode == RecordMode.FrameInterval && ctx.frameIndex < settings.StartFrame
                 || settings.RecordMode == RecordMode.SingleFrame && ctx.frameIndex < settings.StartFrame;
+        }
+
+        /// <summary>
+        /// Tests if a sub frame should be skipped before trying to record it. Callback is invoked for every frame during the recording session.
+        /// </summary>
+        /// <remarks>
+        /// If this function returns True, RecordFrame will not be invoked.
+        /// </remarks>
+        /// <param name="ctx">The current recording session.</param>
+        /// <returns>True if the sub frame should be skipped, False otherwise.</returns>
+        protected internal virtual bool SkipSubFrame(RecordingSession ctx)
+        {
+            if (!settings.IsAccumulationSupported())
+                return false;
+            IAccumulation accumulation = settings as IAccumulation;
+
+            AccumulationSettings accumulationSettings = null;
+
+            if (accumulation != null)
+            {
+                accumulationSettings = accumulation.GetAccumulationSettings();
+            }
+
+            int accumulationSamples = 1;
+            if (accumulationSettings != null &&  accumulationSettings.CaptureAccumulation)
+            {
+                accumulationSamples = accumulationSettings.Samples;
+            }
+
+            bool skip = (ctx.subFrameIndex) % accumulationSamples != 0;
+            return skip;
         }
 
         /// <summary>

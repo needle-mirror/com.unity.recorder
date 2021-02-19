@@ -22,6 +22,8 @@ Each type of Recorder has specific **Capture** and **Format** properties you mus
 
 - [**Audio Recorder properties**](RecorderAudio.md)
 
+- [**AOV Image Sequence Recorder properties**](RecorderAOV.md)
+
 ## Recorder Presets
 
 After you set Recorder properties, you can save them as a [Preset](https://docs.unity3d.com/Manual/Presets.html): use the Preset icon ![](Images/IconPreset.png) in the Recorder properties pane.

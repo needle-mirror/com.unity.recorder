@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Media;
+using UnityEditor.Recorder.Input;
 using UnityEngine;
 using static UnityEditor.Recorder.MovieRecorderSettings;
 
@@ -122,6 +123,7 @@ namespace UnityEditor.Recorder
             internal static readonly GUIContent CaptureAlphaLabel = new GUIContent("Include Alpha", "To Include the alpha channel in the recording.");
             internal static readonly GUIContent EncoderLabel = new GUIContent("Encoder", "The encoder to choose to generate the output recording");
             internal static readonly GUIContent EncoderCustomOptionsLabel = new GUIContent("Encoder options", "The options available in this encoder");
+            internal static readonly GUIContent SourceLabel = new GUIContent("Source", "The input type to use for the recording.");
         }
 
         protected override void OnEnable()
@@ -297,6 +299,21 @@ namespace UnityEditor.Recorder
                 ++EditorGUI.indentLevel;
                 EditorGUILayout.PropertyField(m_CaptureAlpha, Styles.CaptureAlphaLabel);
                 --EditorGUI.indentLevel;
+            }
+        }
+
+        protected override void ImageRenderOptionsGUI()
+        {
+            var recorder = (RecorderSettings)target;
+
+            foreach (var inputsSetting in recorder.InputsSettings)
+            {
+                var audioSettings = inputsSetting as AudioInputSettings;
+                using (new EditorGUI.DisabledScope(audioSettings != null && UnityHelpers.CaptureAccumulation(recorder)))
+                {
+                    var p = GetInputSerializedProperty(serializedObject, inputsSetting);
+                    EditorGUILayout.PropertyField(p, Styles.SourceLabel);
+                }
             }
         }
     }

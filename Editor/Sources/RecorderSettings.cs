@@ -285,5 +285,13 @@ namespace UnityEditor.Recorder
             captureEveryNthFrame = Mathf.Max(1, captureEveryNthFrame);
             take = Mathf.Max(0, take);
         }
+
+        /// <summary>
+        /// Indicates whether the current Recorder supports Accumulation recording or not.
+        /// </summary>
+        public virtual bool IsAccumulationSupported()
+        {
+            return false;
+        }
     }
 }

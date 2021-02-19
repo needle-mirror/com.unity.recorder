@@ -20,27 +20,31 @@ Use this section to define the source and the content of your recording.
 |Property||Function|
 |:---|:---|:---|
 | **Source** ||Specifies the input for the recording.|
-|| Game View |Records frames rendered in the Game View.<br/><br/>Selecting this option displays the [Game View capture properties](#game-view). |
-|| Targeted Camera |Records frames captured by a specific camera, even if the Game View does not use that camera.<br/><br/>Selecting this option displays the [Targeted Camera capture properties](#targeted-camera).|
-|| 360 View |Records a 360-degree image sequence.<br/><br/>Selecting this option displays the [360 View capture properties](#360-view).|
-|| Render Texture Asset |Records frames rendered in a Render Texture.<br/><br/>Selecting this option displays the [Render Texture Asset capture properties](#render-texture-asset).|
-|| Texture Sampling |Supersamples the source camera during the capture to generate anti-aliased images in the recording.<br/><br/>Selecting this option displays the [Texture Sampling capture properties](#texture-sampling).|
+|| Game View |Records frames rendered in the Game View.<br/><br/>Selecting this option displays the [Game View source properties](#game-view-source-properties). |
+|| Targeted Camera |Records frames captured by a specific camera, even if the Game View does not use that camera.<br/><br/>Selecting this option displays the [Targeted Camera source properties](#targeted-camera-source-properties).|
+|| 360 View |Records a 360-degree image sequence.<br/><br/>Selecting this option displays the [360 View source properties](#360-view-source-properties).|
+|| Render Texture Asset |Records frames rendered in a Render Texture.<br/><br/>Selecting this option displays the [Render Texture Asset source properties](#render-texture-asset-source-properties).|
+|| Texture Sampling |Supersamples the source camera during the capture to generate anti-aliased images in the recording.<br/><br/>Selecting this option displays the [Texture Sampling source properties](#texture-sampling-source-properties).|
 | **Flip Vertical** ||When you enable this option, the Recorder flips the output image vertically.<br />This is useful to correct for systems that output video upside down.<br /><br />This option is not available when you record the Game View.|
+| **Accumulation** || Enable this feature to render multiple sub-frames for accumulation purposes. See the [Accumulation properties](#accumulation-properties) for more details on this feature availability, use cases, and setup.<br /><br />**Note:** Enabling the **Accumulation** feature might considerably slow down your recording process as it involves a higher amount of rendering steps.|
 
-### Game View
+### Game View source properties
 [!include[](InclCaptureOptionsGameview.md)]
 
-### Targeted Camera
+### Targeted Camera source properties
 [!include[](InclCaptureOptionsTargetedCamera.md)]
 
-### 360 View
+### 360 View source properties
 [!include[](InclCaptureOptions360View.md)]
 
-### Render Texture Asset
+### Render Texture Asset source properties
 [!include[](InclCaptureOptionsRenderTextureAsset.md)]
 
-### Texture Sampling
+### Texture Sampling source properties
 [!include[](InclCaptureOptionsTextureSampling.md)]
+
+### Accumulation properties
+[!include[](InclCaptureOptionsAccumulation.md)]
 
 ## Format
 
@@ -56,6 +60,6 @@ Use this section to set up the media format you need to save the recorded images
 
 ## Output File
 
-Use this section to specify the output **Path** and **File Name** pattern to save the recorded animation clip.
+Use this section to specify the output **Path** and **File Name** pattern to save the recorded image files.
 
 > **Note:** [Output File properties](OutputFileProperties.md) work the same for all types of recorders.

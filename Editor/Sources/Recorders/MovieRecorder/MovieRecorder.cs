@@ -101,7 +101,7 @@ namespace UnityEditor.Recorder
             var audioInput = (AudioInput)m_Inputs[1];
             var audioAttrsList = new List<AudioTrackAttributes>();
 
-            if (audioInput.audioSettings.PreserveAudio)
+            if (audioInput.audioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
             {
 #if UNITY_EDITOR_OSX
                 // Special case with WebM and audio on older Apple computers: deactivate async GPU readback because there
@@ -149,7 +149,7 @@ namespace UnityEditor.Recorder
                 var attr = new List<IMediaEncoderAttribute>();
                 attr.Add(new VideoTrackMediaEncoderAttribute("VideoAttributes", videoAttrs));
 
-                if (audioInput.audioSettings.PreserveAudio)
+                if (audioInput.audioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
                 {
                     if (audioAttrsList.Count > 0)
                     {
@@ -188,7 +188,7 @@ namespace UnityEditor.Recorder
 
             base.RecordFrame(session);
             var audioInput = (AudioInput)m_Inputs[1];
-            if (audioInput.audioSettings.PreserveAudio)
+            if (audioInput.audioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
                 Settings.m_EncoderManager.AddSamples(m_EncoderHandle, audioInput.mainBuffer);
         }
 

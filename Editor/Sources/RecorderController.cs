@@ -55,6 +55,9 @@ namespace UnityEditor.Recorder
             SceneHook.PrepareSessionRoot();
             m_RecordingSessions = new List<RecordingSession>();
 
+            int numberOfSubframeRecorder = 0;
+            int numberOfRecorderEnabled = 0;
+
             foreach (var recorderSetting in m_Settings.RecorderSettings)
             {
                 if (recorderSetting == null)
@@ -81,6 +84,23 @@ namespace UnityEditor.Recorder
                         Debug.Log("Ignoring disabled recorder '" + recorderSetting.name + "'");
 
                     continue;
+                }
+
+                if (recorderSetting.Enabled)
+                {
+                    numberOfRecorderEnabled++;
+                }
+
+                // Validate that only one recorder support enable capture SubFrames
+                if (UnityHelpers.CaptureAccumulation(recorderSetting))
+                {
+                    numberOfSubframeRecorder++;
+
+                    if (numberOfSubframeRecorder >= 1 && numberOfRecorderEnabled > 1)
+                    {
+                        Debug.LogError("You can only use one active Recorder at a time when you capture accumulation.");
+                        continue;
+                    }
                 }
 
                 var session = m_SceneHook.CreateRecorderSessionWithRecorderComponent(recorderSetting);

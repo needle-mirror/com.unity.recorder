@@ -789,6 +789,24 @@ namespace UnityEditor.Recorder
                 }
             }
 
+            // Validate that only one recorder support enable capture SubFrames
+            //
+            int numberOfSubframeRecorder = 0;
+            foreach (var recorderSetting in activeRecorders)
+            {
+                if (UnityHelpers.CaptureAccumulation(recorderSetting))
+                {
+                    numberOfSubframeRecorder++;
+                }
+
+
+                if (numberOfSubframeRecorder >= 1 && activeRecorders.Length > 1)
+                {
+                    return "You can only use one active Recorder at a time when you capture accumulation.";
+                }
+            }
+
+
             return null;
         }
 
@@ -942,7 +960,7 @@ namespace UnityEditor.Recorder
             {
                 if (m_SelectedRecorderItem.state == RecorderItem.State.HasErrors)
                 {
-                    EditorGUILayout.LabelField("Missing reference to the recorder.");
+                    EditorGUILayout.LabelField("The selected Recorder has errors.");
                 }
                 else
                 {

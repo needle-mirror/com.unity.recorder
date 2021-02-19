@@ -22,6 +22,6 @@ Use this section to set up the media format you need to save the recorded images
 
 ## Output File
 
-Use this section to specify the output **Path** and **File Name** pattern to save the recorded animation clip.
+Use this section to specify the output **Path** and **File Name** pattern to save the recorded audio file.
 
 > **Note:** [Output File properties](OutputFileProperties.md) work the same for all types of recorders.

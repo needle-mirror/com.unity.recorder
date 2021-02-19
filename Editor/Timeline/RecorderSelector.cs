@@ -50,6 +50,13 @@ namespace UnityEditor.Recorder.Timeline
             EditorGUILayout.BeginHorizontal();
             var oldIndex = GetRecorderIndex(m_SelectedRecorder);
             var newIndex = EditorGUILayout.Popup("Selected recorder:", oldIndex, m_RecorderNames);
+
+            if (newIndex < 0)
+            {
+                // For instance a Recorder Clip for an AOV after the HDRP package has been removed
+                return;
+            }
+
             SelectRecorder(GetRecorderFromIndex(newIndex));
 
             EditorGUILayout.EndHorizontal();

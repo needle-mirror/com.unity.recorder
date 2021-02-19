@@ -11,7 +11,7 @@ namespace UnityEditor.Recorder
     /// A class that represents the settings of an Image Recorder.
     /// </summary>
     [RecorderSettings(typeof(ImageRecorder), "Image Sequence", "imagesequence_16")]
-    public class ImageRecorderSettings : RecorderSettings
+    public class ImageRecorderSettings : RecorderSettings, IAccumulation
     {
         /// <summary>
         /// Available options for the output image format used by Image Sequence Recorder.
@@ -128,7 +128,7 @@ namespace UnityEditor.Recorder
         {
             bool isGameViewInput = imageInputSettings.InputType == typeof(GameViewInput);
             bool isFormatExr = OutputFormat == ImageRecorderOutputFormat.EXR;
-            return !isGameViewInput && isFormatExr && CameraInputSettings.UsingHDRP();
+            return !isGameViewInput && isFormatExr && UnityHelpers.UsingHDRP();
         }
 
         internal bool CanCaptureAlpha()
@@ -136,7 +136,7 @@ namespace UnityEditor.Recorder
             bool formatSupportAlpha = OutputFormat == ImageRecorderOutputFormat.PNG ||
                 OutputFormat == ImageRecorderOutputFormat.EXR;
             bool inputSupportAlpha = imageInputSettings.SupportsTransparent;
-            return (formatSupportAlpha && inputSupportAlpha && !CameraInputSettings.UsingHDRP());
+            return (formatSupportAlpha && inputSupportAlpha && !UnityHelpers.UsingHDRP());
         }
 
         internal override void SelfAdjustSettings()
@@ -161,6 +161,43 @@ namespace UnityEditor.Recorder
             var gis = input as GameViewInputSettings;
             if (gis != null)
                 gis.FlipFinalOutput = SystemInfo.supportsAsyncGPUReadback;
+        }
+
+        [SerializeReference] AccumulationSettings _accumulationSettings = new AccumulationSettings();
+
+        /// <summary>
+        /// Stores the AccumulationSettings properties
+        /// </summary>
+        public AccumulationSettings AccumulationSettings
+        {
+            get { return _accumulationSettings; }
+            set { _accumulationSettings = value; }
+        }
+
+        /// <summary>
+        /// Use this method to get all the AccumulationSettings properties.
+        /// </summary>
+        /// <returns>AccumulationSettings</returns>
+        public AccumulationSettings GetAccumulationSettings()
+        {
+            return AccumulationSettings;
+        }
+
+        /// <summary>
+        /// Indicates if the current Recorder supports Accumulation recording (True) or not (False).
+        /// </summary>
+        public override bool IsAccumulationSupported()
+        {
+            if (GetAccumulationSettings() != null)
+            {
+                var cis = m_ImageInputSelector.Selected as CameraInputSettings;
+                var gis = m_ImageInputSelector.Selected as GameViewInputSettings;
+                if (cis != null || gis != null)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

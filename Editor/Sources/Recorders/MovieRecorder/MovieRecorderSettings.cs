@@ -46,7 +46,7 @@ namespace UnityEditor.Recorder
     /// A class that represents the settings of a Movie Recorder.
     /// </summary>
     [RecorderSettings(typeof(MovieRecorder), "Movie", "movie_16")]
-    public class MovieRecorderSettings : RecorderSettings
+    public class MovieRecorderSettings : RecorderSettings, IAccumulation
     {
         /// <summary>
         /// Available options for encoders to register the formats they support.
@@ -195,6 +195,43 @@ namespace UnityEditor.Recorder
 
         [SerializeField] ImageInputSelector m_ImageInputSelector = new ImageInputSelector();
         [SerializeField] AudioInputSettings m_AudioInputSettings = new AudioInputSettings();
+
+        [SerializeReference] AccumulationSettings _accumulationSettings = new AccumulationSettings();
+
+        /// <summary>
+        /// Stores the AccumulationSettings properties.
+        /// </summary>
+        public AccumulationSettings AccumulationSettings
+        {
+            get { return _accumulationSettings; }
+            set { _accumulationSettings = value; }
+        }
+
+        /// <summary>
+        /// Use this method to get all the AccumulationSettings properties.
+        /// </summary>
+        /// <returns>AccumulationSettings</returns>
+        public AccumulationSettings GetAccumulationSettings()
+        {
+            return AccumulationSettings;
+        }
+
+        /// <summary>
+        /// Indicates whether the current Recorder supports Accumulation recording or not.
+        /// </summary>
+        public override bool IsAccumulationSupported()
+        {
+            if (GetAccumulationSettings() != null)
+            {
+                var cis = m_ImageInputSelector.Selected as CameraInputSettings;
+                var gis = m_ImageInputSelector.Selected as GameViewInputSettings;
+                if (cis != null || gis != null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         /// <summary>
         /// These are attributes that are exposed to the Recorder, for customization.

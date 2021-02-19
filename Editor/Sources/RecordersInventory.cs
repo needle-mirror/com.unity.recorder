@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+#if HDRP_AVAILABLE
+using UnityEditor.Recorder.AOV;
+#endif
 using UnityEditor.Recorder.FrameCapturer;
 
 namespace UnityEditor.Recorder
@@ -84,7 +87,11 @@ namespace UnityEditor.Recorder
                         s_Recorders[typeof(AnimationRecorderSettings)],
                         s_Recorders[typeof(MovieRecorderSettings)],
                         s_Recorders[typeof(ImageRecorderSettings)],
-                        s_Recorders[typeof(GIFRecorderSettings)]
+                        s_Recorders[typeof(GIFRecorderSettings)],
+#if HDRP_AVAILABLE
+                        s_Recorders[typeof(AOVRecorderSettings)],
+#endif
+                        s_Recorders[typeof(AudioRecorderSettings)]
                     };
                 }
 
@@ -134,7 +141,13 @@ namespace UnityEditor.Recorder
             get
             {
                 Init();
-                return s_Recorders.Values.Where(r => !s_BuiltInRecorderInfos.Contains(r) && !s_LegacyRecorderInfos.Contains(r));
+                var custom = s_Recorders.Values.Where(r => !s_BuiltInRecorderInfos.Contains(r) && !s_LegacyRecorderInfos.Contains(r));
+#if HDRP_AVAILABLE
+                return custom;
+#else
+                // Remove AOV Recorder from list of custom because it will be inserted in the above catch-all other logic
+                return custom.Where(c => c.recorderType != typeof(AOVRecorder));
+#endif
             }
         }
 

@@ -24,9 +24,6 @@ namespace UnityEditor.Recorder
             if (target == null)
                 return;
 
-            var pf = new PropertyFinder<ImageRecorderSettings>(serializedObject);
-            m_OutputFormat = pf.Find(w => w.OutputFormat);
-
             m_OutputFormat = serializedObject.FindProperty("outputFormat");
             m_CaptureAlpha = serializedObject.FindProperty("captureAlpha");
             m_ColorSpace = serializedObject.FindProperty("m_ColorSpace");
@@ -36,7 +33,7 @@ namespace UnityEditor.Recorder
         {
             EditorGUILayout.PropertyField(m_OutputFormat, Styles.FormatLabel);
             var imageSettings = (ImageRecorderSettings)target;
-            if (!CameraInputSettings.UsingHDRP())
+            if (!UnityHelpers.UsingHDRP())
             {
                 using (new EditorGUI.DisabledScope(!imageSettings.CanCaptureAlpha()))
                 {
