@@ -4,9 +4,14 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.6.0-exp.4] - 2021-02-22
+### Fixed
+ - Fixed an invalid AOV error when selecting the Albedo AOV.
+
 ## [2.6.0-exp.3] - 2021-02-19
 ### Added
- - Added support for recording accumulation in HDRP, for motion blur and path tracer.
+- Added support for recording accumulation in HDRP, for motion blur and path tracer.
+- Integrated AOV Recorder into this package.
 
 ## [2.5.4] - 2021-01-25
 ### Fixed
@@ -14,9 +19,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Removed a console error message displayed when the Recorder cannot find a custom Recorder icon.
 - Fixed an exception that would occur when Recording with Unity 2021.2.
 - Fixed a rounding error in the delta time when recording with non-integer frame rates.
-
-### Added
-- Integrated AOV Recorder into this package.
 
 ## [2.5.2] - 2020-12-16
 ### Fixed

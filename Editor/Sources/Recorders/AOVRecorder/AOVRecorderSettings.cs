@@ -182,7 +182,7 @@ namespace UnityEditor.Recorder.AOV
         private bool IsAOVSelectionValid()
         {
             // See if it is found in the dictionary of supported AOVs
-            return AOVCameraAOVRequestAPIInput.m_Aovs.Keys.ToList().FindIndex(k => k == m_AOVSelection) != 1;
+            return AOVCameraAOVRequestAPIInput.m_Aovs.Keys.ToList().FindIndex(k => k == m_AOVSelection) != -1;
         }
 
 #endif
