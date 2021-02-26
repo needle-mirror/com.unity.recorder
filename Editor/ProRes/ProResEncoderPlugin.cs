@@ -5,7 +5,7 @@ using System.Linq;
 using Unity.Collections;
 using System.IO;
 using ProResOut;
-#if UNITY_STANDALONE_OSX
+#if UNITY_EDITOR_OSX
 using System.Text;
 #endif
 using UnityEngine;
@@ -340,7 +340,7 @@ namespace Unity.Media
 
             int nCodecFormat = (int)codecFormat;
 
-#if UNITY_STANDALONE_OSX
+#if UNITY_EDITOR_OSX
             // Ensure that this codec format is supported, because on macOS we depend on AVFoundation in the OS
             System.Text.StringBuilder sb = new System.Text.StringBuilder(128);
             bool supported = ProResWrapperHelpers.SupportsCodecFormat(nCodecFormat, sb, sb.Capacity);
