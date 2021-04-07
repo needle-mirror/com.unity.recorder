@@ -2,12 +2,14 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
+#pragma warning disable 618
     [CustomEditor(typeof(GIFRecorderSettings))]
+#pragma warning restore 618
     class GIFRecorderSettingsEditor : RecorderEditor
     {
-        protected override void OnEncodingGui()
+        public override void OnInspectorGUI()
         {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("gifEncoderSettings"), new GUIContent("Encoding"), true);
+            EditorGUILayout.LabelField("The selected GIF Animation recorder has been deprecated.");
         }
     }
 }

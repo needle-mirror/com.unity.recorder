@@ -163,19 +163,12 @@ namespace UnityEditor.Recorder.Input
             get { return typeof(AnimationInput); }
         }
 
-        /// <inheritdoc/>
-        protected internal override bool ValidityCheck(List<string> errors)
+        protected internal override void CheckForErrors(List<string> errors)
         {
-            var ok = true;
+            base.CheckForErrors(errors);
 
-            if (bindingType.Count > 0 && bindingType.Any(x => typeof(ScriptableObject).IsAssignableFrom(x))
-            )
-            {
-                ok = false;
+            if (bindingType.Count > 0 && bindingType.Any(x => typeof(ScriptableObject).IsAssignableFrom(x)))
                 errors.Add("ScriptableObjects are not supported inputs.");
-            }
-
-            return ok;
         }
 
         static string GenerateBindingId()

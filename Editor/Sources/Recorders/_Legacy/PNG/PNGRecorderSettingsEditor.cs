@@ -5,9 +5,9 @@ namespace UnityEditor.Recorder.FrameCapturer
     [CustomEditor(typeof(PNGRecorderSettings))]
     class PNGRecorderSettingsEditor : RecorderEditor
     {
-        protected override void OnEncodingGui()
+        public override void OnInspectorGUI()
         {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_PngEncoderSettings"), new GUIContent("Encoding"), true);
+            EditorGUILayout.LabelField("The selected legacy PNG recorder has been deprecated.");
         }
     }
 }

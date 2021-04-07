@@ -46,39 +46,29 @@ namespace UnityEditor.Recorder
             }
             catch (Exception)
             {
-                Debug.LogError(string.Format("Movie recorder output directory \"{0}\" could not be created.", Settings.fileNameGenerator.BuildAbsolutePath(session)));
+                ConsoleLogMessage($"Unable to create the output directory \"{Settings.fileNameGenerator.BuildAbsolutePath(session)}\".", LogType.Error);
+                Recording = false;
                 return false;
             }
 
             var input = m_Inputs[0] as BaseRenderTextureInput;
             if (input == null)
             {
-                Debug.LogError("MediaRecorder could not find input.");
+                ConsoleLogMessage("Movie Recorder could not find its input.", LogType.Error);
+                Recording = false;
                 return false;
             }
             int width = input.OutputWidth;
             int height = input.OutputHeight;
 
-            if (width <= 0 || height <= 0)
-            {
-                Debug.LogError(string.Format("MovieRecorder got invalid input resolution {0} x {1}.", width, height));
-                return false;
-            }
-
             var currentEncoderReg = Settings.GetCurrentEncoder();
-            string erroMessage;
-            if (!currentEncoderReg.SupportsResolution(Settings, width, height, out erroMessage))
-            {
-                Debug.LogError(erroMessage);
-                return false;
-            }
-
+            string errorMessage;
             var imageInputSettings = m_Inputs[0].settings as ImageInputSettings;
-
             var alphaWillBeInImage = imageInputSettings != null && imageInputSettings.SupportsTransparent && imageInputSettings.RecordTransparency;
-            if (alphaWillBeInImage && !currentEncoderReg.SupportsTransparency(Settings, out erroMessage))
+            if (alphaWillBeInImage && !currentEncoderReg.SupportsTransparency(Settings, out errorMessage))
             {
-                Debug.LogError(erroMessage);
+                ConsoleLogMessage(errorMessage, LogType.Error);
+                Recording = false;
                 return false;
             }
 
@@ -92,11 +82,9 @@ namespace UnityEditor.Recorder
             };
 
             if (RecorderOptions.VerboseMode)
-                Debug.Log(
-                    string.Format(
-                        "MovieRecorder starting to write video {0}x{1}@[{2}/{3}] fps into {4}",
-                        width, height, videoAttrs.frameRate.numerator,
-                        videoAttrs.frameRate.denominator, Settings.fileNameGenerator.BuildAbsolutePath(session)));
+                ConsoleLogMessage(
+                    $"MovieRecorder starting to write video {width}x{height}@[{videoAttrs.frameRate.numerator}/{videoAttrs.frameRate.denominator}] fps into {Settings.fileNameGenerator.BuildAbsolutePath(session)}",
+                    LogType.Log);
 
             var audioInput = (AudioInput)m_Inputs[1];
             var audioAttrsList = new List<AudioTrackAttributes>();
@@ -126,12 +114,12 @@ namespace UnityEditor.Recorder
                 audioAttrsList.Add(audioAttrs);
 
                 if (RecorderOptions.VerboseMode)
-                    Debug.Log(string.Format("MovieRecorder starting to write audio {0}ch @ {1}Hz", audioAttrs.channelCount, audioAttrs.sampleRate.numerator));
+                    ConsoleLogMessage($"Starting to write audio {audioAttrs.channelCount}ch @ {audioAttrs.sampleRate.numerator}Hz", LogType.Log);
             }
             else
             {
                 if (RecorderOptions.VerboseMode)
-                    Debug.Log("MovieRecorder starting with no audio.");
+                    ConsoleLogMessage("Starting with no audio.", LogType.Log);
             }
 
             try
@@ -176,7 +164,8 @@ namespace UnityEditor.Recorder
             }
             catch (Exception ex)
             {
-                Debug.LogError("MovieRecorder unable to create MovieEncoder. " + ex.Message);
+                ConsoleLogMessage($"Unable to create encoder: '{ex.Message}'", LogType.Error);
+                Recording = false;
                 return false;
             }
         }
@@ -185,6 +174,9 @@ namespace UnityEditor.Recorder
         {
             if (m_Inputs.Count != 2)
                 throw new Exception("Unsupported number of sources");
+
+            if (!m_RecordingStartedProperly)
+                return; // error will have been triggered in BeginRecording()
 
             base.RecordFrame(session);
             var audioInput = (AudioInput)m_Inputs[1];
@@ -199,7 +191,7 @@ namespace UnityEditor.Recorder
             {
                 s_ConcurrentCount--;
                 if (s_ConcurrentCount < 0)
-                    Debug.LogError($"Recording ended with no matching beginning recording.");
+                    ConsoleLogMessage($"Recording ended with no matching beginning recording.", LogType.Error);
                 if (s_ConcurrentCount <= 1 && s_WarnedUserOfConcurrentCount)
                     s_WarnedUserOfConcurrentCount = false; // reset so that we can warn at the next occurence
                 m_RecordingAlreadyEnded = true;
@@ -213,7 +205,7 @@ namespace UnityEditor.Recorder
         {
             if (s_ConcurrentCount > 1 && !s_WarnedUserOfConcurrentCount)
             {
-                Debug.LogWarning($"There are two or more concurrent Movie Recorders. You may experience slowdowns and other issues, since this is not recommended.");
+                ConsoleLogMessage($"There are two or more concurrent Movie Recorders in your project. You should keep only one of them active per recording to avoid experiencing slowdowns or other issues.", LogType.Warning);
                 s_WarnedUserOfConcurrentCount = true;
             }
         }
@@ -227,6 +219,15 @@ namespace UnityEditor.Recorder
         protected override void WriteFrame(AsyncGPUReadbackRequest r)
         {
             var format = Settings.GetCurrentEncoder().GetTextureFormat(Settings);
+            if (r.hasError)
+            {
+                var rtInput = Settings.ImageInputSettings as RenderTextureInputSettings;
+                if (rtInput != null)
+                    ConsoleLogMessage("The rendered image has errors. Verify that the Render Texture correctly receives data.", LogType.Error);
+                else
+                    ConsoleLogMessage("The rendered image has errors.", LogType.Error);
+                return;
+            }
             Settings.m_EncoderManager.AddFrame(m_EncoderHandle, r.width, r.height, 0, format, r.GetData<byte>());
             WarnOfConcurrentRecorders();
         }

@@ -130,30 +130,15 @@ namespace UnityEditor.Recorder
                 return false;
             }
 
-            foreach (var recorderSetting in m_Settings.RecorderSettings)
-            {
-                var errors = new List<string>();
-
-                // This can be done only here as some recorders needs data from scenes.
-                // Example: Animation Recorder needs their target to exist.
-                if (!recorderSetting.ValidityCheck(errors))
-                {
-                    foreach (var error in errors)
-                        Debug.LogWarning(recorderSetting.name + ": " + error);
-                }
-
-                if (errors.Count > 0)
-                {
-                    if (RecorderOptions.VerboseMode)
-                        Debug.LogWarning("Recorder '" + recorderSetting.name +
-                            "' has warnings and may not record properly.");
-                }
-            }
-
             if (RecorderOptions.VerboseMode)
                 Debug.Log("Start Recording.");
 
-            var success = m_RecordingSessions.Any() && m_RecordingSessions.All(r => r.SessionCreated() && r.BeginRecording());
+            // The controller successfully starts recording if all the sessions were correctly created and at least one session begun recording properly
+            var allSessionsCreated = m_RecordingSessions.All(r => r.SessionCreated());
+            var atLeastOneSuccessfulRecording = false;
+            foreach (var r in m_RecordingSessions)
+                atLeastOneSuccessfulRecording |= r.BeginRecording();
+            var success = m_RecordingSessions.Any() && allSessionsCreated && atLeastOneSuccessfulRecording;
 
             return success;
         }

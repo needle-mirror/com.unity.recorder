@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEditor.Animations;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
@@ -10,33 +12,53 @@ namespace UnityEditor.Recorder
         {
         }
 
-        protected internal override void EndRecording(RecordingSession session)
+        protected internal override bool BeginRecording(RecordingSession session)
         {
-            var ars = (AnimationRecorderSettings)session.settings;
+            if (!base.BeginRecording(session))
+                return false;
 
             foreach (var input in m_Inputs)
             {
                 var aInput = (AnimationInput)input;
-
                 if (aInput.GameObjectRecorder == null)
-                    continue;
-
-                var clip = new AnimationClip();
-
-                ars.fileNameGenerator.CreateDirectory(session);
-
-                var absolutePath = FileNameGenerator.SanitizePath(ars.fileNameGenerator.BuildAbsolutePath(session));
-                var clipName = absolutePath.Replace(FileNameGenerator.SanitizePath(Application.dataPath), "Assets");
-
-                AssetDatabase.CreateAsset(clip, clipName);
-                var aniSettings = (aInput.settings as AnimationInputSettings);
-                aInput.GameObjectRecorder.SaveToClip(clip, ars.FrameRate, aniSettings.CurveFilterOptions);
-                if (aniSettings.ClampedTangents)
                 {
-                    FilterClip(clip);
+                    Recording = false;
+                    return false;
                 }
+            }
 
-                aInput.GameObjectRecorder.ResetRecording();
+            return true;
+        }
+
+        protected internal override void EndRecording(RecordingSession session)
+        {
+            if (Recording) // no need to do this if recording was not successful
+            {
+                var ars = (AnimationRecorderSettings)session.settings;
+                foreach (var input in m_Inputs)
+                {
+                    var aInput = (AnimationInput)input;
+
+                    if (aInput.GameObjectRecorder == null)
+                        continue;
+
+                    var clip = new AnimationClip();
+
+                    ars.fileNameGenerator.CreateDirectory(session);
+
+                    var absolutePath = FileNameGenerator.SanitizePath(ars.fileNameGenerator.BuildAbsolutePath(session));
+                    var clipName = absolutePath.Replace(FileNameGenerator.SanitizePath(Application.dataPath), "Assets");
+
+                    AssetDatabase.CreateAsset(clip, clipName);
+                    var aniSettings = (aInput.settings as AnimationInputSettings);
+                    aInput.GameObjectRecorder.SaveToClip(clip, ars.FrameRate, aniSettings.CurveFilterOptions);
+                    if (aniSettings.ClampedTangents)
+                    {
+                        FilterClip(clip);
+                    }
+
+                    aInput.GameObjectRecorder.ResetRecording();
+                }
             }
 
             base.EndRecording(session);

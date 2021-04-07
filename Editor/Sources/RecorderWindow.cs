@@ -14,7 +14,7 @@ using UnityEngine.UIElements;
 namespace UnityEditor.Recorder
 {
     /// <summary>
-    /// Main window class of the Unity Recorder.
+    /// Main window class of the Recorder.
     /// It can be accessed from an Editor script to show the Recorder Window and eventually Start and Stop the recording using current settings.
     /// Recorder settings are saved in Library/Recorder/recorder.pref
     /// </summary>
@@ -213,16 +213,22 @@ namespace UnityEditor.Recorder
 
         void RegisterCallbacks()
         {
-            Undo.undoRedoPerformed += SaveAndRepaint;
+            Undo.undoRedoPerformed += OnUndoRedoPerformed;
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             EditorApplication.update += UpdateInternal;
         }
 
         void UnregisterCallbacks()
         {
-            Undo.undoRedoPerformed -= SaveAndRepaint;
+            Undo.undoRedoPerformed -= OnUndoRedoPerformed;
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             EditorApplication.update -= UpdateInternal;
+        }
+
+        void OnUndoRedoPerformed()
+        {
+            ReloadRecordings();
+            SaveAndRepaint();
         }
 
         void CreateView()
@@ -643,7 +649,7 @@ namespace UnityEditor.Recorder
             }
             else if (commandName == "SoftDelete" || commandName == "Delete")
             {
-                DeleteRecorder(item, true);
+                DeleteRecorder(item);
                 evt.StopPropagation();
             }
         }
@@ -704,14 +710,6 @@ namespace UnityEditor.Recorder
 
             foreach (var info in RecordersInventory.builtInRecorderInfos)
                 AddRecorderInfoToMenu(info, newRecordMenu);
-
-            if (RecorderOptions.ShowLegacyRecorders)
-            {
-                newRecordMenu.AddSeparator(string.Empty);
-
-                foreach (var info in RecordersInventory.legacyRecorderInfos)
-                    AddRecorderInfoToMenu(info, newRecordMenu);
-            }
 
             var recorderList = RecordersInventory.customRecorderInfos.ToList();
 
@@ -960,7 +958,7 @@ namespace UnityEditor.Recorder
             {
                 if (m_SelectedRecorderItem.state == RecorderItem.State.HasErrors)
                 {
-                    EditorGUILayout.LabelField("The selected Recorder has errors.");
+                    EditorGUILayout.LabelField("This Recorder has errors and cannot record any data.");
                 }
                 else
                 {
@@ -1060,18 +1058,18 @@ namespace UnityEditor.Recorder
             {
                 menu.AddItem(Styles.ClearRecorderListLabel, false, () =>
                 {
-                    if (EditorUtility.DisplayDialog("Clear Recoder List?", "All recorder will be deleted. Proceed?", "Delete Recorders", "Cancel"))
+                    Undo.IncrementCurrentGroup();
+                    Undo.SetCurrentGroupName("Clear Recorder List");
+                    var undoGroupIndex = Undo.GetCurrentGroup();
+                    foreach (var item in items)
                     {
-                        foreach (var item in items)
-                        {
-                            if (item.editor != null)
-                                DestroyImmediate(item.editor);
+                        if (item.editor != null)
+                            DestroyImmediate(item.editor);
 
-                            DeleteRecorder(item, false);
-                        }
-
-                        ReloadRecordings();
+                        DeleteRecorder(item);
                     }
+                    Undo.CollapseUndoOperations(undoGroupIndex);
+                    ReloadRecordings();
                 });
             }
             else
@@ -1130,20 +1128,12 @@ namespace UnityEditor.Recorder
             AddLastAndSelect(copy, candidate.name, candidate.Enabled);
         }
 
-        void DeleteRecorder(RecorderItem item, bool prompt)
+        void DeleteRecorder(RecorderItem item)
         {
-            if (!prompt || EditorUtility.DisplayDialog("Delete Recoder?",
-                "Are you sure you want to delete '" + item.settings.name + "' ?", "Delete", "Cancel"))
-            {
-                var s = item.settings;
-                m_ControllerSettings.RemoveRecorder(s);
-                UnityHelpers.Destroy(s, true);
-                UnityHelpers.Destroy(item.editor, true);
-                m_RecordingListItem.Remove(item);
-            }
-
-            if (prompt)
-                Focus();
+            var s = item.settings;
+            m_ControllerSettings.RemoveRecorder(s);
+            UnityHelpers.Destroy(item.editor, true);
+            m_RecordingListItem.Remove(item);
         }
 
         void OnAddNewRecorder(RecorderInfo info)
@@ -1181,7 +1171,7 @@ namespace UnityEditor.Recorder
                 contextMenu.AddItem(Styles.DeleteLabel, false,
                     data =>
                     {
-                        DeleteRecorder((RecorderItem)data, true);
+                        DeleteRecorder((RecorderItem)data);
                     }, recorder);
             }
 

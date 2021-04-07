@@ -33,8 +33,8 @@ namespace UnityEditor.Recorder
         public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
         public virtual bool IsPlatformSupported { get; }
         public AnimationRecorderSettings() {}
+        protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
         public virtual void OnAfterDuplicate();
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
     }
 
     public abstract class BaseRenderTextureInput : UnityEditor.Recorder.RecorderInput
@@ -109,13 +109,10 @@ namespace UnityEditor.Recorder
         protected GenericRecorder() {}
     }
 
-    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.GIFRecorder), @"GIF Animation", @"imagesequence_16")] public class GIFRecorderSettings : UnityEditor.Recorder.FrameCapturer.BaseFCRecorderSettings
+    [System.Obsolete(@"The GIFRecorder is deprecated")] [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.GIFRecorder), @"GIF Animation", @"imagesequence_16", true)] public class GIFRecorderSettings : UnityEditor.Recorder.FrameCapturer.BaseFCRecorderSettings
     {
         protected virtual string Extension { get; }
-        public int KeyframeInterval { get; set; }
-        public int MaxTasks { get; set; }
-        public int NumColors { get; set; }
-        public GIFRecorderSettings() {}
+        [System.Obsolete(@"The GIFRecorder is deprecated")] public GIFRecorderSettings() {}
     }
 
     public class ImageInputSelector : UnityEditor.Recorder.InputSettingsSelector
@@ -134,14 +131,28 @@ namespace UnityEditor.Recorder
         public AccumulationSettings AccumulationSettings { get; set; }
         public bool CaptureAlpha { get; set; }
         public bool CaptureHDR { get; }
+        public UnityEditor.Recorder.ImageRecorderSettings.EXRCompressionType EXRCompression { get; set; }
         protected virtual string Extension { get; }
         public UnityEditor.Recorder.Input.ImageInputSettings imageInputSettings { get; set; }
         public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
+        public UnityEditor.Recorder.ImageRecorderSettings.ColorSpaceType OutputColorSpace { get; set; }
         public UnityEditor.Recorder.ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat { get; set; }
         public ImageRecorderSettings() {}
         public virtual AccumulationSettings GetAccumulationSettings();
         public virtual bool IsAccumulationSupported();
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
+        public enum ColorSpaceType
+        {
+            public const UnityEditor.Recorder.ImageRecorderSettings.ColorSpaceType sRGB_sRGB = 0;
+            public const UnityEditor.Recorder.ImageRecorderSettings.ColorSpaceType Unclamped_linear_sRGB = 1;
+            public int value__;
+        }
+        public enum EXRCompressionType
+        {
+            public const UnityEditor.Recorder.ImageRecorderSettings.EXRCompressionType None = 0;
+            public const UnityEditor.Recorder.ImageRecorderSettings.EXRCompressionType RLE = 1;
+            public int value__;
+            public const UnityEditor.Recorder.ImageRecorderSettings.EXRCompressionType Zip = 2;
+        }
         public enum ImageRecorderOutputFormat
         {
             public const UnityEditor.Recorder.ImageRecorderSettings.ImageRecorderOutputFormat EXR = 2;
@@ -177,9 +188,10 @@ namespace UnityEditor.Recorder
         public UnityEditor.VideoBitrateMode VideoBitRateMode { get; set; }
         public MovieRecorderSettings() {}
         public virtual AccumulationSettings GetAccumulationSettings();
+        protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
         public void GetPresetsForEncoder(int indexEncoder, out System.Collections.Generic.List<string> presetNames, out System.Collections.Generic.List<string> presetOptions);
+        protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
         public virtual bool IsAccumulationSupported();
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
         public enum VideoRecorderOutputFormat
         {
             public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat MOV = 2;
@@ -211,6 +223,7 @@ namespace UnityEditor.Recorder
         public bool Recording { get; protected set; }
         protected Recorder() {}
         protected virtual bool BeginRecording(UnityEditor.Recorder.RecordingSession session);
+        protected void ConsoleLogMessage(string message, UnityEngine.LogType logType);
         protected virtual void EndRecording(UnityEditor.Recorder.RecordingSession session);
         protected virtual void PrepareNewFrame(UnityEditor.Recorder.RecordingSession ctx);
         protected abstract void RecordFrame(UnityEditor.Recorder.RecordingSession ctx);
@@ -290,12 +303,13 @@ namespace UnityEditor.Recorder
     {
         protected abstract System.Type InputType { get; }
         protected RecorderInputSettings() {}
-        protected abstract bool ValidityCheck(System.Collections.Generic.List<string> errors);
+        protected virtual void CheckForErrors(System.Collections.Generic.List<string> errors);
+        protected virtual void CheckForWarnings(System.Collections.Generic.List<string> warnings);
+        [System.Obsolete(@"Please use methods CheckForErrors() and CheckForWarnings()")] protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
     }
 
     public static class RecorderOptions
     {
-        public static bool ShowLegacyRecorders { get; set; }
         public static bool ShowRecorderGameObject { get; set; }
         public static bool VerboseMode { get; set; }
     }
@@ -318,16 +332,20 @@ namespace UnityEditor.Recorder
         public float StartTime { get; set; }
         public int Take { get; set; }
         protected RecorderSettings() {}
+        protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
+        protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
         protected virtual bool HasErrors();
         public virtual bool IsAccumulationSupported();
         public virtual void OnAfterDuplicate();
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
+        [System.Obsolete(@"Please use methods GetErrors() and GetWarnings()")] protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
     }
 
     [System.AttributeUsage(4, Inherited = false)] public class RecorderSettingsAttribute : System.Attribute
     {
         public RecorderSettingsAttribute(System.Type recorderType, string displayName) {}
+        public RecorderSettingsAttribute(System.Type recorderType, string displayName, bool deprecated) {}
         public RecorderSettingsAttribute(System.Type recorderType, string displayName, string iconName) {}
+        public RecorderSettingsAttribute(System.Type recorderType, string displayName, string iconName, bool deprecated) {}
     }
 
     public class RecorderWindow : UnityEditor.EditorWindow
@@ -369,11 +387,19 @@ namespace UnityEditor.Recorder
 
 namespace UnityEditor.Recorder.AOV
 {
-    public enum AOVColorSpaceType
+    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.AOVRecorder), @"AOV Image Sequence", @"aovimagesequence_16")] public class AOVRecorderSettings : UnityEditor.Recorder.RecorderSettings
     {
-        public const UnityEditor.Recorder.AOV.AOVColorSpaceType sRGB_sRGB = 0;
-        public const UnityEditor.Recorder.AOV.AOVColorSpaceType Unclamped_linear_sRGB = 1;
-        public int value__;
+        public UnityEditor.Recorder.AOV.AOVType AOVSelection { get; set; }
+        public bool CaptureHDR { get; }
+        public UnityEditor.Recorder.ImageRecorderSettings.EXRCompressionType EXRCompression { get; set; }
+        protected virtual string Extension { get; }
+        public UnityEditor.Recorder.Input.ImageInputSettings imageInputSettings { get; set; }
+        public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
+        public UnityEditor.Recorder.ImageRecorderSettings.ColorSpaceType OutputColorSpace { get; set; }
+        public UnityEditor.Recorder.ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat { get; set; }
+        public AOVRecorderSettings() {}
+        protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
+        protected virtual bool HasErrors();
     }
 
     public enum AOVType
@@ -398,14 +424,6 @@ namespace UnityEditor.Recorder.AOV
         public const UnityEditor.Recorder.AOV.AOVType SpecularLighting = 9;
         public int value__;
     }
-
-    public enum EXRCompressionType
-    {
-        public const UnityEditor.Recorder.AOV.EXRCompressionType None = 0;
-        public const UnityEditor.Recorder.AOV.EXRCompressionType RLE = 1;
-        public int value__;
-        public const UnityEditor.Recorder.AOV.EXRCompressionType Zip = 2;
-    }
 }
 
 namespace UnityEditor.Recorder.AOV.Input
@@ -419,13 +437,11 @@ namespace UnityEditor.Recorder.AOV.Input
 
 namespace UnityEditor.Recorder.FrameCapturer
 {
-    public abstract class BaseFCRecorderSettings : UnityEditor.Recorder.RecorderSettings
+    [System.Obsolete(@"The legacy recorders are deprecated")] public abstract class BaseFCRecorderSettings : UnityEditor.Recorder.RecorderSettings
     {
         public UnityEditor.Recorder.Input.ImageInputSettings imageInputSettings { get; set; }
         public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
-        public virtual bool IsPlatformSupported { get; }
         protected BaseFCRecorderSettings() {}
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
     }
 }
 
@@ -448,9 +464,9 @@ namespace UnityEditor.Recorder.Input
         public UnityEditor.Recorder.Input.AnimationInputSettings.CurveSimplificationOptions SimplyCurves { get; set; }
         public AnimationInputSettings() {}
         public void AddComponentToRecord(System.Type componentType);
+        protected virtual void CheckForErrors(System.Collections.Generic.List<string> errors);
         public void ClearExposedReference();
         public void DuplicateExposedReference();
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
         public enum CurveSimplificationOptions
         {
             public const UnityEditor.Recorder.Input.AnimationInputSettings.CurveSimplificationOptions Disabled = 2;
@@ -465,7 +481,6 @@ namespace UnityEditor.Recorder.Input
         protected virtual System.Type InputType { get; }
         public bool PreserveAudio { get; set; }
         public AudioInputSettings() {}
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
     }
 
     [System.ComponentModel.DisplayName(@"360 View")] public class Camera360InputSettings : UnityEditor.Recorder.Input.ImageInputSettings
@@ -480,7 +495,7 @@ namespace UnityEditor.Recorder.Input
         public UnityEditor.Recorder.ImageSource Source { get; set; }
         public float StereoSeparation { get; set; }
         public Camera360InputSettings() {}
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
+        protected virtual void CheckForErrors(System.Collections.Generic.List<string> errors);
     }
 
     public class CameraInput : UnityEditor.Recorder.BaseRenderTextureInput
@@ -501,7 +516,7 @@ namespace UnityEditor.Recorder.Input
         protected virtual System.Type InputType { get; }
         public UnityEditor.Recorder.ImageSource Source { get; set; }
         public CameraInputSettings() {}
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
+        protected virtual void CheckForErrors(System.Collections.Generic.List<string> errors);
     }
 
     [System.ComponentModel.DisplayName(@"Game View")] public class GameViewInputSettings : UnityEditor.Recorder.Input.StandardImageInputSettings
@@ -529,7 +544,7 @@ namespace UnityEditor.Recorder.Input
         public virtual int OutputWidth { get; set; }
         public UnityEngine.RenderTexture RenderTexture { get; set; }
         public RenderTextureInputSettings() {}
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
+        protected virtual void CheckForErrors(System.Collections.Generic.List<string> errors);
     }
 
     [System.ComponentModel.DisplayName(@"Texture Sampling")] public class RenderTextureSamplerSettings : UnityEditor.Recorder.Input.ImageInputSettings
@@ -544,7 +559,7 @@ namespace UnityEditor.Recorder.Input
         public int RenderWidth { get; set; }
         public UnityEditor.Recorder.Input.SuperSamplingCount SuperSampling { get; set; }
         public RenderTextureSamplerSettings() {}
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
+        protected virtual void CheckForWarnings(System.Collections.Generic.List<string> warnings);
     }
 
     public abstract class StandardImageInputSettings : UnityEditor.Recorder.Input.ImageInputSettings
@@ -552,7 +567,8 @@ namespace UnityEditor.Recorder.Input
         public virtual int OutputHeight { get; set; }
         public virtual int OutputWidth { get; set; }
         protected StandardImageInputSettings() {}
-        protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
+        protected virtual void CheckForErrors(System.Collections.Generic.List<string> errors);
+        protected virtual void CheckForWarnings(System.Collections.Generic.List<string> warnings);
     }
 
     public enum SuperSamplingCount

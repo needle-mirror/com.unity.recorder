@@ -77,6 +77,9 @@ namespace UnityEditor.Recorder.Input
             OutputWidth = scSettings.OutputWidth;
             OutputHeight = scSettings.OutputHeight;
 
+            if (OutputWidth <= 0 || OutputHeight <= 0)
+                return; // error will be handled by ImageInputSettings.CheckForErrors. Otherwise we get a failure at RenderTexture.GetTemporary()
+
             int w, h;
             GameViewSize.GetGameRenderSize(out w, out h);
             if (w != OutputWidth || h != OutputHeight)

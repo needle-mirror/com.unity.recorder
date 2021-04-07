@@ -8,16 +8,13 @@ namespace UnityEditor.Recorder
 
         protected virtual void Initialize(SerializedProperty prop)
         {
-            if (target == null)
-            {
-                var path = prop.propertyPath.Split('.');
-                object obj = prop.serializedObject.targetObject;
+            var path = prop.propertyPath.Split('.');
+            object obj = prop.serializedObject.targetObject;
 
-                foreach (var pathNode in path)
-                    obj = GetSerializedField(obj, pathNode).GetValue(obj);
+            foreach (var pathNode in path)
+                obj = GetSerializedField(obj, pathNode).GetValue(obj);
 
-                target = obj as T;
-            }
+            target = obj as T;
         }
 
         static FieldInfo GetSerializedField(object target, string pathNode)

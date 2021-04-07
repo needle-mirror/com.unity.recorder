@@ -62,7 +62,7 @@ namespace UnityEditor.Recorder
         static bool FoldoutPresetEditorStateHeader(PresetEditorState state)
         {
             var r = EditorGUILayout.GetControlRect();
-            state.expanded = EditorGUI.Foldout(r, state.expanded, state.presetEditor.target.name);
+            state.expanded = EditorGUI.Foldout(r, state.expanded, state.presetEditor.target.name, true);
 
             return state.expanded;
         }

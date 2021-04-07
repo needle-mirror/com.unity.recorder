@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -59,10 +60,41 @@ namespace UnityEditor.Recorder
 
         internal abstract RecorderSettings settings { get; set; }
 
+        protected internal void ConsoleLogMessage(string message, LogType logType)
+        {
+            string sAborted = "";
+            switch (logType)
+            {
+                case LogType.Warning:
+                    sAborted = "Recording may cause slowdowns or generate an invalid file. ";
+                    break;
+                case LogType.Error:
+                    sAborted = "Recording failed. ";
+                    break;
+                default:
+                    break;
+            }
+            string logMessage = $"[{GetType().Name}: {settings.name}] {sAborted}{message}";
+            switch (logType)
+            {
+                case LogType.Log:
+                    Debug.Log(logMessage);
+                    break;
+                case LogType.Warning:
+                    Debug.LogWarning(logMessage);
+                    break;
+                case LogType.Error:
+                    Debug.LogError(logMessage);
+                    break;
+                default:
+                    throw new InvalidEnumArgumentException($"Log type {logType} is not supported yet.");
+            }
+        }
+
         protected internal virtual void SessionCreated(RecordingSession session)
         {
             if (RecorderOptions.VerboseMode)
-                Debug.Log(string.Format("Recorder {0} session created", GetType().Name));
+                ConsoleLogMessage("Session created", LogType.Log);
 
             settings.SelfAdjustSettings(); // ignore return value.
 
@@ -71,9 +103,9 @@ namespace UnityEditor.Recorder
             {
                 var toCompare = 1.0f / fixedRate;
                 if (Time.captureFramerate != 0 && Math.Abs(toCompare - Time.captureDeltaTime) > float.Epsilon)
-                    Debug.LogError(string.Format("Recorder {0} is set to record at a fixed rate and another component has already set a conflicting value for [Time.captureFramerate], new value being applied : {1}!", GetType().Name, fixedRate));
+                    ConsoleLogMessage($"Recorder {GetType().Name} is set to record at a fixed rate and another component has already set a conflicting value for [Time.captureFramerate], new value being applied : {fixedRate}!", LogType.Error);
                 else if (Time.captureFramerate == 0 && RecorderOptions.VerboseMode)
-                    Debug.Log("Frame recorder set fixed frame rate to " + fixedRate);
+                    ConsoleLogMessage($"Frame recorder set fixed frame rate to {fixedRate}", LogType.Log);
                 // Note that Time.captureDeltaTime will be modified by HDRP SubFrameManager
                 // to implement the accumulation motion blur/path tracer support.
 
@@ -104,8 +136,35 @@ namespace UnityEditor.Recorder
             if (Recording)
                 throw new Exception("Already recording!");
 
+            // Log old warnings (non-blocking)
+            var oldWarnings = new List<string>();
+#pragma warning disable 618
+            if (!session.settings.ValidityCheck(oldWarnings))
+#pragma warning restore 618
+            {
+                foreach (var w in oldWarnings)
+                    ConsoleLogMessage(w, LogType.Warning);
+            }
+
+            // Log non-blocking warnings
+            var warnings = new List<string>();
+            session.settings.GetWarnings(warnings);
+            foreach (var w in warnings)
+                ConsoleLogMessage(w, LogType.Warning);
+
+            // Log blocking errors and stop
+            var errors = new List<string>();
+            session.settings.GetErrors(errors);
+            foreach (var w in errors)
+                ConsoleLogMessage(w, LogType.Error);
+            if (errors.Count > 0)
+            {
+                Recording = false;
+                return false;
+            }
+
             if (RecorderOptions.VerboseMode)
-                Debug.Log(string.Format("Recorder {0} starting to record", GetType().Name));
+                ConsoleLogMessage($"Starting to record", LogType.Log);
 
             return Recording = true;
         }
@@ -129,7 +188,7 @@ namespace UnityEditor.Recorder
                 {
                     Time.captureFramerate = 0;
                     if (RecorderOptions.VerboseMode)
-                        Debug.Log("Recorder resetting 'CaptureFrameRate' to zero");
+                        ConsoleLogMessage("Recorder resetting 'CaptureFrameRate' to zero", LogType.Log);
                 }
             }
 
@@ -140,7 +199,7 @@ namespace UnityEditor.Recorder
             }
 
             if (RecorderOptions.VerboseMode)
-                Debug.Log(string.Format("{0} recording stopped, total frame count: {1}", GetType().Name, RecordedFramesCount));
+                ConsoleLogMessage($"Recording stopped, total frame count: {RecordedFramesCount}", LogType.Log);
 
             ++settings.Take;
         }

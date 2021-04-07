@@ -23,7 +23,8 @@ namespace UnityEditor.Recorder
             }
             catch (Exception)
             {
-                Debug.LogError(string.Format("Audio recorder output directory \"{0}\" could not be created.", Settings.fileNameGenerator.BuildAbsolutePath(session)));
+                ConsoleLogMessage($"Unable to create the output directory \"{Settings.fileNameGenerator.BuildAbsolutePath(session)}\".", LogType.Error);
+                Recording = false;
                 return false;
             }
 
@@ -46,7 +47,7 @@ namespace UnityEditor.Recorder
                 audioAttrsList.Add(audioAttrs);
 
                 if (RecorderOptions.VerboseMode)
-                    Debug.Log(string.Format("Audio starting to write audio {0}ch @ {1}Hz", audioAttrs.channelCount, audioAttrs.sampleRate.numerator));
+                    ConsoleLogMessage($"Audio starting to write audio {audioAttrs.channelCount}ch @ {audioAttrs.sampleRate.numerator}Hz", LogType.Log);
             }
 
             try
@@ -56,10 +57,10 @@ namespace UnityEditor.Recorder
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 if (RecorderOptions.VerboseMode)
-                    Debug.LogError("AudioRecorder unable to create MovieEncoder.");
+                    ConsoleLogMessage($"Unable to create encoder: '{ex.Message}'", LogType.Error);
             }
 
             return false;

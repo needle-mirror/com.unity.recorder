@@ -63,7 +63,7 @@ float4 float4ToGammaSpace(float4 value)
 float4 frag(v2f i) : SV_Target {
 	const int width = ceil(_MainTex_TexelSize.z / _Target_TexelSize.z / 2.f);
 	const float ratio = 1.f / (1.41f * width);
-	
+
 	float weight = 0.f;
 	float4 color = float4(0.f, 0.f, 0.f, 0.f);
 
@@ -71,20 +71,20 @@ float4 frag(v2f i) : SV_Target {
 		for(int x = -width; x <= width; ++x) {
 			float2 off = float2(x * _MainTex_TexelSize.x, y * _MainTex_TexelSize.y);
 			float2 uv = i.uv + off;
-		
-			float3 s = tex2D(_MainTex, uv).rgb;
-		
+
+			float4 s = tex2D(_MainTex, uv).rgba;
+
 			float c = clamp(sqrt(x*x + y*y) * ratio * (1.f/_KernelScale), -1.57f, 1.57f);
 			float w = pow(cos(c), _KernelCosPower);
-			color.rgb += s.rgb * w;
+			color.rgba += s.rgba * w;
 			weight += w;
 		}
 	}
 
     if (_ApplyGammaCorrection == 0)
-        return _NormalizationFactor * color.rgbb / weight;
+        return _NormalizationFactor * color.rgba / weight;
     else
-        return float4ToGammaSpace(_NormalizationFactor * color.rgbb / weight);
+        return float4ToGammaSpace(_NormalizationFactor * color.rgba / weight);
 }
 
 ENDCG

@@ -1,6 +1,6 @@
 # Known issues and limitations
 
-This page lists some known issues and limitations that you might experience with the Unity Recorder. It also gives basic instructions to help you work around them.
+This page lists some known issues and limitations that you might experience with the Recorder. It also gives basic instructions to help you work around them.
 
 #### Recording slowdown with concurrent Movie Recorders
 
@@ -12,9 +12,20 @@ This page lists some known issues and limitations that you might experience with
 
 **Limitation:** The Recorder currently supports only the recording of samples from the Unity built-in audio engine. As such, it cannot record audio from third-party audio engines such as FMOD Studio or Wwise.
 
-**Workaround:** For a movie, you can record the third-party audio output in WAV format through another application, reimport this recorded file into the Unity Timeline, and then use the Unity Recorder to create the final movie with audio. Alternatively, you can use any video editing software to recompose audio and video.
+**Workaround:** For a movie, you can record the third-party audio output in WAV format through another application, reimport this recorded file into the Unity Timeline, and then use the Recorder to create the final movie with audio. Alternatively, you can use any video editing software to recompose audio and video.
 
-### AOV Recorder limitations
+#### GIF Animation Recorder no longer available
 
-* You can't select the Active Camera as the source of the recording.
-* The AOV Recorder uses a linear gamma (instead of sRGB gamma curve) when recording in PNG and JPEG.
+**Limitation:** This version of the Recorder no longer includes the GIF Animation Recorder, although it is still available in Recorder versions 2.5 and lower.
+
+**Workaround:** To produce a GIF animation, record your content with the [Image Sequence Recorder](RecorderImage.md) and then process the result through any external GIF animation software.
+
+#### Limited support of AA/TAA in AOVs
+
+**Limitation:** The Beauty AOV is the only AOV that you can currently record with Anti-Aliasing (AA) / Temporal Anti-Aliasing (TAA) enabled on your recording camera.
+
+#### Color artifacts in AOV recordings when TAA is enabled
+
+**Known issue:** If you record multiple AOVs while the recording camera has Temporal Anti-Aliasing (TAA) enabled, the recorded outputs might contain unexpected color artifacts. For example, some areas of a Beauty pass might include artificial colors coming from the data recorded for a Normal pass.
+
+**Workaround:** If you need to record a Beauty pass with TAA enabled on your recording camera, you should record it through its own recording session, separately from any other AOVs.

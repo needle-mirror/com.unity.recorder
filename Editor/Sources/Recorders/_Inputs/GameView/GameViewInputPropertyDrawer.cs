@@ -14,9 +14,6 @@ namespace UnityEditor.Recorder.Input
 
         protected override void Initialize(SerializedProperty property)
         {
-            if (target != null)
-                return;
-
             base.Initialize(property);
 
             m_OutputResolution = property.FindPropertyRelative("m_OutputResolution");

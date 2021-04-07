@@ -14,7 +14,6 @@ namespace UnityEditor.Recorder.Input
         SerializedProperty m_IncludeUI;
         SerializedProperty m_OutputResolution;
 
-        bool m_Initialized;
 
         static class Styles
         {
@@ -27,9 +26,6 @@ namespace UnityEditor.Recorder.Input
 
         protected override void Initialize(SerializedProperty property)
         {
-            if (m_Initialized)
-                return;
-
             base.Initialize(property);
 
             m_Source = property.FindPropertyRelative("source");
@@ -37,8 +33,6 @@ namespace UnityEditor.Recorder.Input
             m_OutputResolution = property.FindPropertyRelative("m_OutputResolution");
             m_FlipFinalOutput = property.FindPropertyRelative("flipFinalOutput");
             m_IncludeUI = property.FindPropertyRelative("captureUI");
-
-            m_Initialized = true;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

@@ -180,7 +180,7 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
-        /// Indicates the absolute path (without the extension).
+        /// Indicates the absolute path of the folder to write file to.
         /// </summary>
         internal string AbsolutePath
         {
@@ -197,12 +197,16 @@ namespace UnityEditor.Recorder
             set { m_Path.forceAssetsFolder = value; }
         }
 
-        readonly RecorderSettings m_RecorderSettings;
+        RecorderSettings m_RecorderSettings;
 
-        internal FileNameGenerator(RecorderSettings recorderSettings)
+        internal RecorderSettings RecorderSettings
         {
-            m_RecorderSettings = recorderSettings;
+            set => m_RecorderSettings = value;
+        }
 
+
+        internal FileNameGenerator()
+        {
             m_Wildcards = new List<Wildcard>
             {
                 new Wildcard(DefaultWildcard.Recorder, RecorderResolver),

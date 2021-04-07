@@ -2,7 +2,9 @@
 
 AOV recording is a process that extracts specific render pass data from the Scene that a specific Camera views. This mainly includes render passes related to the material, geometry, depth, motion, and lighting response of the GameObjects in the Scene.
 
-The Unity AOV Recorder generates a sequence of image files in various formats including compressed HDR EXR and supports the recording of [multiple AOVs](#aov-to-export) for various [use cases](#use-case-examples).
+The AOV Recorder only works with projects that use Unity's [HDRP (High Definition Render Pipeline)](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest). It generates a sequence of image files in various formats including compressed EXR and supports the recording of [several different AOVs](#aov-to-export) for various [use cases](#use-case-examples).
+
+>**Note:** This AOV Recorder replaces the one that was formerly available through a separate package. If you previously installed the separate AOV Recorder package, you should uninstall it to avoid any unexpected recording issues.
 
 This page covers all properties specific to the AOV Image Sequence Recorder type.
 
@@ -31,17 +33,25 @@ The following table describes for each one the type of data recorded in each fra
 | AOV | Recorded data | Pixel value |
 |:---|:---|:---|
 | Beauty | The final rendered view (after post-process) without the alpha. | RGB color. |
-| Albedo | The overall perceived colors of the objects in view, with no lighting calculation and no shadows. This includes data from albedo values or albedo maps of the object materials. | RGB color. |
+| Albedo | The overall perceived colors of the surfaces in view, with no lighting calculation and no shadows. This includes data from albedo values or albedo maps of the surface materials. | RGB color. |
 | Normals | The normals of the surfaces in view, resulting from geometric normals and materials normal maps. | R, G and B channels:<br/>The values of the R,G,B channels respectively represent the X,Y,Z vector coordinates of the normals in World Space. |
-| Smoothness | The glossiness or roughness of the surfaces in view. This includes data from smoothness values or smoothness maps of the object materials. | Grayscale:<br/>• Black (value of 0) = rough<br/>• White (value of 1) = glossy |
-| Ambient Occlusion | The ambient occlusion data from the material maps of the objects in view. This does not include data resulting from any ambient occlusion effects. | Grayscale:<br/>• Black (value of 0) = fully occluded<br/>• White (value of 1) = not occluded |
-| Metal | The metallic or non-metallic surfaces in view. This includes data from metal values or metal maps of the object materials. | Grayscale:<br/>• Black (value of 0) = non-metal<br/>• White (value of 1) = metal |
-| Specular | The specular colors of the objects in view. This includes data from specular color values or specular color maps of the object materials. | RGB color. |
-| Alpha | The transparency or opacity of the objects in view. This includes data from alpha values or alpha maps of the object materials. | Grayscale:<br/>• Black (value of 0) = transparent<br/>• White (value of 1) = opaque |
-| Diffuse Lighting | The diffuse light response of the objects in view according to the current lighting of the Scene. It depends on the object materials and includes shadows. | RGB color. |
-| Specular Lighting | The specular light response of the objects in view according to the current lighting of the Scene. It depends on the object materials and includes shadows. | RGB color. |
-| Motion Vectors | The 2D vectors representing the relative movements of the objects, perceived from the recording Camera. | R and G channels only:<br/>• The values of the R and G channels respectively represent the horizontal and vertical coordinates of the vectors in the image plane.<br/>• The range of values is between -1 and 1, normalized to the **Output Resolution** you selected for the recording. |
-| Depth | The relative distances of the objects in view between the Far Plane (farthest point from the camera) and the Near Plane (closest point to the camera). | Grayscale:<br/>• Black (value of 0) = at Far Plane<br/>• White (value of 1) = at Near Plane |
+| Smoothness | The glossiness or roughness of the surfaces in view. This includes data from smoothness values or smoothness maps of the surface materials. | Grayscale:<br/>• Black (value of 0) = rough<br/>• White (value of 1) = glossy |
+| Ambient Occlusion | The ambient occlusion data from the material maps of the surfaces in view. This does not include data resulting from any ambient occlusion effects. | Grayscale:<br/>• Black (value of 0) = fully occluded<br/>• White (value of 1) = not occluded |
+| Metal | The metallic or non-metallic surfaces in view. This includes data from metal values or metal maps of the surface materials. | Grayscale:<br/>• Black (value of 0) = non-metal<br/>• White (value of 1) = metal |
+| Specular | The specular colors of the surfaces in view. This includes data from specular color values or specular color maps of the surface materials. | RGB color. |
+| Alpha | The transparency or opacity of the surfaces in view. This includes data from alpha values or alpha maps of the surface materials. | Grayscale:<br/>• Black (value of 0) = transparent<br/>• White (value of 1) = opaque |
+| Diffuse Lighting* | The direct _and_ indirect diffuse light response of the surfaces in view. | RGB color. |
+| Specular Lighting* | The direct _and_ indirect specular light response of the surfaces in view. | RGB color. |
+| Direct Diffuse* | Only the direct diffuse light response of the surfaces in view. | RGB color. |
+| Direct Specular* | Only the direct specular light response of the surfaces in view. | RGB color. |
+| Indirect Diffuse* | Only the indirect diffuse light response of the surfaces in view. | RGB color. |
+| Reflection* | The light reflected by the surfaces in view. | RGB color. |
+| Refraction* | The light refracted through the surfaces in view. | RGB color. |
+| Emissive* | The light emitted by the surfaces in view. | RGB color. |
+| Motion Vectors | The 2D vectors representing the movements in the Scene, relative to the recording Camera. | R and G channels only:<br/>• The values of the R and G channels respectively represent the horizontal and vertical coordinates of the vectors in the image plane.<br/>• The range of values is between -1 and 1, normalized to the **Output Resolution** you selected for the recording. |
+| Depth | The relative distances of the Scene elements in view between the Far Plane (farthest point from the camera) and the Near Plane (closest point to the camera). | Grayscale:<br/>• Black (value of 0) = at Far Plane<br/>• White (value of 1) = at Near Plane |
+
+_\* These specific AOVs are for light decomposition purposes. The recorded data depends on the current lighting of the Scene and on the surface materials, and includes shadows._
 
 ### Source camera
 

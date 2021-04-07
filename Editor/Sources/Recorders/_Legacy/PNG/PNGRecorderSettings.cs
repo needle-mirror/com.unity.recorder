@@ -1,15 +1,10 @@
 namespace UnityEditor.Recorder.FrameCapturer
 {
-    [RecorderSettings(typeof(PNGRecorder), "Legacy/PNG")]
+    [RecorderSettings(typeof(PNGRecorder), "Legacy/PNG", true)]
+#pragma warning disable 618
     class PNGRecorderSettings : BaseFCRecorderSettings
     {
-        public fcAPI.fcPngConfig m_PngEncoderSettings = fcAPI.fcPngConfig.default_value;
-
-        public PNGRecorderSettings()
-        {
-            fileNameGenerator.FileName = "image_" + DefaultWildcard.Frame;
-        }
-
+#pragma warning restore 618
         protected internal override string Extension
         {
             get { return "png"; }

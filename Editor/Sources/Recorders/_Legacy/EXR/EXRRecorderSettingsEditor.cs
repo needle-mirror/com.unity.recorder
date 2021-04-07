@@ -5,9 +5,9 @@ namespace UnityEditor.Recorder.FrameCapturer
     [CustomEditor(typeof(EXRRecorderSettings))]
     class EXRRecorderSettingsEditor : RecorderEditor
     {
-        protected override void OnEncodingGui()
+        public override void OnInspectorGUI()
         {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_ExrEncoderSettings"), new GUIContent("Encoding"), true);
+            EditorGUILayout.LabelField("The selected legacy EXR recorder has been deprecated.");
         }
     }
 }

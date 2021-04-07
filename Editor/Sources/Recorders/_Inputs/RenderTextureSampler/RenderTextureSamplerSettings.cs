@@ -101,18 +101,11 @@ namespace UnityEditor.Recorder.Input
         }
 
         /// <inheritdoc/>
-        protected internal override bool ValidityCheck(List<string> errors)
+        protected internal override void CheckForWarnings(List<string> warnings)
         {
-            var ok = true;
-
             var h = OutputHeight;
             if (h > kMaxSupportedSize)
-            {
-                ok = false;
-                errors.Add("Output size exceeds maximum supported height: " + kMaxSupportedSize + "px");
-            }
-
-            return ok;
+                warnings.Add($"The image size exceeds the recommended maximum height: {(int)kMaxSupportedSize} px");
         }
 
         /// <inheritdoc/>

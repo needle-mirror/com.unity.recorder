@@ -23,14 +23,8 @@ namespace UnityEditor.Recorder
         private SerializedProperty m_ShutterFullyOpen;
         private SerializedProperty m_ShutterBeginsClosing;
         private const int k_MaxSamples = 8192;
-
-        bool m_Initialized;
         void Initialize(SerializedProperty property)
         {
-            if (m_Initialized)
-                return;
-
-            m_Initialized = true;
             m_CaptureAccumulation = property.FindPropertyRelative("captureAccumulation");
             m_Samples = property.FindPropertyRelative("samples");
             m_ShutterInterval = property.FindPropertyRelative("shutterInterval");

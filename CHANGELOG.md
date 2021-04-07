@@ -1,17 +1,44 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [3.0.0-pre.1] - 2021-04-07
+### Added
+- Added public API for AOVRecorderSettings.
+
+### Changed
+- Enabled alpha channel capture in projects that use HDRP.
+- Changed the package display name from "Unity Recorder" to "Recorder" in the package manager.
+
+### Fixed
+- Fixed clipped text in the file path drop down.
+- Fixed an error that occurred when setting the build target to macOS standalone from the Editor in Windows.
+- Fixed an exception that occurred when the user performed the undo action after deleting a Recorder.
+- Fixed a wrong label for the WebM codec.
+- Fixed invalid values in the alpha channel when performing texture sampling for different rendering and output resolutions.
+- Ensure that the Image Recorder encodes in sRGB when requested, even if the scripted render pipeline provides linear data.
+- Fixed a memory leak in the AOV Recorder.
+- Fixed the Tagged Camera capture process to follow any camera changes that might occur.
+- Improve the console messages for errors and warnings when Recorders are not properly configured.
+
+### Removed
+- Removed legacy Recorders: MP4, EXR, PNG, WEBM and GIF Animation.
 
 ## [2.6.0-exp.4] - 2021-02-22
 ### Fixed
- - Fixed an invalid AOV error when selecting the Albedo AOV.
+- Fixed an "invalid AOV" error that occurred when selecting the Albedo AOV.
 
 ## [2.6.0-exp.3] - 2021-02-19
 ### Added
 - Added support for recording accumulation in HDRP, for motion blur and path tracer.
-- Integrated AOV Recorder into this package.
+- Integrated the AOV Recorder into this package.
+  <br />**Note:** If you previously installed the formerly separate AOV Recorder package, you should uninstall it to avoid any unexpected recording issues.
+
+### Fixed
+- Fixed an issue where the Recorder Window's display name would be incorrect when using the Recorder Editor Sample.
+- Fixed a UI issue where foldouts in the RecorderSettingPreset asset would not open when clicking their header name.
 
 ## [2.5.4] - 2021-01-25
 ### Fixed
@@ -49,7 +76,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed a bug where switching from an absolute path to any other path type would create an invalid output path.
 - Log a warning when multiple concurrent Movie Recorder instances are concurrent, because this is not supported.
 - Fixed a visual glitch with the "Cap FPS" checkbox extending outside its GUI element.
-- Forced the "Render Frame Step" values in Recorders to be larger than zero. 
+- Forced the "Render Frame Step" values in Recorders to be larger than zero.
 - Fixed a bug causing excessive Timeline updates while changing the output file.
 - Removed superfluous "CaptureAudio" option from the AudioRecorder.
 - Fixed a bug that caused Copy/Pasted RecorderClips to lose the settings when entering in playmode.
@@ -67,7 +94,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - UX improvements
 
 ### Bugfixes
-- Fixed a bug that in the texture sampler recorder for animated camera fov and animated physical properties 
+- Fixed a bug that in the texture sampler recorder for animated camera fov and animated physical properties
 - Fixed a bug that caused the recorder to hang when docked next to the GameView.
 - Fixed a bug that caused the recorder to hang if starting recording while already in playmode
 - Fixed a bug where the AudioRecorder would not close the handle to the recorded file.
@@ -85,8 +112,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [2.2.0-preview.4] - 2020-04-08
 ### Public API and bugfixes
 - Added public api's to allow loading previously saved recorder lists.
-- Fixed bug where the first few frames after going in play-mode were not recorded. 
-- Fixed a bug where the texture sampling recorder that did not correctly support the physical cameras. 
+- Fixed bug where the first few frames after going in play-mode were not recorded.
+- Fixed a bug where the texture sampling recorder that did not correctly support the physical cameras.
 - Fixed an issue when starting a record session from scripts.
 - Fixed movie recoder's default framerate value being not set in the API. Default value is now set at 30 FPS.
 

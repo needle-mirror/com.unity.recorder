@@ -22,9 +22,6 @@ namespace UnityEditor.Recorder.Timeline
             {
                 var recorderList = RecordersInventory.builtInRecorderInfos.ToList();
 
-                if (RecorderOptions.ShowLegacyRecorders)
-                    recorderList.AddRange(RecordersInventory.legacyRecorderInfos);
-
                 recorderList.AddRange(RecordersInventory.customRecorderInfos);
 
                 m_RecorderTypes = recorderList.Select(x => x.settingsType).ToList();
@@ -53,7 +50,7 @@ namespace UnityEditor.Recorder.Timeline
 
             if (newIndex < 0)
             {
-                // For instance a Recorder Clip for an AOV after the HDRP package has been removed
+                EditorGUILayout.EndHorizontal();
                 return;
             }
 

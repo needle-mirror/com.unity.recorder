@@ -28,7 +28,7 @@ namespace UnityEditor.Recorder.Timeline
         }
 
         /// <summary>
-        /// Unity Recorder does not support any clip features.
+        /// Recorder does not support any clip features.
         /// For more information see: https://docs.unity3d.com/2018.1/Documentation/ScriptReference/Timeline.ClipCaps.html
         /// </summary>
         public ClipCaps clipCaps

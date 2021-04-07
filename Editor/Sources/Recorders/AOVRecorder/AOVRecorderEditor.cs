@@ -18,7 +18,7 @@ namespace UnityEditor.Recorder
         {
             internal static readonly GUIContent FormatLabel = new GUIContent("Format");
             internal static readonly GUIContent AOVLabel = new GUIContent("Aov to Export", "The AOV render pass to record.");
-            internal static readonly GUIContent AOVCLabel = new GUIContent("Compression", "The data compression method to apply when using EXR format.");
+            internal static readonly GUIContent AOVCLabel = new GUIContent("Compression", "The data compression method to apply when using the EXR format.");
             internal static readonly GUIContent ColorSpace = new GUIContent("Color Space", "The color space (gamma curve, gamut) to use in the output images.\n\nIf you select an option to get unclamped values, you must:\n- Use High Definition Render Pipeline (HDRP).\n- Disable any Tonemapping in your Scene.\n- Disable Dithering on the selected Camera.");
         }
 
@@ -43,19 +43,21 @@ namespace UnityEditor.Recorder
 
             if (imageSettings.CanCaptureHDRFrames())
             {
-                ++EditorGUI.indentLevel;
                 m_ColorSpace.intValue =
                     EditorGUILayout.Popup(Styles.ColorSpace, m_ColorSpace.intValue, list_of_colorspaces);
-                --EditorGUI.indentLevel;
             }
             else
             {
                 using (new EditorGUI.DisabledScope(!imageSettings.CanCaptureHDRFrames()))
                 {
-                    ++EditorGUI.indentLevel;
                     EditorGUILayout.Popup(Styles.ColorSpace, 0, list_of_colorspaces);
-                    --EditorGUI.indentLevel;
                 }
+            }
+
+            if ((ImageRecorderSettings.ImageRecorderOutputFormat)m_OutputFormat.enumValueIndex ==
+                ImageRecorderSettings.ImageRecorderOutputFormat.EXR)
+            {
+                EditorGUILayout.PropertyField(m_EXRCompression, Styles.AOVCLabel);
             }
         }
 
@@ -76,7 +78,7 @@ namespace UnityEditor.Recorder
                 // HDRP_LIGHTDECO_API support has been removed from the project due to HDRP downgrading.
                 var colorToRestore = EditorStyles.label.normal.textColor;
                 EditorStyles.label.normal.textColor = Color.red;
-                EditorGUILayout.LabelField(Styles.AOVLabel.text, $"Value '{selectedAOV}' requires HDRP 8.9.9 or above.");
+                EditorGUILayout.LabelField(Styles.AOVLabel.text, $"You need HDRP 8.9.9 or above to record '{selectedAOV}'.");
                 EditorStyles.label.normal.textColor = colorToRestore;
             }
             else
@@ -85,9 +87,6 @@ namespace UnityEditor.Recorder
                 var newSelectedAOV = AOVCameraAOVRequestAPIInput.m_Aovs.Keys.ElementAt(selectedAOVIndexInSubset);
                 m_AOVSelection.intValue = (int)newSelectedAOV;
             }
-
-            if ((ImageRecorderSettings.ImageRecorderOutputFormat)m_OutputFormat.enumValueIndex == ImageRecorderSettings.ImageRecorderOutputFormat.EXR)
-                EditorGUILayout.PropertyField(m_EXRCompression, Styles.AOVCLabel);
 
             DrawSeparator();
 #else

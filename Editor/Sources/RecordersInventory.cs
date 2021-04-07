@@ -15,6 +15,7 @@ namespace UnityEditor.Recorder
         public Type settingsType;
         public string displayName;
         public string iconName;
+        public bool deprecated;
     }
 
     static class RecordersInventory
@@ -70,7 +71,8 @@ namespace UnityEditor.Recorder
                             settingsType = settingsType,
                             recorderType = settingsAttrib.recorderType,
                             displayName = settingsAttrib.displayName,
-                            iconName = settingsAttrib.iconName
+                            iconName = settingsAttrib.iconName,
+                            deprecated = settingsAttrib.deprecated
                         };
 
                         s_Recorders.Add(settingsType, info);
@@ -87,7 +89,6 @@ namespace UnityEditor.Recorder
                         s_Recorders[typeof(AnimationRecorderSettings)],
                         s_Recorders[typeof(MovieRecorderSettings)],
                         s_Recorders[typeof(ImageRecorderSettings)],
-                        s_Recorders[typeof(GIFRecorderSettings)],
 #if HDRP_AVAILABLE
                         s_Recorders[typeof(AOVRecorderSettings)],
 #endif
@@ -99,6 +100,9 @@ namespace UnityEditor.Recorder
                 {
                     s_LegacyRecorderInfos = new HashSet<RecorderInfo>
                     {
+#pragma warning disable 618
+                        s_Recorders[typeof(GIFRecorderSettings)],
+#pragma warning restore 618
                         s_Recorders[typeof(MP4RecorderSettings)],
                         s_Recorders[typeof(EXRRecorderSettings)],
                         s_Recorders[typeof(PNGRecorderSettings)],
@@ -146,7 +150,8 @@ namespace UnityEditor.Recorder
                 return custom;
 #else
                 // Remove AOV Recorder from list of custom because it will be inserted in the above catch-all other logic
-                return custom.Where(c => c.recorderType != typeof(AOVRecorder));
+                var result = custom.Where(c => c.recorderType != typeof(AOVRecorder));
+                return result;
 #endif
             }
         }

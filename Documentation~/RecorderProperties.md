@@ -18,8 +18,6 @@ Each type of Recorder has specific **Capture** and **Format** properties you mus
 
 - [**Image Sequence Recorder properties**](RecorderImage.md)
 
-- [**GIF Animation Recorder properties**](RecorderGif.md)
-
 - [**Audio Recorder properties**](RecorderAudio.md)
 
 - [**AOV Image Sequence Recorder properties**](RecorderAOV.md)

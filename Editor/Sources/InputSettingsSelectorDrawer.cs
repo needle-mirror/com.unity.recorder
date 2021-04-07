@@ -9,8 +9,6 @@ namespace UnityEditor.Recorder
     [CustomPropertyDrawer(typeof(InputSettingsSelector), true)]
     class InputSettingsSelectorDrawer : TargetedPropertyDrawer<InputSettingsSelector>
     {
-        bool m_Initialized;
-
         GUIContent[] m_DisplayNames;
         Dictionary<string, int> m_NameToIndex;
         Dictionary<int, SerializedProperty> m_IndexToProperty;
@@ -22,11 +20,7 @@ namespace UnityEditor.Recorder
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (!m_Initialized)
-            {
-                Initialize(property);
-                m_Initialized = true;
-            }
+            Initialize(property);
 
             if (m_DisplayNames.Length == 0)
             {

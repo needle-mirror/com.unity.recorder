@@ -1,17 +1,10 @@
 namespace UnityEditor.Recorder.FrameCapturer
 {
-    [RecorderSettings(typeof(WEBMRecorder), "Legacy/WebM")]
+    [RecorderSettings(typeof(WEBMRecorder), "Legacy/WebM", true)]
+#pragma warning disable 618
     class WEBMRecorderSettings : BaseFCRecorderSettings
     {
-        public fcAPI.fcWebMConfig m_WebmEncoderSettings = fcAPI.fcWebMConfig.default_value;
-        public bool m_AutoSelectBR;
-
-        public WEBMRecorderSettings()
-        {
-            fileNameGenerator.FileName = "movie";
-            m_AutoSelectBR = true;
-        }
-
+#pragma warning restore 618
         protected internal override string Extension
         {
             get { return "webm"; }

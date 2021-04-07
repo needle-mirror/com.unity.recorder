@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor.Media;
 using UnityEditor.Recorder;
+using UnityEditor.Recorder.Input;
 using UnityEngine;
 using static UnityEditor.Recorder.MovieRecorderSettings;
 
@@ -227,15 +228,22 @@ namespace Unity.Media
             attr = new List<IMediaEncoderAttribute>();
         }
 
-        internal virtual bool SupportsResolution(MovieRecorderSettings settings, int width, int height, out string errorMessage)
+        internal virtual bool SupportsResolution(MovieRecorderSettings settings, int width, int height, out string errorMessage, out string warningMessage)
         {
+            errorMessage = "";
+            warningMessage = "";
             if (width <= 0 || height <= 0)
             {
-                errorMessage = string.Format("Invalid input resolution {0} x {1}.", width, height);
-                return false;
+                var rtSettings = settings.ImageInputSettings as RenderTextureInputSettings;
+                var inputIsNullRT = rtSettings != null && rtSettings.renderTexture == null;
+                if (!inputIsNullRT)
+                {
+                    // We don't log this message for null RT input because in that case the fix should be to assign a RT
+                    errorMessage = string.Format("The encoder doesn't support the input resolution {0}x{1}.", width, height);
+                    return false;
+                }
             }
 
-            errorMessage = "";
             return true;
         }
 

@@ -31,12 +31,10 @@ namespace Unity.Media
             SupportedFormats = new[] { VideoRecorderOutputFormat.MP4, VideoRecorderOutputFormat.WebM };
         }
 
-        internal override bool SupportsResolution(MovieRecorderSettings settings, int width, int height, out string errorMessage)
+        internal override bool SupportsResolution(MovieRecorderSettings settings, int width, int height, out string errorMessage, out string warningMessage)
         {
-            if (!base.SupportsResolution(settings, width, height, out errorMessage))
-            {
+            if (!base.SupportsResolution(settings, width, height, out errorMessage, out warningMessage))
                 return false;
-            }
 
             errorMessage = "";
             if (settings.OutputFormat == VideoRecorderOutputFormat.MP4)
@@ -45,11 +43,6 @@ namespace Unity.Media
                 {
                     errorMessage = "The MP4 format does not support odd values in resolution";
                     return false;
-                }
-
-                if (width > 4096 || height > 4096)
-                {
-                    Debug.LogWarning(string.Format("MP4 format might not support resolutions bigger than 4096. Current resolution: {0} x {1}.", width, height));
                 }
             }
 

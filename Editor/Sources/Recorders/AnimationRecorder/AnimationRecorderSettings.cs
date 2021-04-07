@@ -78,17 +78,14 @@ namespace UnityEditor.Recorder
         }
 
         /// <inheritdoc/>
-        protected internal override bool ValidityCheck(List<string> errors)
+        protected internal override void GetErrors(List<string> errors)
         {
-            var ok = base.ValidityCheck(errors);
+            base.GetErrors(errors);
 
             if (m_AnimationInputSettings.gameObject == null)
-            {
-                ok = false;
-                errors.Add("No input object set");
-            }
-
-            return ok;
+                errors.Add("No assigned game object to record");
+            else if (m_AnimationInputSettings.bindingType.Count == 0)
+                errors.Add($"No components to record");
         }
 
         /// <inheritdoc/>

@@ -122,8 +122,10 @@ namespace UnityEditor.Recorder
                 recordingStartTS = (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale));
                 recorder.SignalInputsOfStage(ERecordingSessionStage.BeginRecording, this);
 
+                // This must be after the above call otherwise GameView will not be initialized
                 if (!recorder.BeginRecording(this))
                     return false;
+
                 m_InitialFrame = Time.renderedFrameCount;
                 m_FPSTimeStart = Time.unscaledTime;
 
@@ -138,9 +140,6 @@ namespace UnityEditor.Recorder
 
         internal void EndRecording()
         {
-            if (!isRecording)
-                return;
-
             try
             {
                 recorder.SignalInputsOfStage(ERecordingSessionStage.EndRecording, this);

@@ -34,7 +34,7 @@ namespace UnityEditor.Recorder
 
             if (settings.HasErrors())
             {
-                Debug.LogError($"The '{settings.name}' AOV Recorder has errors and will not save data.");
+                Debug.LogError($"The '{settings.name}' AOV Recorder has errors and cannot record any data.");
                 return false;
             }
 
@@ -80,7 +80,7 @@ namespace UnityEditor.Recorder
                 {
                     case ImageRecorderSettings.ImageRecorderOutputFormat.EXR:
                     {
-                        bytes = tex.EncodeToEXR(Settings.m_EXRCompression.ToNativeType());
+                        bytes = tex.EncodeToEXR(ImageRecorderSettings.ToNativeType(Settings.EXRCompression));
                         WriteToFile(bytes);
                         break;
                     }

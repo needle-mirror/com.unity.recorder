@@ -85,40 +85,21 @@ namespace UnityEditor.Recorder.AOV
         Depth = 17
     }
 
-    public enum AOVColorSpaceType
-    {
-        sRGB_sRGB,
-        Unclamped_linear_sRGB
-    }
-
     /// <summary>
-    /// Compression type for EXR files.
+    /// A class that represents the settings of an AOV Sequence Recorder.
     /// </summary>
-    public enum EXRCompressionType
-    {
-        /// <summary>
-        /// No compression.
-        /// </summary>
-        None,
-        /// <summary>
-        /// Run-length encoding compression.
-        /// </summary>
-        RLE,
-        /// <summary>
-        /// Zip compression.
-        /// </summary>
-        Zip
-    }
-
     [RecorderSettings(typeof(AOVRecorder), "AOV Image Sequence", "aovimagesequence_16")]
-    internal class AOVRecorderSettings : RecorderSettings
+    public class AOVRecorderSettings : RecorderSettings
     {
         [SerializeField] internal ImageRecorderSettings.ImageRecorderOutputFormat m_OutputFormat = ImageRecorderSettings.ImageRecorderOutputFormat.EXR;
         [SerializeField] internal AOVType m_AOVSelection = AOVType.Beauty;
-        [SerializeField] internal EXRCompressionType m_EXRCompression = EXRCompressionType.Zip;
+        [SerializeField] internal ImageRecorderSettings.EXRCompressionType m_EXRCompression = ImageRecorderSettings.EXRCompressionType.Zip;
         [SerializeField] internal AOVImageInputSelector m_AOVImageInputSelector = new AOVImageInputSelector();
-        [SerializeField] internal AOVColorSpaceType m_ColorSpace = AOVColorSpaceType.Unclamped_linear_sRGB;
+        [SerializeField] internal ImageRecorderSettings.ColorSpaceType m_ColorSpace = ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB;
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public AOVRecorderSettings()
         {
             FileNameGenerator.FileName = "aov_image_" + DefaultWildcard.Frame;
@@ -142,39 +123,72 @@ namespace UnityEditor.Recorder.AOV
             }
         }
 
+        /// <summary>
+        /// Indicates the selected AOV to render.
+        /// </summary>
+        public AOVType AOVSelection
+        {
+            get => m_AOVSelection;
+            set => m_AOVSelection = value;
+        }
+
+        /// <summary>
+        /// Stores the color space to use to encode the output image files.
+        /// </summary>
+        public ImageRecorderSettings.ColorSpaceType OutputColorSpace
+        {
+            get => m_ColorSpace;
+            set => m_ColorSpace = value;
+        }
+
+        /// <summary>
+        /// Stores the data compression method to use to encode image files in the EXR format.
+        /// </summary>
+        public ImageRecorderSettings.EXRCompressionType EXRCompression
+        {
+            get => m_EXRCompression;
+            set => m_EXRCompression = value;
+        }
+
         internal bool CanCaptureHDRFrames()
         {
             bool isFormatExr = m_OutputFormat == ImageRecorderSettings.ImageRecorderOutputFormat.EXR;
             return isFormatExr;
         }
 
-        public bool CaptureHDR
+        /// <summary>
+        /// Stores the output image format currently used for this Recorder.
+        /// </summary>
+        public ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat
         {
-            get => CanCaptureHDRFrames() && m_ColorSpace == AOVColorSpaceType.Unclamped_linear_sRGB;
+            get { return m_OutputFormat; }
+            set { m_OutputFormat = value; }
         }
 
+        /// <summary>
+        /// Use this property to capture the frames in HDR (if the setup supports it).
+        /// </summary>
+        public bool CaptureHDR
+        {
+            get => CanCaptureHDRFrames() && m_ColorSpace == ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB;
+        }
+
+        /// <summary>
+        /// The settings of the input image.
+        /// </summary>
         public ImageInputSettings imageInputSettings
         {
             get { return m_AOVImageInputSelector.imageInputSettings; }
             set { m_AOVImageInputSelector.imageInputSettings = value; }
         }
 
-        protected internal override bool ValidityCheck(List<string> errors)
+        protected internal override void GetErrors(List<string> errors)
         {
-            var ok = base.ValidityCheck(errors);
-
-            if (string.IsNullOrEmpty(FileNameGenerator.FileName))
-            {
-                ok = false;
-                errors.Add("missing file name");
-            }
+            base.GetErrors(errors);
 
 #if !HDRP_AVAILABLE
-            ok = false;
             errors.Add("HDRP package not available");
 #endif
-
-            return ok;
         }
 
 #if HDRP_AVAILABLE
@@ -200,6 +214,9 @@ namespace UnityEditor.Recorder.AOV
 #endif
         }
 
+        /// <summary>
+        /// The list of settings of the Recorder Inputs.
+        /// </summary>
         public override IEnumerable<RecorderInputSettings> InputsSettings
         {
             get { yield return m_AOVImageInputSelector.Selected; }

@@ -35,9 +35,6 @@ namespace UnityEditor.Recorder
                 s_OpenPathIcon = UnityHelpers.LoadLocalPackageAsset<Texture2D>($"{iconName}.png", true);
             }
 
-            if (target != null)
-                return;
-
             base.Initialize(property);
 
             m_FileName = property.FindPropertyRelative("m_FileName");

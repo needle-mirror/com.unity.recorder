@@ -33,7 +33,7 @@ namespace UnityEditor.Recorder
                 case MovieRecorderSettings.VideoRecorderOutputFormat.MP4:
                     return "H.264 MP4";
                 case MovieRecorderSettings.VideoRecorderOutputFormat.WebM:
-                    return "VP9 WebM";
+                    return "VP8 WebM";
                 case MovieRecorderSettings.VideoRecorderOutputFormat.MOV:
                     return "ProRes QuickTime";
                 default:
@@ -216,9 +216,7 @@ namespace UnityEditor.Recorder
             return AccumulationSettings;
         }
 
-        /// <summary>
-        /// Indicates whether the current Recorder supports Accumulation recording or not.
-        /// </summary>
+        /// <inheritdoc/>
         public override bool IsAccumulationSupported()
         {
             if (GetAccumulationSettings() != null)
@@ -338,30 +336,35 @@ namespace UnityEditor.Recorder
             }
         }
 
-        /// <inheritdoc/>
-        protected internal override bool ValidityCheck(List<string> errors)
+        protected internal override void GetWarnings(List<string> warnings)
         {
-            var ok = base.ValidityCheck(errors);
-
-            if (FrameRatePlayback == FrameRatePlayback.Variable)
-            {
-                errors.Add("Movie recorder does not properly support Variable frame rate playback. Please consider using Constant frame rate instead");
-                ok = false;
-            }
+            base.GetWarnings(warnings);
 
             var iis = m_ImageInputSelector.Selected as ImageInputSettings;
             if (iis != null)
             {
-                string errorMsg;
-                if (!encodersRegistered[encoderSelected]
-                    .SupportsResolution(this, iis.OutputWidth, iis.OutputHeight, out errorMsg))
-                {
-                    errors.Add(errorMsg);
-                    ok = false;
-                }
+                string errorMsg, warningMsg;
+                encodersRegistered[encoderSelected].SupportsResolution(this, iis.OutputWidth, iis.OutputHeight,
+                    out errorMsg, out warningMsg);
+                if (warningMsg != String.Empty)
+                    warnings.Add(warningMsg);
             }
+        }
 
-            return ok;
+        protected internal override void GetErrors(List<string> errors)
+        {
+            base.GetErrors(errors);
+
+            if (FrameRatePlayback == FrameRatePlayback.Variable)
+                errors.Add("Movie Recorder does not properly support variable frame rate playback. Consider using Constant frame rate instead.");
+
+            var iis = m_ImageInputSelector.Selected as ImageInputSettings;
+            if (iis != null)
+            {
+                string errorMsg, warningMsg;
+                if (!encodersRegistered[encoderSelected].SupportsResolution(this, iis.OutputWidth, iis.OutputHeight, out errorMsg, out warningMsg))
+                    errors.Add(errorMsg);
+            }
         }
 
         internal override void SelfAdjustSettings()

@@ -10,7 +10,7 @@ Use the general recording properties to simultaneously start or stop recordings 
 |:---|:---|:---|
 |![](Images/BtnRecord.png)<br/>**[Record Button]**   | | [Starts](#starting-a-recording) or [stops](#stopping-a-recording) a recording session.  |
 | **Start Recording**/<br/>**Stop Recording** | | This button has exactly the same function and behavior as the Record Button (see above). |
-|**Exit Play Mode**   | | When you enable this option, the Unity Recorder automatically exits Play mode when it finishes recording.  |
+|**Exit Play Mode**   | | When you enable this option, the Recorder automatically exits Play mode when it finishes recording.  |
 | **Recording Mode** ||Allows you to specify the frames or time interval to record.|
 ||_Manual_ |Start or stop recording when you manually click **Start Recording** or **Stop Recording**, respectively.|
 || _Single Frame_ |Record a single frame. Use the **Target Frame** property to specify this frame.|
@@ -28,13 +28,13 @@ Use the **Frame Rate** properties to specify how to constrain the frame rate dur
 | **Playback** ||Specifies how to control the frame rate during recording.|
 || _Constant_ |Limit the Recorder to a specific frame rate. Use the **Target** property to specify this rate.|
 || _Variable_ |Use the application's frame rate. Specify the upper limit of the application's rate during recording with the **Max FPS** property.<br/><br/> **Note:** The **Movie Recorder** does not support a variable frame rate.|
-| **Target FPS** ||Sets the frame rate to capture the recording at. This property appears when you set **Playback** to **Constant**. <br/><br/> The Unity Recorder captures at this rate regardless of whether you run your application at a higher or lower frame rate. For example, if you set **Target FPS** to a custom value of 30 fps but you run your application at 60 fps, the Recorder captures at 30 fps.|
-| **Max FPS** ||Limit the rate of updates in Play mode . This property is available when you set **Playback** to **Variable**. To prevent your application from exceeding this frame rate, the Unity Recorder inserts delays during playback. Use this property to reduce the size of the output.|
+| **Target FPS** ||Sets the frame rate to capture the recording at. This property appears when you set **Playback** to **Constant**. <br/><br/> The Recorder captures at this rate regardless of whether you run your application at a higher or lower frame rate. For example, if you set **Target FPS** to a custom value of 30 fps but you run your application at 60 fps, the Recorder captures at 30 fps.|
+| **Max FPS** ||Limit the rate of updates in Play mode . This property is available when you set **Playback** to **Variable**. To prevent your application from exceeding this frame rate, the Recorder inserts delays during playback. Use this property to reduce the size of the output.|
 | **Cap FPS** ||Enable this property when the frame rate of your application is faster than the **Target FPS**. This property is available when **Playback** is **Constant**.|
 
 ## Starting a recording
 
-When you use the Recorder window, you must always start the recording manually. When you start a recording, the Unity Recorder activates Play mode (if it is not already active) and starts to capture Play mode data using all active Recorders.
+When you use the Recorder window, you must always start the recording manually. When you start a recording, the Recorder activates Play mode (if it is not already active) and starts to capture Play mode data using all active Recorders.
 
 To start recording, you can do any of the following:
   - In the Recorder window, select the Record button or the **START RECORDING** button.

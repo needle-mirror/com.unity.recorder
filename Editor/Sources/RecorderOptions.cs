@@ -38,16 +38,6 @@ namespace UnityEditor.Recorder
             }
         }
 
-        /// <summary>
-        /// If true, legacy recorders will be displayed in the "Add New Recorder" menu.
-        /// Legacy recorders are deprecated and will be removed from the Unity Recorder in future releases.
-        /// </summary>
-        public static bool ShowLegacyRecorders
-        {
-            get { return EditorPrefs.GetBool(k_ShowLegacyModeMenuItem, false); }
-            set { EditorPrefs.SetBool(k_ShowLegacyModeMenuItem, value); }
-        }
-
         internal static bool exitPlayMode
         {
             get { return EditorPrefs.GetBool(k_ExitPayModeItem, false); }
@@ -94,21 +84,6 @@ namespace UnityEditor.Recorder
         static bool ToggleShowRecorderGameObjectValidate()
         {
             Menu.SetChecked(k_ShowRecorderGameObject, ShowRecorderGameObject);
-            return true;
-        }
-
-        [MenuItem(k_ShowLegacyModeMenuItem, false, RecorderWindow.MenuRootIndex + 200)]
-        static void ToggleShowLegacyRecorders()
-        {
-            var value = !ShowLegacyRecorders;
-            EditorPrefs.SetBool(k_ShowLegacyModeMenuItem, value);
-            ShowLegacyRecorders = value;
-        }
-
-        [MenuItem(k_ShowLegacyModeMenuItem, true)]
-        static bool ToggleShowLegacyRecordersValidate()
-        {
-            Menu.SetChecked(k_ShowLegacyModeMenuItem, ShowLegacyRecorders);
             return true;
         }
     }

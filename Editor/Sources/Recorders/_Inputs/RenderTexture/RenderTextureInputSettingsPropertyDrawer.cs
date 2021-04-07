@@ -18,11 +18,8 @@ namespace UnityEditor.Recorder.Input
         {
             base.Initialize(property);
 
-            if (m_SourceRTxtr == null)
-                m_SourceRTxtr = property.FindPropertyRelative("renderTexture");
-
-            if (m_FlipFinalOutput == null)
-                m_FlipFinalOutput = property.FindPropertyRelative("flipFinalOutput");
+            m_SourceRTxtr = property.FindPropertyRelative("renderTexture");
+            m_FlipFinalOutput = property.FindPropertyRelative("flipFinalOutput");
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

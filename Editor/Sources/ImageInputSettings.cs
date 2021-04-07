@@ -79,27 +79,23 @@ namespace UnityEditor.Recorder.Input
             return v;
         }
 
-        /// <inheritdoc />
-        protected internal override bool ValidityCheck(List<string> errors)
+        protected internal override void CheckForWarnings(List<string> warnings)
         {
-            var ok = true;
+            base.CheckForWarnings(warnings);
+
+            if (OutputHeight > (int)maxSupportedSize)
+                warnings.Add($"The image size exceeds the recommended maximum height of {(int)maxSupportedSize} px: {OutputHeight}");
+        }
+
+        protected internal override void CheckForErrors(List<string> errors)
+        {
+            base.CheckForErrors(errors);
 
             var h = OutputHeight;
-
-            if (h > (int)maxSupportedSize)
-            {
-                ok = false;
-                errors.Add("Output size exceeds maximum supported height: " + (int)maxSupportedSize + "px");
-            }
-
             var w = OutputWidth;
-            if (w <= 0 || h <= 0)
-            {
-                ok = false;
-                errors.Add("Invalid output resolution: " + w + "x" + h);
-            }
 
-            return ok;
+            if (w <= 0 || h <= 0)
+                errors.Add($"Invalid source image resolution {w}x{h}");
         }
     }
 }

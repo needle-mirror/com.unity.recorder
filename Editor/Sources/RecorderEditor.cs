@@ -180,13 +180,28 @@ namespace UnityEditor.Recorder
         /// </summary>
         protected virtual void OnValidateSettingsGUI()
         {
-            var errors = new List<string>();
-            if (!((RecorderSettings)target).ValidityCheck(errors))
+            var oldWarnings = new List<string>();
+            var targetSettings = target as RecorderSettings;
+#pragma warning disable 618
+            if (!targetSettings.ValidityCheck(oldWarnings))
+#pragma warning restore 618
             {
-                foreach (var error in errors)
-                    EditorGUILayout.HelpBox(error, MessageType.Warning);
-                OnRecorderValidated?.Invoke();
+                foreach (var e in oldWarnings)
+                    EditorGUILayout.HelpBox(e, MessageType.Warning);
             }
+
+            var warnings = new List<string>();
+            targetSettings.GetWarnings(warnings);
+            foreach (var w in warnings)
+                EditorGUILayout.HelpBox(w, MessageType.Warning);
+
+            var errors = new List<string>();
+            targetSettings.GetErrors(errors);
+            foreach (var e in errors)
+                EditorGUILayout.HelpBox(e, MessageType.Error);
+
+            if (oldWarnings.Count > 0 || warnings.Count > 0 || errors.Count > 0)
+                OnRecorderValidated?.Invoke();
         }
 
         internal virtual bool DrawCaptureSection()

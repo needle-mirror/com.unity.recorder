@@ -1,6 +1,6 @@
 # Movie Recorder properties
 
-The **Movie Recorder** generates videos in the H.264 MP4, VP9 WebM, or ProRes QuickTime format. It does not support variable frame rates.
+The **Movie Recorder** generates videos in the H.264 MP4, VP8 WebM, or ProRes QuickTime format. It does not support variable frame rates.
 
 This page covers all properties specific to the Movie Recorder type.
 
@@ -53,9 +53,9 @@ Use this section to set up the media format you need to save the recorded images
 
 |Property|Function|
 |:---|:---|
-| **Media File Format** | The encoding format of the Recorder's output. Choose **H.264 MP4**, **VP9 WebM** or **ProRes QuickTime**. |
+| **Media File Format** | The encoding format of the Recorder's output. Choose **H.264 MP4**, **VP8 WebM** or **ProRes QuickTime**. |
 | **Include Alpha** | Enable this property to include the alpha channel in the recording. Disable it to only record the RGB channels.<br/><br/>This property is not available when the selected **Media File Format** or **Codec Format** doesn't support transparency, or when **Capture** is set to **Game View**. |
-| **Quality** | The quality of the output movie: **Low**, **Medium**, or **High**. The lower the quality, the smaller the file size.<br/><br/>This property is only available when you set the **Media File Format** to **H.264 MP4** or **VP9 WebM**. |
+| **Quality** | The quality of the output movie: **Low**, **Medium**, or **High**. The lower the quality, the smaller the file size.<br/><br/>This property is only available when you set the **Media File Format** to **H.264 MP4** or **VP8 WebM**. |
 | **Codec Format** | The video codec to use to encode the output file. Choose among a variety of [**Apple ProRes**](https://en.wikipedia.org/wiki/Apple_ProRes) codecs: **ProRes 4444 XQ**, **ProRes 4444**, **ProRes 422 HQ**, **ProRes 422**, **ProRes 422 LT** or **ProRes 422 Proxy**.<br/><br/>This property is only available when you set the **Media File Format** to **ProRes QuickTime**. |
 | **Color Definition** | The video color space to use for the recording. Currently, the only available option is **HD Rec. 709**, which refers to HDTV standard.<br/><br/>This property is only available when you set the **Media File Format** to **ProRes QuickTime**. |
 

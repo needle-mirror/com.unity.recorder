@@ -1,15 +1,10 @@
 namespace UnityEditor.Recorder.FrameCapturer
 {
-    [RecorderSettings(typeof(EXRRecorder), "Legacy/OpenEXR")]
+    [RecorderSettings(typeof(EXRRecorder), "Legacy/OpenEXR", true)]
+#pragma warning disable 618
     class EXRRecorderSettings : BaseFCRecorderSettings
     {
-        public fcAPI.fcExrConfig m_ExrEncoderSettings = fcAPI.fcExrConfig.default_value;
-
-        public EXRRecorderSettings()
-        {
-            fileNameGenerator.FileName = "image_" + DefaultWildcard.Frame;
-        }
-
+#pragma warning restore 618
         protected internal override string Extension
         {
             get { return "exr"; }

@@ -16,17 +16,10 @@ namespace UnityEditor.Recorder
         {
             base.Initialize(property);
 
-            if (m_RootProperty == null)
-                m_RootProperty = property.FindPropertyRelative("m_Root");
-
-            if (m_LeafProperty == null)
-                m_LeafProperty = property.FindPropertyRelative("m_Leaf");
-
-            if (m_ForceAssetFolder == null)
-                m_ForceAssetFolder = property.FindPropertyRelative("m_ForceAssetFolder");
-
-            if (m_AbsolutePathProperty == null)
-                m_AbsolutePathProperty = property.FindPropertyRelative("m_AbsolutePath");
+            m_RootProperty = property.FindPropertyRelative("m_Root");
+            m_LeafProperty = property.FindPropertyRelative("m_Leaf");
+            m_ForceAssetFolder = property.FindPropertyRelative("m_ForceAssetFolder");
+            m_AbsolutePathProperty = property.FindPropertyRelative("m_AbsolutePath");
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -40,7 +33,7 @@ namespace UnityEditor.Recorder
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
 
-            const float rootWidth = 110.0f;
+            const float rootWidth = 125.0f;
             const float btnWidth = 30.0f;
 
             var leafWidth = target.forceAssetsFolder ? position.width - rootWidth : position.width - rootWidth - btnWidth - 10;

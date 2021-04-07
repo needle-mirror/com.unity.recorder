@@ -8,7 +8,6 @@
   * [Animation Clip Recorder](RecorderAnimation.md)
   * [Movie Recorder](RecorderMovie.md)
   * [Image Sequence Recorder](RecorderImage.md)
-  * [GIF Animation Recorder](RecorderGif.md)
   * [Audio Recorder](RecorderAudio.md)
   * [AOV Recorder](RecorderAOV.md)
 * [Debugging recorders](RecorderDebugging.md)

@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Serialization;
 
 namespace UnityEditor.Recorder
 {
@@ -31,9 +30,59 @@ namespace UnityEditor.Recorder
             /// </summary>
             EXR
         }
-        internal enum ColorSpaceType
+
+        /// <summary>
+        /// Compression type for EXR files.
+        /// </summary>
+        public enum EXRCompressionType
         {
+            /// <summary>
+            /// No compression.
+            /// </summary>
+            None,
+            /// <summary>
+            /// Run-length encoding compression.
+            /// </summary>
+            RLE,
+            /// <summary>
+            /// Zip compression.
+            /// </summary>
+            Zip
+        }
+
+        static internal Texture2D.EXRFlags ToNativeType(EXRCompressionType type)
+        {
+            Texture2D.EXRFlags nativeType = Texture2D.EXRFlags.None;
+            switch (type)
+            {
+                case ImageRecorderSettings.EXRCompressionType.RLE:
+                    nativeType = Texture2D.EXRFlags.CompressRLE;
+                    break;
+                case ImageRecorderSettings.EXRCompressionType.Zip:
+                    nativeType = Texture2D.EXRFlags.CompressZIP;
+                    break;
+                case ImageRecorderSettings.EXRCompressionType.None:
+                    nativeType = Texture2D.EXRFlags.None;
+                    break;
+                default:
+                    throw new InvalidEnumArgumentException($"Unexpected compression type '{type}'.");
+            }
+
+            return nativeType;
+        }
+
+        /// <summary>
+        /// Color Space (gamma curve, gamut) to use in the output images.
+        /// </summary>
+        public enum ColorSpaceType
+        {
+            /// <summary>
+            /// The sRGB color space.
+            /// </summary>
             sRGB_sRGB,
+            /// <summary>
+            /// The linear sRGB color space.
+            /// </summary>
             Unclamped_linear_sRGB
         }
 
@@ -68,11 +117,12 @@ namespace UnityEditor.Recorder
         /// </summary>
         public bool CaptureHDR
         {
-            get { return CanCaptureHDRFrames() && m_ColorSpace == ColorSpaceType.Unclamped_linear_sRGB;; }
+            get { return CanCaptureHDRFrames() && m_ColorSpace == ColorSpaceType.Unclamped_linear_sRGB; }
         }
 
 
         [SerializeField] ImageInputSelector m_ImageInputSelector = new ImageInputSelector();
+        [SerializeField] internal ImageRecorderSettings.EXRCompressionType m_EXRCompression = ImageRecorderSettings.EXRCompressionType.Zip;
         [SerializeField] internal ColorSpaceType m_ColorSpace = ColorSpaceType.Unclamped_linear_sRGB;
         /// <summary>
         /// Default constructor.
@@ -102,18 +152,30 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
+        /// Stores the data compression method to use to encode image files in the EXR format.
+        /// </summary>
+        public EXRCompressionType EXRCompression
+        {
+            get => m_EXRCompression;
+            set => m_EXRCompression = value;
+        }
+
+        /// <summary>
+        /// Stores the color space to use to encode the output image files.
+        /// </summary>
+        public ColorSpaceType OutputColorSpace
+        {
+            get => m_ColorSpace;
+            set => m_ColorSpace = value;
+        }
+
+        /// <summary>
         /// The settings of the input image.
         /// </summary>
         public ImageInputSettings imageInputSettings
         {
             get { return m_ImageInputSelector.ImageInputSettings; }
             set { m_ImageInputSelector.ImageInputSettings = value; }
-        }
-
-        protected internal override bool ValidityCheck(List<string> errors)
-        {
-            var ok = base.ValidityCheck(errors);
-            return ok;
         }
 
         /// <summary>
@@ -136,7 +198,7 @@ namespace UnityEditor.Recorder
             bool formatSupportAlpha = OutputFormat == ImageRecorderOutputFormat.PNG ||
                 OutputFormat == ImageRecorderOutputFormat.EXR;
             bool inputSupportAlpha = imageInputSettings.SupportsTransparent;
-            return (formatSupportAlpha && inputSupportAlpha && !UnityHelpers.UsingHDRP());
+            return (formatSupportAlpha && inputSupportAlpha && !UnityHelpers.UsingURP());
         }
 
         internal override void SelfAdjustSettings()
@@ -183,9 +245,7 @@ namespace UnityEditor.Recorder
             return AccumulationSettings;
         }
 
-        /// <summary>
-        /// Indicates if the current Recorder supports Accumulation recording (True) or not (False).
-        /// </summary>
+        /// <inheritdoc/>
         public override bool IsAccumulationSupported()
         {
             if (GetAccumulationSettings() != null)
@@ -198,6 +258,29 @@ namespace UnityEditor.Recorder
                 }
             }
             return false;
+        }
+
+        internal override bool NeedToConvertFromLinearToSRGB()
+        {
+            // We need to convert from linear to sRGB for image recorders only if the project settings say linear and the
+            // output is expected to be sRGB
+            var expectSRGB = false;
+            switch (OutputFormat)
+            {
+                case ImageRecorderOutputFormat.EXR:
+                    expectSRGB = m_ColorSpace == ColorSpaceType.sRGB_sRGB;
+                    break;
+                case ImageRecorderOutputFormat.PNG:
+                case ImageRecorderOutputFormat.JPEG:
+                    expectSRGB = true; // PNG & JPEG must always be sRGB
+                    break;
+                default:
+                    throw new InvalidEnumArgumentException(
+                        $"Unexpected image output format '{OutputFormat}'");
+            }
+
+            var convertLinearToSrgb = PlayerSettings.colorSpace == ColorSpace.Linear && expectSRGB;
+            return convertLinearToSrgb;
         }
     }
 }

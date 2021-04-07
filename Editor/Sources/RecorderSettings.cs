@@ -189,11 +189,12 @@ namespace UnityEditor.Recorder
         /// </summary>
         protected RecorderSettings()
         {
-            fileNameGenerator = new FileNameGenerator(this)
+            fileNameGenerator = new FileNameGenerator()
             {
                 Root = OutputPath.Root.Project,
                 Leaf = "Recordings"
             };
+            fileNameGenerator.RecorderSettings = this;
         }
 
         /// <summary>
@@ -201,6 +202,7 @@ namespace UnityEditor.Recorder
         /// </summary>
         /// <param name="errors">List of errors encountered.</param>
         /// <returns>True if there are no errors, False otherwise.</returns>
+        [Obsolete("Please use methods GetErrors() and GetWarnings()")]
         protected internal virtual bool ValidityCheck(List<string> errors)
         {
             var ok = true;
@@ -208,9 +210,9 @@ namespace UnityEditor.Recorder
             if (InputsSettings != null)
             {
                 var inputErrors = new List<string>();
-
+#pragma warning disable 618
                 var valid = InputsSettings.All(x => x.ValidityCheck(inputErrors));
-
+#pragma warning restore 618
                 if (!valid)
                 {
                     errors.AddRange(inputErrors);
@@ -218,25 +220,56 @@ namespace UnityEditor.Recorder
                 }
             }
 
+            return ok;
+        }
+
+        /// <summary>
+        /// Tests if the Recorder has any errors.
+        /// </summary>
+        /// <param name="errors">List of errors encountered.</param>
+        protected internal virtual void GetErrors(List<string> errors)
+        {
+            if (InputsSettings != null)
+            {
+                foreach (var i in InputsSettings)
+                {
+                    var inputErrors = new List<string>();
+                    i.CheckForErrors(inputErrors);
+                    errors.AddRange(inputErrors);
+                }
+            }
+
             if (string.IsNullOrEmpty(fileNameGenerator.FileName))
             {
                 errors.Add("Missing file name");
-                ok = false;
             }
 
             if (Math.Abs(FrameRate) <= float.Epsilon)
             {
-                ok = false;
                 errors.Add("Invalid frame rate");
             }
 
             if (!IsPlatformSupported)
             {
                 errors.Add("Current platform is not supported");
-                ok  = false;
             }
+        }
 
-            return ok;
+        /// <summary>
+        /// Tests if the Recorder has any warnings.
+        /// </summary>
+        /// <param name="warnings">List of warnings encountered.</param>
+        protected internal virtual void GetWarnings(List<string> warnings)
+        {
+            if (InputsSettings != null)
+            {
+                foreach (var i in InputsSettings)
+                {
+                    var inputWarnings = new List<string>();
+                    i.CheckForWarnings(inputWarnings);
+                    warnings.AddRange(inputWarnings);
+                }
+            }
         }
 
         /// <summary>
@@ -267,14 +300,23 @@ namespace UnityEditor.Recorder
         {
         }
 
+        // Errors mean that the inspector will be blank so don't use them yet for problems that can be fixed in the inspector
         protected internal virtual bool HasErrors()
         {
             return false;
         }
 
+        // For now both errors and warnings make the recording invalid
         internal virtual bool HasWarnings()
         {
-            return !ValidityCheck(new List<string>());
+            var errors = new List<string>();
+            var warnings = new List<string>();
+#pragma warning disable 618
+            ValidityCheck(warnings);
+#pragma warning restore 618
+            GetErrors(errors);
+            GetWarnings(warnings);
+            return errors.Count > 0 || warnings.Count > 0;
         }
 
         /// <summary>
@@ -289,7 +331,16 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Indicates whether the current Recorder supports Accumulation recording or not.
         /// </summary>
+        /// <returns>True if the current Recorder supports Accumulation recording, False otherwise.</returns>
         public virtual bool IsAccumulationSupported()
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Indicates whether the color space should be converted from linear to sRGB or not.
+        /// </summary>
+        internal virtual bool NeedToConvertFromLinearToSRGB()
         {
             return false;
         }

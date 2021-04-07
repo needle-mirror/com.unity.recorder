@@ -60,18 +60,11 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
-        /// <inheritdoc/>
-        protected internal override bool ValidityCheck(List<string> errors)
+        protected internal override void CheckForErrors(List<string> errors)
         {
-            var ok = true;
-
+            base.CheckForErrors(errors);
             if (renderTexture == null)
-            {
-                ok = false;
                 errors.Add("Missing source render texture object/asset.");
-            }
-
-            return ok;
         }
     }
 }

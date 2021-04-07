@@ -1,11 +1,10 @@
 using System.IO;
-using System.Threading;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 #if HDRP_ACCUM_API
 using UnityEngine.Rendering.HighDefinition;
 #endif
@@ -102,7 +101,7 @@ namespace UnityEditor.Recorder
         {
             get
             {
-                return "Unity Recorder " + PackageVersion;
+                return "Recorder " + PackageVersion;
             }
         }
 
@@ -121,37 +120,6 @@ namespace UnityEditor.Recorder
             }
         }
         private static string m_PackageVersion = "";
-
-        /// <summary>
-        /// Perform a vertical flip of the supplied texture.
-        /// </summary>
-        /// <param name="tex">The texture to flip</param>
-        /// <param name="captureAlpha">Whether or not to include transparency</param>
-        /// <returns></returns>
-        internal static Texture2D FlipTextureVertically(Texture2D tex, bool captureAlpha)
-        {
-            var FlippedTexture = new Texture2D(tex.width, tex.height, tex.format, false);
-            // Texture2D -> RenderTexture for flip
-            var active = RenderTexture.active; // remember for later
-            var rt = RenderTexture.GetTemporary(tex.width, tex.height);
-            RenderTexture.active = rt;
-            // Use flip material
-            var copyMaterial = new Material(Shader.Find("Hidden/Recorder/Inputs/CameraInput/Copy"));
-            if (captureAlpha)
-                copyMaterial.EnableKeyword("TRANSPARENCY_ON");
-            copyMaterial.EnableKeyword("VERTICAL_FLIP");
-            Graphics.Blit(tex, rt, copyMaterial); // Copy Texture2D to RenderTexture using the shader above
-            // Flipped RenderTexture -> Texture2D
-            RenderTexture.active = rt;
-            FlippedTexture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
-            FlippedTexture.Apply();
-
-            // Restore initial active RT
-            RenderTexture.active = active; // restore
-            RenderTexture.ReleaseTemporary(rt);
-
-            return FlippedTexture;
-        }
 
         /// <summary>
         /// Convert an RGBA32 texture to an RGB24 one.

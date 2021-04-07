@@ -1,4 +1,5 @@
 using UnityEditor.Animations;
+using UnityEngine;
 
 namespace UnityEditor.Recorder.Input
 {
@@ -21,7 +22,7 @@ namespace UnityEditor.Recorder.Input
             var srcGO = aniSettings.gameObject;
 
             if (srcGO == null)
-                throw new System.NullReferenceException("srcGO");
+                return; // error message will be posted by AnimationRecorderSettings.GetErrors
 
             GameObjectRecorder = new GameObjectRecorder(srcGO);
 

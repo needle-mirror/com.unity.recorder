@@ -70,16 +70,11 @@ namespace UnityEditor.Recorder.Input
         }
 
         /// <inheritdoc/>
-        protected internal override bool ValidityCheck(List<string> errors)
+        protected internal override void CheckForErrors(List<string> errors)
         {
-            var ok = base.ValidityCheck(errors);
+            base.CheckForErrors(errors);
             if (Source == ImageSource.TaggedCamera && string.IsNullOrEmpty(CameraTag))
-            {
-                ok = false;
                 errors.Add("Missing tag for camera selection");
-            }
-
-            return ok;
         }
     }
 }

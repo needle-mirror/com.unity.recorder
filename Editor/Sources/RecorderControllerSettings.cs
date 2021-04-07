@@ -204,6 +204,8 @@ namespace UnityEditor.Recorder
         /// <param name="recorder">The Recorder Settings instance to add.</param>
         public void AddRecorderSettings(RecorderSettings recorder)
         {
+            EditorUtility.SetDirty(this);
+            Undo.RegisterCompleteObjectUndo(this, "Add Recorder");
             if (!m_RecorderSettings.Contains(recorder))
             {
                 AddRecorderInternal(recorder);
@@ -219,7 +221,10 @@ namespace UnityEditor.Recorder
         {
             if (m_RecorderSettings.Contains(recorder))
             {
+                EditorUtility.SetDirty(this);
+                Undo.RegisterCompleteObjectUndo(this, "Remove Recorder");
                 m_RecorderSettings.Remove(recorder);
+                Undo.DestroyObjectImmediate(recorder);
                 Save();
             }
         }

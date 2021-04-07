@@ -22,7 +22,8 @@ namespace UnityEditor.Recorder
 
         protected internal override bool BeginRecording(RecordingSession session)
         {
-            if (!base.BeginRecording(session)) { return false; }
+            if (!base.BeginRecording(session))
+                return false;
 
             Settings.fileNameGenerator.CreateDirectory(session);
 
@@ -55,7 +56,7 @@ namespace UnityEditor.Recorder
                         bytes = tex.EncodeToJPG();
                         break;
                     case ImageRecorderSettings.ImageRecorderOutputFormat.EXR:
-                        bytes = tex.EncodeToEXR();
+                        bytes = tex.EncodeToEXR(ImageRecorderSettings.ToNativeType(Settings.EXRCompression));
                         break;
                     default:
                         Profiler.EndSample();

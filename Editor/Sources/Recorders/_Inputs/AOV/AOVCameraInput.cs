@@ -298,6 +298,15 @@ namespace UnityEditor.Recorder.Input
             base.FrameDone(session);
             DisableAOVCapture(session);
         }
+
+        protected internal override void EndRecording(RecordingSession session)
+        {
+            base.EndRecording(session);
+            if (m_ColorRT != null)
+                UnityHelpers.Destroy(m_ColorRT);
+            if (m_TempRT != null)
+                UnityHelpers.Destroy(m_TempRT);
+        }
     }
 }
 #else // HDRP_AVAILABLE

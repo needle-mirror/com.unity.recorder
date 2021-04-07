@@ -13,8 +13,6 @@ namespace UnityEditor.Recorder
 
         SerializedProperty m_ImageAspect;
 
-        bool m_Initialized;
-
         const string k_Format = "0.0###";
         static GUIContent[] s_DisplayNames;
 
@@ -32,11 +30,6 @@ namespace UnityEditor.Recorder
 
         void Initialize(SerializedProperty property)
         {
-            if (m_Initialized)
-                return;
-
-            m_Initialized = true;
-
             m_CustomAspectX = property.FindPropertyRelative("m_CustomAspectX");
             m_CustomAspectY = property.FindPropertyRelative("m_CustomAspectY");
 

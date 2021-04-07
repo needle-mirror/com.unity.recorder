@@ -27,11 +27,5 @@ namespace UnityEditor.Recorder.Input
         {
             get { return typeof(AudioInput); }
         }
-
-        /// <inheritdoc/>
-        protected internal override bool ValidityCheck(List<string> errors)
-        {
-            return true;
-        }
     }
 }

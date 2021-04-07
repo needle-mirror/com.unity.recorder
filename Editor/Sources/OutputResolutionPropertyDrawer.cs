@@ -15,7 +15,6 @@ namespace UnityEditor.Recorder
 
         ImageHeightSelector m_HeightSelector;
 
-        bool m_Initialized;
 
         static class Styles
         {
@@ -34,11 +33,6 @@ namespace UnityEditor.Recorder
 
         void Initialize(SerializedProperty property)
         {
-            if (m_Initialized)
-                return;
-
-            m_Initialized = true;
-
             m_CustomWidth = property.FindPropertyRelative("m_CustomWidth");
             m_CustomHeight = property.FindPropertyRelative("m_CustomHeight");
 
