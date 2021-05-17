@@ -10,6 +10,7 @@ namespace UnityEditor.Recorder
         BeginRecording,
         NewFrameStarting,
         NewFrameReady,
+        SkipFrame,
         FrameDone,
         EndRecording,
         SessionCreated
@@ -296,6 +297,11 @@ namespace UnityEditor.Recorder
                     foreach (var input in m_Inputs)
                         input.NewFrameReady(session);
                     break;
+                case ERecordingSessionStage.SkipFrame:
+                    foreach (var input in m_Inputs)
+                        input.SkipFrame(session);
+                    break;
+
                 case ERecordingSessionStage.FrameDone:
                     foreach (var input in m_Inputs)
                         input.FrameDone(session);

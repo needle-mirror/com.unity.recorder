@@ -4,6 +4,14 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0-pre.2] - 2021-05-17
+### Added
+- Added support for arm64 macOS.
+
+### Fixed
+- (macOS) Fixed an image stride issue for ProRes formats 4444 and 4444XQ.
+- Fixed audio recording issue when the frame interval is not starting at 0.
+
 ## [3.0.0-pre.1] - 2021-04-07
 ### Added
 - Added public API for AOVRecorderSettings.
@@ -14,7 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed clipped text in the file path drop down.
-- Fixed an error that occurred when setting the build target to macOS standalone from the Editor in Windows.
 - Fixed an exception that occurred when the user performed the undo action after deleting a Recorder.
 - Fixed a wrong label for the WebM codec.
 - Fixed invalid values in the alpha channel when performing texture sampling for different rendering and output resolutions.
@@ -39,6 +46,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed an issue where the Recorder Window's display name would be incorrect when using the Recorder Editor Sample.
 - Fixed a UI issue where foldouts in the RecorderSettingPreset asset would not open when clicking their header name.
+
+## [2.5.5] - 2021-02-26
+### Fixed
+- Fixed an error that occurred when setting the build target to macOS standalone from the Editor in Windows.
 
 ## [2.5.4] - 2021-01-25
 ### Fixed

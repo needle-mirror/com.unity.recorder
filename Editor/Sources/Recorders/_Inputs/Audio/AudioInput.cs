@@ -160,6 +160,12 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
+        internal override void SkipFrame(RecordingSession session)
+        {
+            // Audio input must render the audio frame when a frame is skipped
+            NewFrameReady(session);
+        }
+
         protected internal override void FrameDone(RecordingSession session)
         {
         }

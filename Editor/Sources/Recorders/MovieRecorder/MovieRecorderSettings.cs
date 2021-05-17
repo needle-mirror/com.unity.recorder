@@ -273,21 +273,28 @@ namespace UnityEditor.Recorder
             // For all assemblies find all MediaEncoderRegister
             foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
             {
-                var allTypes = a.GetTypes();
-                var encoders = allTypes.Where(
-                    type => type.IsSubclassOf(typeof(MediaEncoderRegister))
-                );
-#if UNITY_EDITOR_LINUX
-                // Ignore ProRes
-                encoders = encoders.Where(
-                    type => type != typeof(ProResEncoderRegister)
-                );
-#endif
-                foreach (var e in encoders)
+                try
                 {
-                    var o = Activator.CreateInstance(e);
-                    var mr = o as MediaEncoderRegister;
-                    encodersRegistered.Add(mr);
+                    var allTypes = a.GetTypes();
+                    var encoders = allTypes.Where(
+                        type => type.IsSubclassOf(typeof(MediaEncoderRegister))
+                    );
+    #if UNITY_EDITOR_LINUX
+                    // Ignore ProRes
+                    encoders = encoders.Where(
+                        type => type != typeof(ProResEncoderRegister)
+                    );
+    #endif
+                    foreach (var e in encoders)
+                    {
+                        var o = Activator.CreateInstance(e);
+                        var mr = o as MediaEncoderRegister;
+                        encodersRegistered.Add(mr);
+                    }
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    Debug.LogWarning($"Failed to look for Movie Encoders in assembly '{a.FullName}': {e.Message}");
                 }
             }
         }

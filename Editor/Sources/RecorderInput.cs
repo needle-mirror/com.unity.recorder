@@ -48,6 +48,8 @@ namespace UnityEditor.Recorder
 
         protected internal virtual void NewFrameStarting(RecordingSession session) {}
 
+        internal virtual void SkipFrame(RecordingSession session) {}
+
         protected internal virtual void NewFrameReady(RecordingSession session) {}
 
         protected internal virtual void FrameDone(RecordingSession session) {}

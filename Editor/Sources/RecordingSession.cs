@@ -170,6 +170,10 @@ namespace UnityEditor.Recorder
                     }
                     recorder.SignalInputsOfStage(ERecordingSessionStage.FrameDone, this);
                 }
+                else
+                {
+                    recorder.SignalInputsOfStage(ERecordingSessionStage.SkipFrame, this);
+                }
             }
             catch (Exception ex)
             {
@@ -225,11 +229,15 @@ namespace UnityEditor.Recorder
             try
             {
                 AllowInBackgroundMode();
-                currentFrameStartTS = (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale)) - recordingStartTS;
-
-                recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameStarting, this);
-                recorder.PrepareNewFrame(this);
-                m_SubFrameIndex++;
+                currentFrameStartTS =
+                    (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale)) -
+                    recordingStartTS;
+                if (!recorder.SkipFrame(this))
+                {
+                    recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameStarting, this);
+                    recorder.PrepareNewFrame(this);
+                    m_SubFrameIndex++;
+                }
             }
             catch (Exception ex)
             {

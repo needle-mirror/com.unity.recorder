@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Reflection;
 #if HDRP_AVAILABLE
 using UnityEditor.Recorder.AOV;
 #endif
@@ -34,9 +35,9 @@ namespace UnityEditor.Recorder
                 {
                     types = a.GetTypes();
                 }
-                catch (Exception)
+                catch (ReflectionTypeLoadException e)
                 {
-                    Debug.LogError("Failed reflecting assembly: " + a.FullName);
+                    Debug.LogWarning($"Failed to look for Recorder Settings in assembly '{a.FullName}': {e.Message}");
                     continue;
                 }
 
