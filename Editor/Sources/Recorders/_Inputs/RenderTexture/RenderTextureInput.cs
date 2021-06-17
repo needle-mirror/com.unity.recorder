@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 
 namespace UnityEditor.Recorder.Input
@@ -11,6 +12,9 @@ namespace UnityEditor.Recorder.Input
 
         // Whether or not the incoming RenderTexture must be converted from linear to sRGB color space
         private bool m_needToConvertLinearToSRGB = false;
+
+        // Whether or not the incoming RenderTexture must be converted from sRGB to linear color space
+        private bool m_needToConvertSRGBToLinear = false;
 
         RenderTextureInputSettings cbSettings => (RenderTextureInputSettings)settings;
 
@@ -46,8 +50,35 @@ namespace UnityEditor.Recorder.Input
                 m_needToFlipVertically = m_needToFlipVertically ? encoderAlreadyFlips : !encoderAlreadyFlips;
             }
 
-            m_needToConvertLinearToSRGB = session.settings.NeedToConvertFromLinearToSRGB();
-            if (m_needToFlipVertically || m_needToConvertLinearToSRGB)
+            var requiredColorSpace = ImageRecorderSettings.ColorSpaceType.sRGB_sRGB;
+            if (session.settings is ImageRecorderSettings)
+            {
+                requiredColorSpace = ((ImageRecorderSettings)session.settings).OutputColorSpaceComputed;
+            }
+            else if (session.settings is MovieRecorderSettings)
+            {
+                requiredColorSpace = ImageRecorderSettings.ColorSpaceType.sRGB_sRGB; // always sRGB
+            }
+            var renderTextureColorSpace = UnityHelpers.GetColorSpaceType(cbSettings.renderTexture.graphicsFormat); // the color space of the RenderTexture
+            var projectColorSpace = PlayerSettings.colorSpace;
+
+            // Log warnings in unsupported contexts
+            if (projectColorSpace == ColorSpace.Gamma)
+            {
+                if (requiredColorSpace == ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB)
+                    Debug.LogWarning($"Gamma color space does not support linear output format. This operation is not supported.");
+
+                if (renderTextureColorSpace != ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB)
+                    Debug.LogWarning($"Gamma color space does not support non-linear textures. This operation is not supported.");
+            }
+
+            // We convert from linear to sRGB if the project is linear + the source RT is linear + the output color space is sRGB
+            m_needToConvertLinearToSRGB = (projectColorSpace == ColorSpace.Linear && renderTextureColorSpace == ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB) && requiredColorSpace == ImageRecorderSettings.ColorSpaceType.sRGB_sRGB;
+
+            // We convert from sRGB to linear if the RT is sRGB (gamma) and the output color space is linear (e.g., linear EXR)
+            m_needToConvertSRGBToLinear = renderTextureColorSpace == ImageRecorderSettings.ColorSpaceType.sRGB_sRGB && requiredColorSpace == ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB;
+
+            if (m_needToFlipVertically || m_needToConvertLinearToSRGB || m_needToConvertSRGBToLinear)
             {
                 workTexture = new RenderTexture(OutputRenderTexture);
                 workTexture.name = "RenderTextureInput_intermediate";
@@ -64,8 +95,13 @@ namespace UnityEditor.Recorder.Input
 
             if (m_needToConvertLinearToSRGB)
                 MaterialRenderTextureCopy.EnableKeyword("SRGB_CONVERSION");
+            else if (m_needToConvertSRGBToLinear)
+                MaterialRenderTextureCopy.EnableKeyword("LINEAR_CONVERSION");
 
-            if (m_needToFlipVertically || m_needToConvertLinearToSRGB)
+            if (!cbSettings.renderTexture.IsCreated())
+                Debug.LogError($"The render texture '{cbSettings.renderTexture.name}' was not created before being sampled. Its content is invalid.");
+
+            if (m_needToFlipVertically || m_needToConvertLinearToSRGB || m_needToConvertSRGBToLinear)
             {
                 // Perform the actual conversion
                 var rememberActive = RenderTexture.active;

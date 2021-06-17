@@ -336,13 +336,5 @@ namespace UnityEditor.Recorder
         {
             return false;
         }
-
-        /// <summary>
-        /// Indicates whether the color space should be converted from linear to sRGB or not.
-        /// </summary>
-        internal virtual bool NeedToConvertFromLinearToSRGB()
-        {
-            return false;
-        }
     }
 }

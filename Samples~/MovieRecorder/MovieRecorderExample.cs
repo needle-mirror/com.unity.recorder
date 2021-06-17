@@ -10,7 +10,7 @@ namespace UnityEngine.Recorder.Examples
 {
     /// <summary>
     /// This example shows how to set up a recording session via script, for an MP4 file.
-    /// To use this example, add the MultipleRecordingsExample component to a GameObject.
+    /// To use this example, add the MovieRecorderExample component to a GameObject.
     ///
     /// Enter the Play Mode to start the recording.
     /// The recording automatically stops when you exit the Play Mode or when you disable the component.

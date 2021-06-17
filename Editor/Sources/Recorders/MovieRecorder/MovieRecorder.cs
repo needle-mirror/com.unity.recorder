@@ -216,18 +216,17 @@ namespace UnityEditor.Recorder
             WarnOfConcurrentRecorders();
         }
 
+        // Override the parent code from BaseTextureRecorder because it converts the GPU readback request to a Texture2D, a costly operation.
+        // The encoder API already provides a way to encode frames coming from a GPU readback request, leading to better performance.
         protected override void WriteFrame(AsyncGPUReadbackRequest r)
         {
-            var format = Settings.GetCurrentEncoder().GetTextureFormat(Settings);
             if (r.hasError)
             {
-                var rtInput = Settings.ImageInputSettings as RenderTextureInputSettings;
-                if (rtInput != null)
-                    ConsoleLogMessage("The rendered image has errors. Verify that the Render Texture correctly receives data.", LogType.Error);
-                else
-                    ConsoleLogMessage("The rendered image has errors.", LogType.Error);
+                ConsoleLogMessage("The rendered image has errors. Skipping this frame.", LogType.Error);
                 return;
             }
+
+            var format = Settings.GetCurrentEncoder().GetTextureFormat(Settings);
             Settings.m_EncoderManager.AddFrame(m_EncoderHandle, r.width, r.height, 0, format, r.GetData<byte>());
             WarnOfConcurrentRecorders();
         }

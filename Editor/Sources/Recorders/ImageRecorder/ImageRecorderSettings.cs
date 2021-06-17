@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 namespace UnityEditor.Recorder
 {
@@ -169,6 +171,29 @@ namespace UnityEditor.Recorder
             set => m_ColorSpace = value;
         }
 
+        // This is necessary because the value in OutputColorSpace might hold invalid information (e.g. for PNG and JPEG it
+        // could say Linear) because the value doesn't change when the output format is changed.
+        // See the handling of the color space dropdown in ImageRecorderEditor.FileTypeAndFormatGUI.
+        internal ColorSpaceType OutputColorSpaceComputed
+        {
+            get
+            {
+                switch (OutputFormat)
+                {
+                    case ImageRecorderOutputFormat.PNG:
+                    case ImageRecorderOutputFormat.JPEG:
+                        return ColorSpaceType.sRGB_sRGB; // these formats must always be sRGB
+                    case ImageRecorderOutputFormat.EXR:
+                        if (CanCaptureHDRFrames())
+                            return OutputColorSpace;
+                        else
+                            return ColorSpaceType.sRGB_sRGB; // must be sRGB
+                    default:
+                        throw new InvalidEnumArgumentException($"Unexpected output format {OutputFormat}");
+                }
+            }
+        }
+
         /// <summary>
         /// The settings of the input image.
         /// </summary>
@@ -210,7 +235,7 @@ namespace UnityEditor.Recorder
             var renderTextureSamplerSettings = input as RenderTextureSamplerSettings;
             if (renderTextureSamplerSettings != null)
             {
-                var colorSpace = OutputFormat == ImageRecorderOutputFormat.EXR ? ColorSpace.Linear : ColorSpace.Gamma;
+                var colorSpace = OutputFormat == ImageRecorderOutputFormat.EXR ? UnityEngine.ColorSpace.Linear : UnityEngine.ColorSpace.Gamma;
                 renderTextureSamplerSettings.ColorSpace = colorSpace;
             }
 
@@ -258,29 +283,6 @@ namespace UnityEditor.Recorder
                 }
             }
             return false;
-        }
-
-        internal override bool NeedToConvertFromLinearToSRGB()
-        {
-            // We need to convert from linear to sRGB for image recorders only if the project settings say linear and the
-            // output is expected to be sRGB
-            var expectSRGB = false;
-            switch (OutputFormat)
-            {
-                case ImageRecorderOutputFormat.EXR:
-                    expectSRGB = m_ColorSpace == ColorSpaceType.sRGB_sRGB;
-                    break;
-                case ImageRecorderOutputFormat.PNG:
-                case ImageRecorderOutputFormat.JPEG:
-                    expectSRGB = true; // PNG & JPEG must always be sRGB
-                    break;
-                default:
-                    throw new InvalidEnumArgumentException(
-                        $"Unexpected image output format '{OutputFormat}'");
-            }
-
-            var convertLinearToSrgb = PlayerSettings.colorSpace == ColorSpace.Linear && expectSRGB;
-            return convertLinearToSrgb;
         }
     }
 }

@@ -152,6 +152,8 @@ namespace UnityEditor.Recorder.Input
 
         public static void SelectSize(object size)
         {
+            if (size == null)
+                return;
             var index = IndexOf(size);
 
             var gameView = GetMainGameView();

@@ -3,6 +3,7 @@ using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 #if HDRP_ACCUM_API
@@ -212,6 +213,17 @@ namespace UnityEditor.Recorder
             }
 #endif
             return false;
+        }
+
+        /// <summary>
+        /// Returns the color space of the specified graphics format.
+        /// </summary>
+        /// <param name="format">The graphics format to probe.</param>
+        /// <returns></returns>
+        internal static ImageRecorderSettings.ColorSpaceType GetColorSpaceType(GraphicsFormat format)
+        {
+            // All sRGB formats end with "_SRGB"?
+            return format.ToString().EndsWith("_SRGB") ? ImageRecorderSettings.ColorSpaceType.sRGB_sRGB : ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB;
         }
     }
 }

@@ -29,3 +29,20 @@ This page lists some known issues and limitations that you might experience with
 **Known issue:** If you record multiple AOVs while the recording camera has Temporal Anti-Aliasing (TAA) enabled, the recorded outputs might contain unexpected color artifacts. For example, some areas of a Beauty pass might include artificial colors coming from the data recorded for a Normal pass.
 
 **Workaround:** If you need to record a Beauty pass with TAA enabled on your recording camera, you should record it through its own recording session, separately from any other AOVs.
+
+#### Images vertically flipped on OpenGL with Unity Editor 2021.2
+
+**Known issue:** On OpenGL hardware, with Unity Editor 2021.2, the recorded output is vertically flipped for all input sources.
+
+**Workaround:** In the Recorder properties, enable the **Flip Vertical** option, and then start a new recording. Note that this option is not available if you are using the Game View as the source of the recording. To solve this, you can still use a Targeted Camera as the source instead of the Game View.
+
+<a name="360-view"></a>
+#### 360 View recording issues and limitations
+
+The Recorder doesn't fully support 360 View recording. Here is a list of known issues you might encounter:
+
+* If you record a 360 View in projects that use the High Definition Render Pipeline (HDRP), the rendered cube map might have artefacts that make its boundaries visible. One way to work around this issue would be to disable post-process effects such as Shadows, Bloom, or Volumetric Fogs.
+
+* If you record a 360 View through a Physical Camera, the rendered image is not equirectangular, which makes the output media unusable. To work around the issue, use a regular Camera for the recording.
+
+* The Recorder doesn't support stereoscopic recording in projects that use any Scriptable Render Pipelines (SRPs). The **Stereo Separation** property has no effect on the recorded views, which makes the rendering identical for both eyes.

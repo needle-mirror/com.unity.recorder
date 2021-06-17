@@ -4,6 +4,16 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2021-06-17
+### Changed
+- Prevent invalid GPU callback data from being written to a frame: this change skips the problematic frame and logs an error message.
+
+### Fixed
+- Do not perform the color space conversion from linear to sRGB for RenderTextures that are already sRGB.
+- Ensure that the color space conversion from sRGB to linear is performed when required for EXR files
+- Fixed an exception that occurred when sending a RenderTexture to a Recorder before creating this RenderTexture.
+- Fixed issues with the Recorder samples about synchronizing multiple recordings and resetting the Game view resolution.
+
 ## [3.0.0-pre.2] - 2021-05-17
 ### Added
 - Added support for arm64 macOS.
@@ -11,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - (macOS) Fixed an image stride issue for ProRes formats 4444 and 4444XQ.
 - Fixed audio recording issue when the frame interval is not starting at 0.
+- Fixed image artifacts on the first recorded frame with HDRP and TAA enabled.
 
 ## [3.0.0-pre.1] - 2021-04-07
 ### Added

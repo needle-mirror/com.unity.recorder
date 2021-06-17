@@ -167,6 +167,12 @@ namespace UnityEditor.Recorder
         /// <param name="r">The asynchronous readback target.</param>
         protected virtual void WriteFrame(AsyncGPUReadbackRequest r)
         {
+            if (r.hasError)
+            {
+                ConsoleLogMessage("The rendered image has errors. Skipping this frame.", LogType.Error);
+                return;
+            }
+
             if (m_ReadbackTexture == null)
                 m_ReadbackTexture = CreateReadbackTexture(r.width, r.height);
             Profiler.BeginSample("BaseTextureRecorder.LoadRawTextureData");

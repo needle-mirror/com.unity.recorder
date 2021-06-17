@@ -77,8 +77,7 @@ namespace UnityEngine.Recorder.Examples
             {
                 Source = ImageSource.MainCamera,
                 OutputWidth = 1920,
-                OutputHeight = 1080,
-                CaptureUI = true
+                OutputHeight = 1080
             };
 
             // Setup Recording

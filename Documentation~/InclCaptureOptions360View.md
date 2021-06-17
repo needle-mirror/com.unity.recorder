@@ -2,6 +2,8 @@ These properties appear when you set **Source** to **360 View**.
 
 To capture 360 degree recordings, the Recorder rotates the **Camera** 360 degrees around its **Y** axis.
 
+**Note:** The Recorder doesn't fully support 360 View recording. See the [Known issues and limitations](KnownIssues.md#360-view) for more details. 
+
 ![](Images/CaptureOptions360View.png)
 
 |Property||Function|

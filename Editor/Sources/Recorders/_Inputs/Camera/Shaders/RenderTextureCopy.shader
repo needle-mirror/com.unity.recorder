@@ -15,7 +15,8 @@ Shader "Hidden/RenderTextureCopy"
             #include "UnityCG.cginc"
 			#define FLT_EPSILON     1.192092896e-07 // Smallest positive number, such that 1.0 + FLT_EPSILON != 1.0
             #pragma multi_compile ___ VERTICAL_FLIP
-            #pragma multi_compile ___ SRGB_CONVERSION
+            #pragma multi_compile ___ SRGB_CONVERSION // perform linear -> sRGB
+            #pragma multi_compile ___ LINEAR_CONVERSION // perform sRGB -> linear
 
             UNITY_DECLARE_SCREENSPACE_TEXTURE(_MainTex);
             uniform float4 _MainTex_ST;
@@ -39,6 +40,20 @@ Shader "Hidden/RenderTextureCopy"
 			float4 LinearToSRGB(float4 c)
 			{
 				return float4(LinearToSRGB(c.rgb), c.a);
+			}
+
+            // See https://entropymine.com/imageworsener/srgbformula/
+            float3 SRGBToLinear(float3 c)
+			{
+				float3 LinearLo = c / 12.92;
+				float3 LinearHi = PositivePow((c + 0.055)/1.055, float3(2.4, 2.4, 2.4));
+				float3 Linear   = (c <= 0.04045) ? LinearLo : LinearHi;
+				return Linear;
+			}
+
+			float4 SRGBToLinear(float4 c)
+			{
+				return float4(SRGBToLinear(c.rgb), c.a);
 			}
 
             struct appdata_t {
@@ -75,6 +90,8 @@ Shader "Hidden/RenderTextureCopy"
 
                 #if defined(SRGB_CONVERSION)
 				    return LinearToSRGB(color);
+                #elif defined(LINEAR_CONVERSION)
+				    return SRGBToLinear(color);
                 #else
                     return color;
                 #endif
