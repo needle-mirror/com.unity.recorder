@@ -7,9 +7,6 @@ namespace UnityEditor.Recorder.Input
 {
     class RenderTextureInput : BaseRenderTextureInput
     {
-        // Whether or not the incoming RenderTexture must be flipped vertically
-        private bool m_needToFlipVertically = false;
-
         // Whether or not the incoming RenderTexture must be converted from linear to sRGB color space
         private bool m_needToConvertLinearToSRGB = false;
 
@@ -28,6 +25,13 @@ namespace UnityEditor.Recorder.Input
             {
                 if (_matSRGBConversion == null)
                     _matSRGBConversion = new Material(Shader.Find("Hidden/RenderTextureCopy"));
+
+                if (NeedToFlipVertically != null && NeedToFlipVertically.Value)
+                    _matSRGBConversion.EnableKeyword("VERTICAL_FLIP");
+                if (m_needToConvertLinearToSRGB)
+                    _matSRGBConversion.EnableKeyword("SRGB_CONVERSION");
+                else if (m_needToConvertSRGBToLinear)
+                    _matSRGBConversion.EnableKeyword("LINEAR_CONVERSION");
                 return _matSRGBConversion;
             }
         }
@@ -42,13 +46,8 @@ namespace UnityEditor.Recorder.Input
             OutputWidth = cbSettings.OutputWidth;
             OutputRenderTexture = cbSettings.renderTexture;
 
-            m_needToFlipVertically = cbSettings.FlipFinalOutput; // whether or not the recorder settings have the flip box checked
-            var movieRecorderSettings = session.settings as MovieRecorderSettings;
-            if (movieRecorderSettings != null)
-            {
-                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-                m_needToFlipVertically = m_needToFlipVertically ? encoderAlreadyFlips : !encoderAlreadyFlips;
-            }
+            var encoderAlreadyFlips = session.settings.EncoderAlreadyFlips();
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(cbSettings.FlipFinalOutput, this, encoderAlreadyFlips);
 
             var requiredColorSpace = ImageRecorderSettings.ColorSpaceType.sRGB_sRGB;
             if (session.settings is ImageRecorderSettings)
@@ -78,7 +77,7 @@ namespace UnityEditor.Recorder.Input
             // We convert from sRGB to linear if the RT is sRGB (gamma) and the output color space is linear (e.g., linear EXR)
             m_needToConvertSRGBToLinear = renderTextureColorSpace == ImageRecorderSettings.ColorSpaceType.sRGB_sRGB && requiredColorSpace == ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB;
 
-            if (m_needToFlipVertically || m_needToConvertLinearToSRGB || m_needToConvertSRGBToLinear)
+            if (NeedToFlipVertically.Value || m_needToConvertLinearToSRGB || m_needToConvertSRGBToLinear)
             {
                 workTexture = new RenderTexture(OutputRenderTexture);
                 workTexture.name = "RenderTextureInput_intermediate";
@@ -90,18 +89,10 @@ namespace UnityEditor.Recorder.Input
             if (cbSettings.renderTexture == null)
                 return; // error will have been triggered in BeginRecording()
 
-            if (m_needToFlipVertically)
-                MaterialRenderTextureCopy.EnableKeyword("VERTICAL_FLIP");
-
-            if (m_needToConvertLinearToSRGB)
-                MaterialRenderTextureCopy.EnableKeyword("SRGB_CONVERSION");
-            else if (m_needToConvertSRGBToLinear)
-                MaterialRenderTextureCopy.EnableKeyword("LINEAR_CONVERSION");
-
             if (!cbSettings.renderTexture.IsCreated())
                 Debug.LogError($"The render texture '{cbSettings.renderTexture.name}' was not created before being sampled. Its content is invalid.");
 
-            if (m_needToFlipVertically || m_needToConvertLinearToSRGB || m_needToConvertSRGBToLinear)
+            if ((NeedToFlipVertically != null && NeedToFlipVertically.Value) || m_needToConvertLinearToSRGB || m_needToConvertSRGBToLinear)
             {
                 // Perform the actual conversion
                 var rememberActive = RenderTexture.active;
@@ -129,6 +120,8 @@ namespace UnityEditor.Recorder.Input
                 UnityHelpers.Destroy(workTexture);
                 workTexture = null;
             }
+
+            NeedToFlipVertically = null; // This variable is not valid anymore
         }
     }
 }

@@ -12,6 +12,7 @@ Shader "Hidden/Recorder/Inputs/MakeOpaque" {
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
+            #pragma multi_compile ___ VERTICAL_FLIP
 
             UNITY_DECLARE_SCREENSPACE_TEXTURE(_MainTex);
             uniform float4 _MainTex_ST;
@@ -42,7 +43,11 @@ Shader "Hidden/Recorder/Inputs/MakeOpaque" {
             fixed4 frag (v2f i) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-                fixed4 result = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, i.texcoord) * _Color;
+                float2 t = i.texcoord;
+                #if defined(VERTICAL_FLIP)
+                t.y = 1.0 - t.y;
+                #endif
+                fixed4 result = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, t) * _Color;
 				result.a = 1.0;
 				return result;
             }

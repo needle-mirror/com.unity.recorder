@@ -7,7 +7,6 @@ namespace UnityEditor.Recorder.Input
     class GameViewInput : BaseRenderTextureInput
     {
         bool m_ModifiedResolution;
-        TextureFlipper m_VFlipper;
         RenderTexture m_CaptureTexture;
         RenderTexture m_TempCaptureTextureOpaque; // A temp RenderTexture for alpha conversion
         Material m_ToOpaqueMaterial = null;
@@ -18,6 +17,9 @@ namespace UnityEditor.Recorder.Input
             {
                 if (m_ToOpaqueMaterial == null)
                     m_ToOpaqueMaterial = new Material(Shader.Find("Hidden/Recorder/Inputs/MakeOpaque"));
+
+                if (NeedToFlipVertically != null && NeedToFlipVertically.Value)
+                    m_ToOpaqueMaterial.EnableKeyword("VERTICAL_FLIP");
                 return m_ToOpaqueMaterial;
             }
         }
@@ -27,7 +29,7 @@ namespace UnityEditor.Recorder.Input
             get { return (GameViewInputSettings)settings; }
         }
 
-        internal void MakeFullyOpaque(Texture tex)
+        internal void MakeFullyOpaqueAndPerformVFlip(Texture tex)
         {
             var rememberActive = RenderTexture.active;
             if (tex is RenderTexture)
@@ -56,19 +58,9 @@ namespace UnityEditor.Recorder.Input
         {
             Profiler.BeginSample("GameViewInput.NewFrameReady");
             ScreenCapture.CaptureScreenshotIntoRenderTexture(m_CaptureTexture);
-            var movieRecorderSettings = session.settings as MovieRecorderSettings;
-            bool needToFlip = scSettings.FlipFinalOutput;
-            if (movieRecorderSettings != null)
-            {
-                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-                needToFlip &= encoderAlreadyFlips;
-            }
 
-            if (needToFlip)
-                OutputRenderTexture = m_VFlipper?.Flip(m_CaptureTexture);
-
-            // Force opaque alpha channel
-            MakeFullyOpaque(OutputRenderTexture);
+            // Force opaque alpha channel and perform vertical flip if necessary
+            MakeFullyOpaqueAndPerformVFlip(OutputRenderTexture);
             Profiler.EndSample();
         }
 
@@ -115,21 +107,12 @@ namespace UnityEditor.Recorder.Input
             m_CaptureTexture.name = "GameViewInput_mCaptureTexture";
 
             var movieRecorderSettings = session.settings as MovieRecorderSettings;
-            bool needToFlip = scSettings.FlipFinalOutput;
+            bool encoderAlreadyFlips = false;
             if (movieRecorderSettings != null)
-            {
-                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-                needToFlip &= encoderAlreadyFlips;
-            }
+                encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
 
-            if (needToFlip)
-            {
-                m_VFlipper = new TextureFlipper(false);
-                m_VFlipper.Init(m_CaptureTexture);
-                OutputRenderTexture = m_VFlipper.workTexture;
-            }
-            else
-                OutputRenderTexture = m_CaptureTexture;
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(false, this, encoderAlreadyFlips);
+            OutputRenderTexture = m_CaptureTexture;
 #endif
         }
 
@@ -137,6 +120,7 @@ namespace UnityEditor.Recorder.Input
         {
             base.EndRecording(session);
             RenderTexture.ReleaseTemporary(m_TempCaptureTextureOpaque);
+            NeedToFlipVertically = null; // This variable is not valid anymore
         }
 
         protected internal override void FrameDone(RecordingSession session)
@@ -157,9 +141,6 @@ namespace UnityEditor.Recorder.Input
                         GameViewSize.RestoreSize();
                 }
             }
-
-            m_VFlipper?.Dispose();
-            m_VFlipper = null;
 
             base.Dispose(disposing);
         }

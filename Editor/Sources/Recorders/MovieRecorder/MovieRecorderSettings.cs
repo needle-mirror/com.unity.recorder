@@ -420,10 +420,6 @@ namespace UnityEditor.Recorder
                 }
             }
 
-            var gis = selectedInput as GameViewInputSettings;
-            if (gis != null)
-                gis.FlipFinalOutput = SystemInfo.supportsAsyncGPUReadback;
-
             m_ImageInputSelector.ForceEvenResolution(OutputFormat == VideoRecorderOutputFormat.MP4);
         }
     }

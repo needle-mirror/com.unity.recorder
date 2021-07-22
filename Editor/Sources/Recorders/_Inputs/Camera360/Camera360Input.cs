@@ -7,7 +7,6 @@ namespace UnityEditor.Recorder.Input
     class Camera360Input : BaseRenderTextureInput
     {
         bool m_ModifiedResolution;
-        TextureFlipper m_VFlipper = new TextureFlipper();
 
         RenderTexture m_Cubemap1;
         RenderTexture m_Cubemap2;
@@ -19,13 +18,43 @@ namespace UnityEditor.Recorder.Input
 
         Camera targetCamera { get; set; }
 
+        private Material copyMaterial
+        {
+            get
+            {
+                if (m_CopyMaterial == null)
+                    m_CopyMaterial = new Material(copyShader);
+
+                if ((NeedToFlipVertically != null && NeedToFlipVertically.Value))
+                    m_CopyMaterial.EnableKeyword("VERTICAL_FLIP");
+                return m_CopyMaterial;
+            }
+        }
+        private Material m_CopyMaterial;
+
+        private Shader copyShader
+        {
+            get
+            {
+                if (m_CopyShader == null)
+                    m_CopyShader = Shader.Find("Hidden/Recorder/Inputs/CameraInput/Copy");
+                return m_CopyShader;
+            }
+        }
+        private Shader m_CopyShader;
+
+        RenderTexture m_TempCaptureTextureVFlip; // A temp RenderTexture for vertical flips
+
         protected internal override void BeginRecording(RecordingSession session)
         {
-            if (settings360.FlipFinalOutput)
-                m_VFlipper = new TextureFlipper();
+            var encoderAlreadyFlips = session.settings.EncoderAlreadyFlips();
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(settings360.FlipFinalOutput, this, encoderAlreadyFlips);
 
             OutputWidth = settings360.OutputWidth;
             OutputHeight = settings360.OutputHeight;
+
+            if (NeedToFlipVertically.Value)
+                m_TempCaptureTextureVFlip = RenderTexture.GetTemporary(OutputWidth, OutputHeight);
         }
 
         protected internal override void NewFrameStarting(RecordingSession session)
@@ -93,21 +122,25 @@ namespace UnityEditor.Recorder.Input
                 m_Cubemap1.ConvertToEquirect(OutputRenderTexture);
             }
 
-            var movieRecorderSettings = session.settings as MovieRecorderSettings;
-            bool needToFlip = settings360.FlipFinalOutput; // whether or not the recorder settings have the flip box checked
-            if (movieRecorderSettings != null)
+            if (NeedToFlipVertically != null && NeedToFlipVertically.Value)
             {
-                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-                needToFlip = needToFlip ? encoderAlreadyFlips : !encoderAlreadyFlips;
+                var rememberActive = RenderTexture.active;
+                Graphics.Blit(OutputRenderTexture, m_TempCaptureTextureVFlip); // copy tex to rt
+                Graphics.Blit(m_TempCaptureTextureVFlip, OutputRenderTexture, copyMaterial); // copy rt to tex with vflip
+                RenderTexture.active = rememberActive; // restore active  RT
             }
-
-            if (needToFlip)
-                OutputRenderTexture = m_VFlipper.Flip(OutputRenderTexture);
 
             targetCamera.stereoSeparation = eyesEyeSepBackup;
             targetCamera.stereoTargetEye = eyeMaskBackup;
 
             GL.sRGBWrite = sRGBWrite;
+        }
+
+        protected internal override void EndRecording(RecordingSession session)
+        {
+            base.EndRecording(session);
+            RenderTexture.ReleaseTemporary(m_TempCaptureTextureVFlip);
+            NeedToFlipVertically = null; // This variable is not valid anymore
         }
 
         protected override void Dispose(bool disposing)
@@ -119,9 +152,6 @@ namespace UnityEditor.Recorder.Input
 
                 if (m_Cubemap2)
                     UnityHelpers.Destroy(m_Cubemap2);
-
-                if (m_VFlipper != null)
-                    m_VFlipper.Dispose();
             }
 
             base.Dispose(disposing);

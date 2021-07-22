@@ -19,6 +19,11 @@ namespace UnityEditor.Recorder
         protected internal Texture2D ReadbackTexture { get; set; }
 
         /// <summary>
+        /// Indicates whether or not the texture needs to be flipped vertically after being grabbed.
+        /// </summary>
+        internal bool? NeedToFlipVertically { get; set; }
+
+        /// <summary>
         /// Stores the output image width.
         /// </summary>
         public int OutputWidth { get; protected set; }

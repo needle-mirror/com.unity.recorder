@@ -30,12 +30,6 @@ This page lists some known issues and limitations that you might experience with
 
 **Workaround:** If you need to record a Beauty pass with TAA enabled on your recording camera, you should record it through its own recording session, separately from any other AOVs.
 
-#### Images vertically flipped on OpenGL with Unity Editor 2021.2
-
-**Known issue:** On OpenGL hardware, with Unity Editor 2021.2, the recorded output is vertically flipped for all input sources.
-
-**Workaround:** In the Recorder properties, enable the **Flip Vertical** option, and then start a new recording. Note that this option is not available if you are using the Game View as the source of the recording. To solve this, you can still use a Targeted Camera as the source instead of the Game View.
-
 <a name="360-view"></a>
 #### 360 View recording issues and limitations
 

@@ -336,5 +336,14 @@ namespace UnityEditor.Recorder
         {
             return false;
         }
+
+        internal bool EncoderAlreadyFlips()
+        {
+            var movieRecorderSettings = this as MovieRecorderSettings;
+            bool encoderAlreadyFlips = false;
+            if (movieRecorderSettings != null)
+                encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
+            return encoderAlreadyFlips;
+        }
     }
 }

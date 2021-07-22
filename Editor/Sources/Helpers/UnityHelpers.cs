@@ -1,6 +1,8 @@
+using System.ComponentModel;
 using System.IO;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
+using UnityEditor.Recorder.Input;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -224,6 +226,51 @@ namespace UnityEditor.Recorder
         {
             // All sRGB formats end with "_SRGB"?
             return format.ToString().EndsWith("_SRGB") ? ImageRecorderSettings.ColorSpaceType.sRGB_sRGB : ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB;
+        }
+
+        /// <summary>
+        /// Returns the Recorder-specific color space matching the Unity color space.
+        /// </summary>
+        /// <param name="space">The Unity color space to probe</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidEnumArgumentException">Throws an exception if the enum value is not as expected.</exception>
+        internal static ImageRecorderSettings.ColorSpaceType GetColorSpaceType(ColorSpace space)
+        {
+            switch (space)
+            {
+                case ColorSpace.Gamma:
+                    return ImageRecorderSettings.ColorSpaceType.sRGB_sRGB;
+                case ColorSpace.Linear:
+                    return ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB;
+                default:
+                    throw new InvalidEnumArgumentException($"Unexpected color space '{space}'");
+            }
+        }
+
+        // Whether or not to perform a manual vertical flip, based on the user's intention as well as the characteristics
+        // of the current graphics API (OpenGL is vflipped compared to Metal & D3D) and capture source.
+        // wantFlippedTexture: If true, the user expects a vertically flipped texture.
+        // calledFrom: The object that calls this method.
+        internal static bool NeedToActuallyFlip(bool wantFlippedTexture, BaseRenderTextureInput calledFrom,
+            bool encoderAlreadyFlips)
+        {
+            // We need to take several things into account: what the user expects, whether or not the rendering is made
+            // on a GameView source, and whether or not the hardware is OpenGL.
+            bool isGameView = calledFrom is GameViewInput; // game view is already flipped
+            bool isCameraInputLegacyRP = calledFrom is CameraInput && UsingLegacyRP(); // legacy RP has vflipped camera input
+
+            // OpenGL causes a flipped image except if:
+            // * source is 360 camera
+            // * source is RenderTextureInput
+            // * source is RenderTextureSampler
+            // * source is CameraInput in a URP project
+            bool isFlippedBecauseOfOpenGL = !SystemInfo.graphicsUVStartsAtTop &&
+                !(calledFrom is Camera360Input || calledFrom is RenderTextureInput
+                    || calledFrom is RenderTextureSampler
+                    || (calledFrom is CameraInput && UsingURP()));
+            bool willBeFlipped = isGameView ^ encoderAlreadyFlips ^ isCameraInputLegacyRP ^ isFlippedBecauseOfOpenGL;
+
+            return willBeFlipped != wantFlippedTexture;
         }
     }
 }

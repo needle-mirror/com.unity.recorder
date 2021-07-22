@@ -11,11 +11,15 @@ namespace UnityEditor.Recorder.Input
         Shader accumulateShader;
         Shader normalizeShader;
 
-        TextureFlipper m_VFlipper;
-
         RenderTexture m_renderRT;
         RenderTexture[] m_accumulateRTs = new RenderTexture[2];
         int m_renderWidth, m_renderHeight;
+
+        // Whether or not the incoming RenderTexture must be converted from linear to sRGB color space
+        private bool m_needToConvertLinearToSRGB = false;
+
+        // Whether or not the incoming RenderTexture must be converted from sRGB to linear color space
+        private bool m_needToConvertSRGBToLinear = false;
 
         Material m_superMaterial;
         Material m_accumulateMaterial;
@@ -104,14 +108,38 @@ namespace UnityEditor.Recorder.Input
             normalizeShader = Shader.Find("Hidden/BeautyShot/Normalize");
 
             var movieRecorderSettings = session.settings as MovieRecorderSettings;
-            bool needToFlip = rtsSettings.FlipFinalOutput;
+            bool encoderAlreadyFlips = false;
             if (movieRecorderSettings != null)
             {
-                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-                needToFlip = needToFlip ? encoderAlreadyFlips : !encoderAlreadyFlips;
+                encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
             }
-            if (needToFlip)
-                m_VFlipper = new TextureFlipper();
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(rtsSettings.FlipFinalOutput, this, encoderAlreadyFlips);
+
+            var requiredColorSpace = ImageRecorderSettings.ColorSpaceType.sRGB_sRGB;
+            if (session.settings is ImageRecorderSettings)
+            {
+                requiredColorSpace = ((ImageRecorderSettings)session.settings).OutputColorSpaceComputed;
+            }
+            else if (session.settings is MovieRecorderSettings)
+            {
+                requiredColorSpace = ImageRecorderSettings.ColorSpaceType.sRGB_sRGB; // always sRGB
+            }
+
+            var projectColorSpace = PlayerSettings.colorSpace;
+
+            // Log warnings in unsupported contexts
+            if (projectColorSpace == ColorSpace.Gamma)
+            {
+                if (requiredColorSpace == ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB)
+                    Debug.LogWarning(
+                        $"Gamma color space does not support linear output format. This operation is not supported.");
+            }
+
+            // We convert from linear to sRGB if the project is linear + the source RT is linear + the output color space is sRGB
+            m_needToConvertLinearToSRGB = projectColorSpace == ColorSpace.Linear && requiredColorSpace == ImageRecorderSettings.ColorSpaceType.sRGB_sRGB;
+
+            // We convert from sRGB to linear if the RT is sRGB (gamma) and the output color space is linear (e.g., linear EXR)
+            m_needToConvertSRGBToLinear = projectColorSpace == ColorSpace.Gamma && requiredColorSpace == ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB;
 
             var h = rtsSettings.OutputHeight;
 
@@ -294,8 +322,6 @@ namespace UnityEditor.Recorder.Input
                 UnityHelpers.Destroy(m_superMaterial);
                 UnityHelpers.Destroy(m_accumulateMaterial);
                 UnityHelpers.Destroy(m_normalizeMaterial);
-                if (m_VFlipper != null)
-                    m_VFlipper.Dispose();
             }
 
             base.Dispose(disposing);
@@ -309,7 +335,12 @@ namespace UnityEditor.Recorder.Input
             {
                 // Blit with normalization if sizes match.
                 m_normalizeMaterial.SetFloat("_NormalizationFactor", 1.0f / (float)rtsSettings.SuperSampling);
-                m_normalizeMaterial.SetInt("_ApplyGammaCorrection", QualitySettings.activeColorSpace == ColorSpace.Linear && rtsSettings.ColorSpace == ColorSpace.Gamma ? 1 : 0);
+                if (NeedToFlipVertically.Value)
+                    m_normalizeMaterial.EnableKeyword("VERTICAL_FLIP");
+                if (m_needToConvertLinearToSRGB)
+                    m_normalizeMaterial.EnableKeyword("SRGB_CONVERSION");
+                else if (m_needToConvertSRGBToLinear)
+                    m_normalizeMaterial.EnableKeyword("LINEAR_CONVERSION");
                 Graphics.Blit(m_renderRT, OutputRenderTexture, m_normalizeMaterial);
             }
             else
@@ -319,19 +350,14 @@ namespace UnityEditor.Recorder.Input
                 m_superMaterial.SetFloat("_KernelCosPower", rtsSettings.superKernelPower);
                 m_superMaterial.SetFloat("_KernelScale", rtsSettings.superKernelScale);
                 m_superMaterial.SetFloat("_NormalizationFactor", 1.0f / (float)rtsSettings.SuperSampling);
-                m_superMaterial.SetInt("_ApplyGammaCorrection", QualitySettings.activeColorSpace == ColorSpace.Linear && rtsSettings.ColorSpace == ColorSpace.Gamma ? 1 : 0);
+                if (NeedToFlipVertically.Value)
+                    m_superMaterial.EnableKeyword("VERTICAL_FLIP");
+                if (m_needToConvertLinearToSRGB)
+                    m_superMaterial.EnableKeyword("SRGB_CONVERSION");
+                else if (m_needToConvertSRGBToLinear)
+                    m_superMaterial.EnableKeyword("LINEAR_CONVERSION");
                 Graphics.Blit(m_renderRT, OutputRenderTexture, m_superMaterial);
             }
-
-            bool needToFlip = rtsSettings.FlipFinalOutput; // whether or not the recorder settings have the flip box checked
-            var movieRecorderSettings = session.settings as MovieRecorderSettings;
-            if (movieRecorderSettings != null)
-            {
-                bool encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-                needToFlip = needToFlip ? encoderAlreadyFlips : !encoderAlreadyFlips;
-            }
-            if (needToFlip)
-                OutputRenderTexture = m_VFlipper.Flip(OutputRenderTexture);
         }
 
         void ShiftProjectionMatrix(Camera camera, Vector2 sample)
@@ -409,6 +435,12 @@ namespace UnityEditor.Recorder.Input
             }
 
             Graphics.Blit(accumulateInto, m_renderRT);
+        }
+
+        protected internal override void EndRecording(RecordingSession session)
+        {
+            base.EndRecording(session);
+            NeedToFlipVertically = null; // This variable is not valid anymore
         }
     }
 }

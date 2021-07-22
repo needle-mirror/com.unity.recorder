@@ -36,7 +36,7 @@ namespace UnityEditor.Recorder.Input
         [SerializeField] private string cameraTag;
 
         /// <summary>
-        /// Use this property if you need to vertically flip the final output.
+        /// Use this property if you want to apply a vertical flip to the final output.
         /// </summary>
         public bool FlipFinalOutput
         {

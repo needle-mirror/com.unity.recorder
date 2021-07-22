@@ -12,7 +12,7 @@ namespace Unity.Media
 {
     internal class CoreMediaEncoderRegister : MediaEncoderRegister
     {
-        internal override bool PerformsVerticalFlip => true; // the Core Media Encoder performs a VFlip in Unity Corethe encoder will flip its input vertically
+        internal override bool PerformsVerticalFlip => false;
 
         internal sealed override VideoRecorderOutputFormat[] SupportedFormats { get; set; }
 

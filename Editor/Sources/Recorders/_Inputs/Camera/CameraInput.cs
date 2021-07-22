@@ -19,7 +19,6 @@ namespace UnityEditor.Recorder.Input
 
         private InputStrategy  m_InputStrategy;
         private bool           m_ModifiedResolution;
-        private TextureFlipper m_VFlipper;
         private Camera         m_UICamera;
         private CanvasBackup[] m_CanvasBackups;
 
@@ -31,7 +30,7 @@ namespace UnityEditor.Recorder.Input
             private Shader        m_CopyShader;
             private Material      m_CopyMaterial;
             private RenderTexture m_RenderTexture;
-            public bool           flipVertically = true; // set to false to avoid vflip
+            protected internal bool          NeedToFlipVertically;
 
             public Camera targetCamera
             {
@@ -106,13 +105,12 @@ namespace UnityEditor.Recorder.Input
                 get
                 {
                     if (m_CopyMaterial == null)
-                    {
                         m_CopyMaterial = new Material(copyShader);
-                        if (m_CaptureAlpha)
-                            m_CopyMaterial.EnableKeyword("TRANSPARENCY_ON");
-                        if (flipVertically)
-                            m_CopyMaterial.EnableKeyword("VERTICAL_FLIP");
-                    }
+
+                    if (m_CaptureAlpha)
+                        m_CopyMaterial.EnableKeyword("TRANSPARENCY_ON");
+                    if (NeedToFlipVertically)
+                        m_CopyMaterial.EnableKeyword("VERTICAL_FLIP");
                     return m_CopyMaterial;
                 }
             }
@@ -202,13 +200,15 @@ namespace UnityEditor.Recorder.Input
         /// <inheritdoc/>
         protected internal override void BeginRecording(RecordingSession session)
         {
-            if (cbSettings.FlipFinalOutput)
-                m_VFlipper = new TextureFlipper();
+            var encoderAlreadyFlips = session.settings.EncoderAlreadyFlips();
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(cbSettings.FlipFinalOutput, this, encoderAlreadyFlips);
 
             if (UnityHelpers.UsingLegacyRP())
                 m_InputStrategy = new CameraCommandBufferLegacyInputStrategy(cbSettings.RecordTransparency);
             else
                 m_InputStrategy = new CaptureCallbackSRPInputStrategy(cbSettings.RecordTransparency);
+
+            m_InputStrategy.NeedToFlipVertically = NeedToFlipVertically.Value; // update the flag in the input strategy
 
             switch (cbSettings.Source)
             {
@@ -314,18 +314,6 @@ namespace UnityEditor.Recorder.Input
             }
 
             PrepFrameRenderTexture(session);
-            bool needToFlip = true;
-            var movieRecorderSettings = session.recorder.settings as MovieRecorderSettings;
-            if (movieRecorderSettings != null)
-            {
-                var encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-                needToFlip = encoderAlreadyFlips;
-            }
-
-            if (UnityHelpers.UsingLegacyRP())
-                m_InputStrategy.flipVertically = needToFlip; // regular pipeline
-            else
-                m_InputStrategy.flipVertically = !needToFlip; // scriptable render pipeline already flips input
             m_InputStrategy.SetupCamera(OutputRenderTexture);
         }
 
@@ -372,9 +360,6 @@ namespace UnityEditor.Recorder.Input
                     m_CanvasBackups[i].canvas.worldCamera = m_CanvasBackups[i].camera;
                 }
             }
-
-            if (cbSettings.FlipFinalOutput)
-                OutputRenderTexture = m_VFlipper.Flip(OutputRenderTexture);
         }
 
         /// <inheritdoc/>
@@ -392,9 +377,6 @@ namespace UnityEditor.Recorder.Input
                     if (GameViewSize.modifiedResolutionCount == 0)
                         GameViewSize.RestoreSize();
                 }
-
-                if (m_VFlipper != null)
-                    m_VFlipper.Dispose();
             }
 
             base.Dispose(disposing);
@@ -426,6 +408,12 @@ namespace UnityEditor.Recorder.Input
             OutputRenderTexture.Create();
             if (m_UICamera != null)
                 m_UICamera.targetTexture = OutputRenderTexture;
+        }
+
+        protected internal override void EndRecording(RecordingSession session)
+        {
+            base.EndRecording(session);
+            NeedToFlipVertically = null; // This variable is not valid anymore
         }
     }
 }

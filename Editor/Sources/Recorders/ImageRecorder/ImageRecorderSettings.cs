@@ -244,10 +244,6 @@ namespace UnityEditor.Recorder
             {
                 cbis.RecordTransparency = CanCaptureAlpha() && CaptureAlpha;
             }
-
-            var gis = input as GameViewInputSettings;
-            if (gis != null)
-                gis.FlipFinalOutput = SystemInfo.supportsAsyncGPUReadback;
         }
 
         [SerializeReference] AccumulationSettings _accumulationSettings = new AccumulationSettings();

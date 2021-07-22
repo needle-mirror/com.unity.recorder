@@ -1,7 +1,7 @@
 ﻿Shader "Hidden/BeautyShot/Normalize" {
 	Properties { _MainTex ("Texture", any) = "" {} }
 
-	SubShader { 
+	SubShader {
 		Pass {
  			ZTest Always Cull Off ZWrite Off
 
@@ -11,38 +11,15 @@
 			#pragma target 2.0
 
 			#include "UnityCG.cginc"
+			#define FLT_EPSILON     1.192092896e-07 // Smallest positive number, such that 1.0 + FLT_EPSILON != 1.0
+            #pragma multi_compile ___ VERTICAL_FLIP
+            #pragma multi_compile ___ SRGB_CONVERSION // perform linear -> sRGB
+            #pragma multi_compile ___ LINEAR_CONVERSION // perform sRGB -> linear
 
-			sampler2D _MainTex;
+            UNITY_DECLARE_SCREENSPACE_TEXTURE(_MainTex);
 			uniform float4 _MainTex_ST;
 
 			float _NormalizationFactor;
-            int _ApplyGammaCorrection;
-
-            float floatToGammaSpace(float value)
-            {
-                if (value <= 0.0)
-                    return 0.0F;
-                else if (value <= 0.0031308)
-                    return 12.92 * value;
-                else if (value < 1.0)
-                    return 1.055 * pow(value, 0.4166667) - 0.055;
-                else if (value == 1.0)
-                    return 1.0;
-                else
-                    return pow(value, 0.45454545454545);
-            }
-
-            float4 float4ToGammaSpace(float4 value)
-            {
-                float4 gammaValue;
-
-                gammaValue[0] = floatToGammaSpace(value[0]);
-                gammaValue[1] = floatToGammaSpace(value[1]);
-                gammaValue[2] = floatToGammaSpace(value[2]);
-                gammaValue[3] = value[3];
-
-                return gammaValue;
-            }
 
             struct appdata_t {
 				float4 vertex : POSITION;
@@ -62,17 +39,60 @@
 				return o;
 			}
 
+			// This is a port of the HLSL code in StdLib.hlsl
+			float3 PositivePow(float3 base, float3 power)
+			{
+				return pow(max(abs(base), float3(FLT_EPSILON, FLT_EPSILON, FLT_EPSILON)), power);
+			}
+
+			// This is a port of the HLSL code in Color.hlsl. Also see https://entropymine.com/imageworsener/srgbformula
+			float3 LinearToSRGB(float3 c)
+			{
+				float3 sRGBLo = c * 12.92;
+				float3 sRGBHi = (PositivePow(c, float3(1.0/2.4, 1.0/2.4, 1.0/2.4)) * 1.055) - 0.055;
+				float3 sRGB   = (c <= 0.0031308) ? sRGBLo : sRGBHi;
+				return sRGB;
+			}
+
+			float4 LinearToSRGB(float4 c)
+			{
+				return float4(LinearToSRGB(c.rgb), c.a);
+			}
+
+            // See https://entropymine.com/imageworsener/srgbformula/
+            float3 SRGBToLinear(float3 c)
+			{
+				float3 LinearLo = c / 12.92;
+				float3 LinearHi = PositivePow((c + 0.055)/1.055, float3(2.4, 2.4, 2.4));
+				float3 Linear   = (c <= 0.04045) ? LinearLo : LinearHi;
+				return Linear;
+			}
+
+			float4 SRGBToLinear(float4 c)
+			{
+				return float4(SRGBToLinear(c.rgb), c.a);
+			}
+
 			fixed4 frag (v2f i) : SV_Target
 			{
-				float4 mainTex = tex2D(_MainTex, i.texcoord);
-                if(_ApplyGammaCorrection == 0)
-                     return mainTex * _NormalizationFactor;
-                else
-                    return float4ToGammaSpace( mainTex * _NormalizationFactor );
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+                float2 t = i.texcoord;
+                #if defined(VERTICAL_FLIP)
+                    t.y = 1.0 - t.y;
+                #endif
+                fixed4 color = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, t) * _NormalizationFactor;
+
+                #if defined(SRGB_CONVERSION)
+				    return LinearToSRGB(color);
+                #elif defined(LINEAR_CONVERSION)
+				    return SRGBToLinear(color);
+                #else
+                    return color;
+                #endif
 			}
-			ENDCG 
+			ENDCG
 
 		}
 	}
-	Fallback Off 
+	Fallback Off
 }

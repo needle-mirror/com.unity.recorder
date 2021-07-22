@@ -504,6 +504,7 @@ namespace UnityEditor.Recorder.Input
         public CameraInput() {}
         protected virtual void BeginRecording(UnityEditor.Recorder.RecordingSession session);
         protected virtual void Dispose(bool disposing);
+        protected virtual void EndRecording(UnityEditor.Recorder.RecordingSession session);
         protected virtual void NewFrameReady(UnityEditor.Recorder.RecordingSession session);
         protected virtual void NewFrameStarting(UnityEditor.Recorder.RecordingSession session);
     }

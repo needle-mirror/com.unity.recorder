@@ -50,7 +50,7 @@ namespace Unity.Media
 
         internal sealed override VideoRecorderOutputFormat[] SupportedFormats { get; set; }
 
-        internal override bool PerformsVerticalFlip => false; // the ProRes wrappers do not perform a VFlip
+        internal override bool PerformsVerticalFlip => true;
 
         internal override TextureFormat GetTextureFormat(MovieRecorderSettings settings)
         {
