@@ -183,35 +183,38 @@ namespace UnityEditor.Recorder
             }
 
             var arguments = (openInsideFolder ? "" : "-R ") + osxPath;
-
-            try
-            {
-                System.Diagnostics.Process.Start("open", arguments);
-            }
-            catch (System.ComponentModel.Win32Exception e)
-            {
-                // tried to open mac finder in windows
-                // just silently skip error
-                // we currently have no platform define for the current OS we are in, so we resort to this
-                e.HelpLink = ""; // do anything with this variable to silence warning about not using it
-            }
+            System.Diagnostics.Process.Start("open", arguments);
         }
 
         static void OpenInWindows(string path, bool openInsideFolder)
         {
             var winPath = path.Replace("/", "\\"); // windows explorer doesn't like forward slashes
+            System.Diagnostics.Process.Start("explorer.exe", (openInsideFolder ? "/root," : "/select,") + winPath);
+        }
 
-            try
+        static void OpenInLinux(string path)
+        {
+            FileInfo fiPath = new FileInfo(path);
+            if (fiPath.Exists)
             {
-                System.Diagnostics.Process.Start("explorer.exe", (openInsideFolder ? "/root," : "/select,") + winPath);
+                // xdg-open will open the file with the default file handler, so instead we pass the parent directory
+                // because we want to open a file explorer, not a file _handler_.
+                path = fiPath.DirectoryName;
             }
-            catch (System.ComponentModel.Win32Exception e)
+
+            var linuxPath = path.Replace("\\", "/");
+
+            if (!linuxPath.StartsWith("\""))
             {
-                // tried to open win explorer in mac
-                // just silently skip error
-                // we currently have no platform define for the current OS we are in, so we resort to this
-                e.HelpLink = ""; // do anything with this variable to silence warning about not using it
+                linuxPath = "\"" + linuxPath;
             }
+
+            if (!linuxPath.EndsWith("\""))
+            {
+                linuxPath = linuxPath + "\"";
+            }
+
+            System.Diagnostics.Process.Start("xdg-open", linuxPath);
         }
 
         public static void Open(string path)
@@ -221,13 +224,25 @@ namespace UnityEditor.Recorder
 
             var openInsideFolder = Directory.Exists(path);
 
-            if (Application.platform == RuntimePlatform.WindowsEditor)
+            try
             {
-                OpenInWindows(path, openInsideFolder);
+                if (Application.platform == RuntimePlatform.WindowsEditor)
+                {
+                    OpenInWindows(path, openInsideFolder);
+                }
+                else if (Application.platform == RuntimePlatform.OSXEditor)
+                {
+                    OpenInOSX(path, openInsideFolder);
+                }
+                else if (Application.platform == RuntimePlatform.LinuxEditor)
+                {
+                    OpenInLinux(path);
+                }
             }
-            else if (Application.platform == RuntimePlatform.OSXEditor)
+            catch (System.ComponentModel.Win32Exception e)
             {
-                OpenInOSX(path, openInsideFolder);
+                // Safe guard for platform
+                e.HelpLink = ""; // do anything with this variable to silence warning about not using it
             }
         }
     }

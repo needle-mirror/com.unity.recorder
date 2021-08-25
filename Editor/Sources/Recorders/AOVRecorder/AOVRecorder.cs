@@ -89,7 +89,7 @@ namespace UnityEditor.Recorder
                         WriteToFile(bytes);
                         break;
                     case ImageRecorderSettings.ImageRecorderOutputFormat.JPEG:
-                        bytes = tex.EncodeToJPG();
+                        bytes = tex.EncodeToJPG(Settings.JpegQuality);
                         WriteToFile(bytes);
                         break;
                     default:

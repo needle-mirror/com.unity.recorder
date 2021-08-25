@@ -39,9 +39,20 @@ namespace UnityEditor.Recorder
         private static ListRequest s_Request;
         private static bool s_NeedToResetView = false;
 
-        [MenuItem(MenuRoot + "Recorder Window", false, MenuRootIndex)]
-        static void ShowRecorderWindow()
+        private static bool HasFocus()
         {
+            return (focusedWindow != null && focusedWindow.GetType() == typeof(RecorderWindow));
+        }
+
+        [MenuItem(MenuRoot + "Recorder Window", false, MenuRootIndex)]
+        static void ToggleRecorderWindow()
+        {
+            if (HasFocus())
+            {
+                var recorderWindow = GetWindow(typeof(RecorderWindow), false, s_WindowTitle, false);
+                recorderWindow.Close();
+                return;
+            }
             GetWindow(typeof(RecorderWindow), false, s_WindowTitle);
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEditor.Recorder;
@@ -63,6 +64,13 @@ namespace UnityEditor.Recorder
 
             var currentEncoderReg = Settings.GetCurrentEncoder();
             string errorMessage;
+            // Detect unsupported codec
+            if (!currentEncoderReg.IsFormatSupported(Settings.OutputFormat))
+            {
+                Debug.LogError($"The '{Settings.OutputFormat}' format is not supported on this platform");
+                return false;
+            }
+
             var imageInputSettings = m_Inputs[0].settings as ImageInputSettings;
             var alphaWillBeInImage = imageInputSettings != null && imageInputSettings.SupportsTransparent && imageInputSettings.RecordTransparency;
             if (alphaWillBeInImage && !currentEncoderReg.SupportsTransparency(Settings, out errorMessage))
@@ -72,13 +80,14 @@ namespace UnityEditor.Recorder
                 return false;
             }
 
+            var bitrateMode = ConvertBitrateMode(Settings.EncodingQuality);
             var videoAttrs = new VideoTrackAttributes
             {
                 frameRate = RationalFromDouble(session.settings.FrameRate),
                 width = (uint)width,
                 height = (uint)height,
                 includeAlpha = alphaWillBeInImage,
-                bitRateMode = Settings.VideoBitRateMode
+                bitRateMode = bitrateMode
             };
 
             if (RecorderOptions.VerboseMode)
@@ -89,7 +98,7 @@ namespace UnityEditor.Recorder
             var audioInput = (AudioInput)m_Inputs[1];
             var audioAttrsList = new List<AudioTrackAttributes>();
 
-            if (audioInput.audioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
+            if (audioInput.AudioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
             {
 #if UNITY_EDITOR_OSX
                 // Special case with WebM and audio on older Apple computers: deactivate async GPU readback because there
@@ -104,10 +113,10 @@ namespace UnityEditor.Recorder
                 {
                     sampleRate = new MediaRational
                     {
-                        numerator = audioInput.sampleRate,
+                        numerator = audioInput.SampleRate,
                         denominator = 1
                     },
-                    channelCount = audioInput.channelCount,
+                    channelCount = audioInput.ChannelCount,
                     language = ""
                 };
 
@@ -137,7 +146,7 @@ namespace UnityEditor.Recorder
                 var attr = new List<IMediaEncoderAttribute>();
                 attr.Add(new VideoTrackMediaEncoderAttribute("VideoAttributes", videoAttrs));
 
-                if (audioInput.audioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
+                if (audioInput.AudioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
                 {
                     if (audioAttrsList.Count > 0)
                     {
@@ -180,8 +189,8 @@ namespace UnityEditor.Recorder
 
             base.RecordFrame(session);
             var audioInput = (AudioInput)m_Inputs[1];
-            if (audioInput.audioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
-                Settings.m_EncoderManager.AddSamples(m_EncoderHandle, audioInput.mainBuffer);
+            if (audioInput.AudioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
+                Settings.m_EncoderManager.AddSamples(m_EncoderHandle, audioInput.MainBuffer);
         }
 
         protected internal override void EndRecording(RecordingSession session)

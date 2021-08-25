@@ -79,7 +79,6 @@ namespace UnityEditor.Recorder
         /// The current frame ID (a four-digit zero-padded number).
         /// </summary>
         public static readonly string Frame = GeneratePattern("Frame");
-
         /// <summary>
         /// The file extension of the output format.
         /// </summary>

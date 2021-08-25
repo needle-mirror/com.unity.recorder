@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Unity.Collections;
-using UnityEditor.Media;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
 
@@ -10,7 +8,7 @@ namespace UnityEditor.Recorder
 {
     class AudioRecorder : GenericRecorder<AudioRecorderSettings>
     {
-        private WavEncoder m_Encoder;
+        internal WAVEncoder m_Encoder;
 
         protected internal override bool BeginRecording(RecordingSession session)
         {
@@ -28,33 +26,10 @@ namespace UnityEditor.Recorder
                 return false;
             }
 
-            var audioInput = (AudioInput)m_Inputs[0];
-            var audioAttrsList = new List<AudioTrackAttributes>();
-
-            if (audioInput.audioSettings.PreserveAudio)
-            {
-                var audioAttrs = new AudioTrackAttributes
-                {
-                    sampleRate = new MediaRational
-                    {
-                        numerator = audioInput.sampleRate,
-                        denominator = 1
-                    },
-                    channelCount = audioInput.channelCount,
-                    language = ""
-                };
-
-                audioAttrsList.Add(audioAttrs);
-
-                if (RecorderOptions.VerboseMode)
-                    ConsoleLogMessage($"Audio starting to write audio {audioAttrs.channelCount}ch @ {audioAttrs.sampleRate.numerator}Hz", LogType.Log);
-            }
-
             try
             {
                 var path =  Settings.fileNameGenerator.BuildAbsolutePath(session);
-                m_Encoder = new WavEncoder(path);
-
+                m_Encoder = new WAVEncoder(path);
                 return true;
             }
             catch (Exception ex)
@@ -70,10 +45,10 @@ namespace UnityEditor.Recorder
         {
             var audioInput = (AudioInput)m_Inputs[0];
 
-            if (!audioInput.audioSettings.PreserveAudio)
+            if (!audioInput.AudioSettings.PreserveAudio)
                 return;
 
-            m_Encoder.AddSamples(audioInput.mainBuffer);
+            m_Encoder.AddSamples(audioInput.MainBuffer);
         }
 
         protected internal override void EndRecording(RecordingSession session)
@@ -92,12 +67,18 @@ namespace UnityEditor.Recorder
         }
     }
 
-    internal class WavEncoder
+    /// <summary>
+    /// An encoder for the WAV format.
+    /// </summary>
+    public class WAVEncoder : IDisposable
     {
         BinaryWriter _binwriter;
 
-        // Use this for initialization
-        public WavEncoder(string filename)
+        /// <summary>
+        /// The constructor of a WAV encoder.
+        /// </summary>
+        /// <param name="filename">The path of the WAV file to create.</param>
+        public WAVEncoder(string filename)
         {
             var stream = new FileStream(filename, FileMode.Create);
             _binwriter = new BinaryWriter(stream);
@@ -105,6 +86,9 @@ namespace UnityEditor.Recorder
                 _binwriter.Write((byte)0);
         }
 
+        /// <summary>
+        /// Stop the encoder and close the file.
+        /// </summary>
         public void Stop()
         {
             var closewriter = _binwriter;
@@ -137,6 +121,10 @@ namespace UnityEditor.Recorder
             closewriter.Close();
         }
 
+        /// <summary>
+        /// Add audio samples to the WAV file.
+        /// </summary>
+        /// <param name="data">The buffer of audio samples to add.</param>
         public void AddSamples(NativeArray<float> data)
         {
             if (RecorderOptions.VerboseMode)
@@ -149,6 +137,9 @@ namespace UnityEditor.Recorder
                 _binwriter.Write(data[n]);
         }
 
+        /// <summary>
+        /// Stop the encoder.
+        /// </summary>
         public void Dispose()
         {
             Stop();

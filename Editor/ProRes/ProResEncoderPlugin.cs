@@ -198,6 +198,16 @@ namespace Unity.Media
         {
             return "mov";
         }
+
+        internal override bool IsFormatSupported(VideoRecorderOutputFormat format)
+        {
+#if UNITY_EDITOR_LINUX
+            // ProRes is not supported on Linux
+            return false;
+#else
+            return true;
+#endif
+        }
     }
 
     internal class ProResEncoderCore

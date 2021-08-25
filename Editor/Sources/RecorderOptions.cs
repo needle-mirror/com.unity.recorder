@@ -7,8 +7,6 @@ namespace UnityEditor.Recorder
     /// </summary>
     public static class RecorderOptions
     {
-        const string k_VerboseModeMenuItem = RecorderWindow.MenuRoot + "Options/Verbose Mode";
-        const string k_ShowRecorderGameObject = RecorderWindow.MenuRoot + "Options/Show Recorder GameObject";
         const string k_ShowLegacyModeMenuItem = RecorderWindow.MenuRoot + "Options/Show Legacy Recorders";
 
         const string k_ExitPayModeItem = RecorderWindow.MenuRoot + "Options/Exit PlayMode";
@@ -20,21 +18,20 @@ namespace UnityEditor.Recorder
         /// </summary>
         public static bool VerboseMode
         {
-            get { return EditorPrefs.GetBool(k_VerboseModeMenuItem, false); }
-            set { EditorPrefs.SetBool(k_VerboseModeMenuItem, value); }
+            get => RecorderPreferencesSettings.Instance.VerboseMode;
+            set => RecorderPreferencesSettings.Instance.VerboseMode = value;
         }
 
         /// <summary>
-        /// The recoder uses a "Unity-RecorderSessions" GameObject to store Scene references and manage recording sessions.
+        /// The recorder uses a "Unity-RecorderSessions" GameObject to store Scene references and manage recording sessions.
         /// If true, this GameObject will be visible in the Scene Hierarchy.
         /// </summary>
         public static bool ShowRecorderGameObject
         {
-            get { return EditorPrefs.GetBool(k_ShowRecorderGameObject, false); }
+            get => RecorderPreferencesSettings.Instance.ShowGO;
             set
             {
-                EditorPrefs.SetBool(k_ShowRecorderGameObject, value);
-                UnityHelpers.SetGameObjectsVisibility(value);
+                RecorderPreferencesSettings.Instance.ShowGO = value;
             }
         }
 
@@ -44,7 +41,7 @@ namespace UnityEditor.Recorder
             set { EditorPrefs.SetBool(k_ExitPayModeItem, value); }
         }
 
-        internal static float recorderPanelWith
+        internal static float recorderPanelWidth
         {
             get { return EditorPrefs.GetFloat(k_RecorderPanelWidth, 0); }
             set { EditorPrefs.SetFloat(k_RecorderPanelWidth, value); }
@@ -54,37 +51,6 @@ namespace UnityEditor.Recorder
         {
             get { return EditorPrefs.GetInt(k_SelectedRecorderIndex, 0); }
             set { EditorPrefs.SetInt(k_SelectedRecorderIndex, value); }
-        }
-
-
-        [MenuItem(k_VerboseModeMenuItem, false, RecorderWindow.MenuRootIndex + 200)]
-        static void ToggleDebugMode()
-        {
-            var value = !VerboseMode;
-            EditorPrefs.SetBool(k_VerboseModeMenuItem, value);
-            VerboseMode = value;
-        }
-
-        [MenuItem(k_VerboseModeMenuItem, true)]
-        static bool ToggleDebugModeValidate()
-        {
-            Menu.SetChecked(k_VerboseModeMenuItem, VerboseMode);
-            return true;
-        }
-
-        [MenuItem(k_ShowRecorderGameObject, false, RecorderWindow.MenuRootIndex + 200)]
-        static void ToggleShowRecorderGameObject()
-        {
-            var value = !ShowRecorderGameObject;
-            EditorPrefs.SetBool(k_ShowRecorderGameObject, value);
-            ShowRecorderGameObject = value;
-        }
-
-        [MenuItem(k_ShowRecorderGameObject, true)]
-        static bool ToggleShowRecorderGameObjectValidate()
-        {
-            Menu.SetChecked(k_ShowRecorderGameObject, ShowRecorderGameObject);
-            return true;
         }
     }
 

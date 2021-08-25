@@ -13,7 +13,7 @@ namespace UnityEditor.Recorder
     {
         SerializedProperty m_OutputFormat;
         SerializedProperty m_OutputFormatSuffix;
-        SerializedProperty m_EncodingBitRateMode;
+        SerializedProperty m_EncodingQuality;
         SerializedProperty m_CaptureAlpha;
         SerializedProperty m_ContainerFormatSelected;
         SerializedProperty m_EncoderSelected;
@@ -136,7 +136,7 @@ namespace UnityEditor.Recorder
             m_OutputFormat = serializedObject.FindProperty("outputFormat");
             m_OutputFormatSuffix = serializedObject.FindProperty("outputFormatSuffix");
             m_CaptureAlpha = serializedObject.FindProperty("captureAlpha");
-            m_EncodingBitRateMode = serializedObject.FindProperty("videoBitRateMode");
+            m_EncodingQuality = serializedObject.FindProperty("encodingQuality");
             m_ContainerFormatSelected = serializedObject.FindProperty("containerFormatSelected");
             m_EncoderSelected = serializedObject.FindProperty("encoderSelected");
             m_EncoderPresetSelected = serializedObject.FindProperty("encoderPresetSelected");
@@ -289,7 +289,7 @@ namespace UnityEditor.Recorder
             if (RegisteredEncoders[m_EncoderSelected.intValue].GetType() == typeof(CoreMediaEncoderRegister))
             {
                 ++EditorGUI.indentLevel;
-                EditorGUILayout.PropertyField(m_EncodingBitRateMode, Styles.VideoBitRateLabel);
+                EditorGUILayout.PropertyField(m_EncodingQuality, Styles.VideoBitRateLabel);
                 --EditorGUI.indentLevel;
             }
 

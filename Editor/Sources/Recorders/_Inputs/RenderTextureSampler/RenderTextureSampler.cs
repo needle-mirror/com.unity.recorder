@@ -427,7 +427,7 @@ namespace UnityEditor.Recorder.Input
                 }
                 // It is really important to call ResetProjectionMatrix to insure the
                 // camera will be recomputed and reflect the normal camera's parameters.
-                // Call this to end the effect of setting projectionMatrix. FTV-824
+                // Call this to end the effect of setting projectionMatrix. REC-260
                 cam.ResetProjectionMatrix();
                 // If the camera was using physical properties we need reset the camera
                 // to keep using physical properties.

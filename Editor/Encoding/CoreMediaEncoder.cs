@@ -68,6 +68,16 @@ namespace Unity.Media
         {
             return "mp4";
         }
+
+        internal override bool IsFormatSupported(VideoRecorderOutputFormat format)
+        {
+#if UNITY_EDITOR_LINUX
+            // MP4 is not supported on Linux
+            return format != VideoRecorderOutputFormat.MP4;
+#else
+            return true;
+#endif
+        }
     }
 
     internal class CoreMediaEncoder : IMediaEncoder

@@ -4,6 +4,20 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0-pre.1] - 2021-08-25
+### Added
+- Added a slider to change the JPEG quality when using Image Recorders or AOV Recorders.
+- Added a new <AOV> wildcard for AOV Image Sequence recorders, and include it in the default file name.
+
+### Changed
+- Modified the Recorder menu item to cycle the Recorder Window status between open, in focus, and closed.
+- Added <Recorder> wildcard to the default file name of all recorders.
+- Moved the Recorder Options from Recorder menu items to Unity Editor user Preferences.
+- Expose the AudioInput, AudioRecorderSettings, and WAVEncoder classes to the public API.
+
+### Fixed
+- Fix the "Open output location" button functionality in Linux.
+
 ## [3.0.1] - 2021-07-22
 ### Fixed
 - Perform the appropriate color space conversion for Texture Sampling sources when required.

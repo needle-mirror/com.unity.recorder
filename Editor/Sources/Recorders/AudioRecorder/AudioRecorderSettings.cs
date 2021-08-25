@@ -4,38 +4,36 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
-    enum AudioRecorderOutputFormat
-    {
-        // MP3,
-        WAV
-    }
-
+    /// <summary>
+    /// A class that represents the settings of an Audio Recorder.
+    /// </summary>
     [RecorderSettings(typeof(AudioRecorder), "Audio")]
-    class AudioRecorderSettings : RecorderSettings
+    public class AudioRecorderSettings : RecorderSettings
     {
-        public AudioRecorderOutputFormat  outputFormat = AudioRecorderOutputFormat.WAV;
-
         [SerializeField] AudioInputSettings m_AudioInputSettings = new AudioInputSettings();
 
         protected internal override string Extension
         {
-            get { return outputFormat.ToString().ToLower(); }
+            get { return "wav"; }
         }
 
-        public AudioInputSettings audioInputSettings
+        AudioInputSettings AudioInputSettings
         {
             get { return m_AudioInputSettings; }
         }
 
+        /// <inheritdoc/>
         public override IEnumerable<RecorderInputSettings> InputsSettings
         {
             get { yield return m_AudioInputSettings; }
         }
 
-
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public AudioRecorderSettings()
         {
-            fileNameGenerator.FileName = "mixdown_" + DefaultWildcard.Take;
+            fileNameGenerator.FileName = DefaultWildcard.Recorder + "_" + DefaultWildcard.Take;
         }
     }
 }

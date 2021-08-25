@@ -61,7 +61,10 @@ namespace UnityEditor.Recorder.Input
         }
     }
 
-    class AudioInput : RecorderInput
+    /// <summary>
+    /// Use this class to record audio from the built-in Unity audio system.
+    /// </summary>
+    public class AudioInput : RecorderInput
     {
         class BufferManager : IDisposable
         {
@@ -88,17 +91,49 @@ namespace UnityEditor.Recorder.Input
 
         ushort m_ChannelCount;
 
-        public ushort channelCount
+        /// <summary>
+        /// The number of channels in the audio input.
+        /// </summary>
+        public ushort ChannelCount
         {
             get { return m_ChannelCount; }
         }
 
-        public int sampleRate
+        /// <summary>
+        /// The sampling rate, in hertz.
+        /// </summary>
+        public int SampleRate
         {
-            get { return AudioSettings.outputSampleRate; }
+            get { return UnityEngine.AudioSettings.outputSampleRate; }
         }
 
-        public NativeArray<float> mainBuffer
+        /// <summary>
+        /// Get the size of the buffer of audio samples (including all channels).
+        /// </summary>
+        /// <returns></returns>
+        public int GetBufferSize()
+        {
+            return MainBuffer.Length;
+        }
+
+        /// <summary>
+        /// Get the buffer of audio samples.
+        /// </summary>
+        /// <param name="userArray">A native array of float that is supplied and managed by the user.</param>
+        /// <param name="writtenSize">The number of values that were written to the supplied array.</param>
+        /// <exception cref="ArgumentException">Throws an exception if the passed array is too small to hold the buffer data.</exception>
+        public void GetBuffer(ref NativeArray<float> userArray, out int writtenSize)
+        {
+            var buff = MainBuffer;
+            if (userArray.Length < buff.Length)
+                throw new ArgumentException(
+                    $"The supplied array (size {userArray.Length}) must be larger than or of the same size as the audio sample buffer (size {buff.Length})");
+
+            userArray.GetSubArray(0, buff.Length).CopyFrom(buff);
+            writtenSize = buff.Length;
+        }
+
+        internal NativeArray<float> MainBuffer
         {
             get { return s_BufferManager.GetBuffer(0); }
         }
@@ -106,7 +141,10 @@ namespace UnityEditor.Recorder.Input
         static AudioInput s_Handler;
         static BufferManager s_BufferManager;
 
-        public AudioInputSettings audioSettings
+        /// <summary>
+        /// The settings of the audio input.
+        /// </summary>
+        public AudioInputSettings AudioSettings
         {
             get { return (AudioInputSettings)settings; }
         }
@@ -114,7 +152,7 @@ namespace UnityEditor.Recorder.Input
         protected internal override void BeginRecording(RecordingSession session)
         {
             m_ChannelCount = new Func<ushort>(() => {
-                switch (AudioSettings.speakerMode)
+                switch (UnityEngine.AudioSettings.speakerMode)
                 {
                     case AudioSpeakerMode.Mono:        return 1;
                     case AudioSpeakerMode.Stereo:      return 2;
@@ -130,13 +168,13 @@ namespace UnityEditor.Recorder.Input
             if (RecorderOptions.VerboseMode)
                 Debug.Log(string.Format("AudioInput.BeginRecording for capture frame rate {0}", Time.captureFramerate));
 
-            if (audioSettings.PreserveAudio)
+            if (AudioSettings.PreserveAudio)
                 AudioRenderer.Start();
         }
 
         protected internal override void NewFrameReady(RecordingSession session)
         {
-            if (!audioSettings.PreserveAudio)
+            if (!AudioSettings.PreserveAudio)
                 return;
 
             if (s_Handler == null)
@@ -156,7 +194,7 @@ namespace UnityEditor.Recorder.Input
 
                 s_BufferManager = new BufferManager(bufferCount, sampleFrameCount, m_ChannelCount);
 
-                AudioRenderer.Render(mainBuffer);
+                AudioRenderer.Render(MainBuffer);
             }
         }
 
@@ -183,7 +221,7 @@ namespace UnityEditor.Recorder.Input
 
             s_Handler = null;
 
-            if (audioSettings.PreserveAudio)
+            if (AudioSettings.PreserveAudio)
                 AudioRenderer.Stop();
         }
     }

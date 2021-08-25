@@ -155,7 +155,7 @@ namespace UnityEditor.Recorder
                 else
                 {
                     ret.media_format = r.Settings.OutputFormat.ConvertToString();
-                    ret.quality = r.Settings.VideoBitRateMode.ConvertToString();
+                    ret.quality = r.Settings.EncodingQuality.ConvertToString();
                 }
 
                 return ret;

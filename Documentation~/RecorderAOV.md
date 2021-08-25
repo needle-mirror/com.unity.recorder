@@ -90,7 +90,8 @@ Use this section to set up the media format you need to save the recorded images
 | **Color Space** | | The color space (gamma curve and gamut) to use in the output images. |
 |  | sRGB, sRGB | Uses sRGB curve and sRGB primaries. |
 |  | Linear, sRGB (unclamped) | Uses linear curve and sRGB primaries.<br/>This option is only available when you set the **Format** to **EXR**.<br/><br/>**Important:** To get the expected unclamped values in the output images, you must:<br/><br/>• Disable any Tonemapping post-processing effects in your Scene (menu: **Edit > Project Settings > HDRP Default Settings** and deselect **Tonemapping**) and in any Volume that includes a Tonemapping override (select the Volume, navigate in the Inspector and deselect **Tonemapping** if present).<br/><br/>• Disable **Dithering** on the Camera selected for the capture (in the Inspector, navigate to **General** and deselect **Dithering**). |
-| **Compression** | | The compression method to apply when saving the data. <br/>This property is only available when you set the **Format** to **EXR**. |
+| **Quality** | | The JPEG encoding quality level. <br/>This property is only available when you set the **Format** to **JPEG**. |
+| **Compression** | | The EXR compression method to apply when saving the data. <br/>This property is only available when you set the **Format** to **EXR**. |
 |  | None | Disables all compression. |
 |  | Zip | Applies deflate compression to blocks of 16 scanlines at a time.<br/>This is the default selection. |
 |  | RLE | Applies [Run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding) compression.  |

@@ -36,7 +36,7 @@ namespace UnityEngine.Recorder.Examples
             videoRecorder.Enabled = true;
 
             videoRecorder.OutputFormat = MovieRecorderSettings.VideoRecorderOutputFormat.MP4;
-            videoRecorder.VideoBitRateMode = VideoBitrateMode.Low;
+            videoRecorder.EncodingQuality = MovieRecorderSettings.VideoEncodingQuality.Low;
 
             videoRecorder.ImageInputSettings = new GameViewInputSettings
             {

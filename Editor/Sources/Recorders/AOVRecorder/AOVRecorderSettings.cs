@@ -96,13 +96,21 @@ namespace UnityEditor.Recorder.AOV
         [SerializeField] internal ImageRecorderSettings.EXRCompressionType m_EXRCompression = ImageRecorderSettings.EXRCompressionType.Zip;
         [SerializeField] internal AOVImageInputSelector m_AOVImageInputSelector = new AOVImageInputSelector();
         [SerializeField] internal ImageRecorderSettings.ColorSpaceType m_ColorSpace = ImageRecorderSettings.ColorSpaceType.Unclamped_linear_sRGB;
+        [SerializeField] internal int m_JpegQuality = 75;
 
         /// <summary>
         /// Default constructor.
         /// </summary>
         public AOVRecorderSettings()
         {
-            FileNameGenerator.FileName = "aov_image_" + DefaultWildcard.Frame;
+            var aovWildcard = DefaultWildcard.GeneratePattern("AOV");
+            FileNameGenerator.AddWildcard(aovWildcard, AOVNameResolver);
+            FileNameGenerator.FileName = DefaultWildcard.Recorder + "_" + aovWildcard + "_" + DefaultWildcard.Take + "_" + DefaultWildcard.Frame;
+        }
+
+        string AOVNameResolver(RecordingSession session)
+        {
+            return AOVSelection.ToString();
         }
 
         protected internal override string Extension
@@ -154,6 +162,15 @@ namespace UnityEditor.Recorder.AOV
         {
             bool isFormatExr = m_OutputFormat == ImageRecorderSettings.ImageRecorderOutputFormat.EXR;
             return isFormatExr;
+        }
+
+        /// <summary>
+        /// The JPEG encoding quality level. Range is 1 to 100. Default value is 75.
+        /// </summary>
+        public int JpegQuality
+        {
+            get { return m_JpegQuality; }
+            set { m_JpegQuality = value; }
         }
 
         /// <summary>

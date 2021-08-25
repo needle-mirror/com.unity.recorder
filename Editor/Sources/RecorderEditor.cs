@@ -15,7 +15,6 @@ namespace UnityEditor.Recorder
         SerializedProperty m_FileNameGenerator;
         SerializedProperty m_Take;
 
-
         internal event Action OnRecorderValidated;
         SavedBool showFormat;
         SavedBool showOutputFile;
@@ -156,6 +155,7 @@ namespace UnityEditor.Recorder
                 OnEncodingGui();
                 EditorGUILayout.Separator();
             }
+
             showOutputFile.value = DrawHeaderFoldout(Styles.OutputFileLabel, showOutputFile, false);
             if (showOutputFile)
             {

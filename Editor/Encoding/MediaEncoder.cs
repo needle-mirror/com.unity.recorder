@@ -261,6 +261,11 @@ namespace Unity.Media
         {
             throw new NotImplementedException();
         }
+
+        internal virtual bool IsFormatSupported(VideoRecorderOutputFormat format)
+        {
+            return true;
+        }
     }
 
     internal interface IMediaEncoder : IDisposable

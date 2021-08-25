@@ -13,6 +13,7 @@ namespace UnityEditor.Recorder
         SerializedProperty m_AOVSelection;
         SerializedProperty m_EXRCompression;
         SerializedProperty m_ColorSpace;
+        SerializedProperty m_JpegQuality;
 
         static class Styles
         {
@@ -20,6 +21,7 @@ namespace UnityEditor.Recorder
             internal static readonly GUIContent AOVLabel = new GUIContent("Aov to Export", "The AOV render pass to record.");
             internal static readonly GUIContent AOVCLabel = new GUIContent("Compression", "The data compression method to apply when using the EXR format.");
             internal static readonly GUIContent ColorSpace = new GUIContent("Color Space", "The color space (gamma curve, gamut) to use in the output images.\n\nIf you select an option to get unclamped values, you must:\n- Use High Definition Render Pipeline (HDRP).\n- Disable any Tonemapping in your Scene.\n- Disable Dithering on the selected Camera.");
+            internal static readonly GUIContent JpegQualityLabel = new GUIContent("Quality", "The JPEG encoding quality level.");
         }
 
         protected override void OnEnable()
@@ -33,6 +35,7 @@ namespace UnityEditor.Recorder
             m_AOVSelection = serializedObject.FindProperty("m_AOVSelection");
             m_EXRCompression = serializedObject.FindProperty("m_EXRCompression");
             m_ColorSpace = serializedObject.FindProperty("m_ColorSpace");
+            m_JpegQuality = serializedObject.FindProperty("m_JpegQuality");
         }
 
         protected override void FileTypeAndFormatGUI()
@@ -58,6 +61,11 @@ namespace UnityEditor.Recorder
                 ImageRecorderSettings.ImageRecorderOutputFormat.EXR)
             {
                 EditorGUILayout.PropertyField(m_EXRCompression, Styles.AOVCLabel);
+            }
+            if ((ImageRecorderSettings.ImageRecorderOutputFormat)m_OutputFormat.enumValueIndex ==
+                ImageRecorderSettings.ImageRecorderOutputFormat.JPEG)
+            {
+                EditorGUILayout.IntSlider(m_JpegQuality, 1, 100, Styles.JpegQualityLabel);
             }
         }
 

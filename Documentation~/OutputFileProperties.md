@@ -30,17 +30,18 @@ The **+Wildcards** menu helps you quickly append them to the file name string, b
 
 | Placeholder | Description | Resolved value example |
 |--|--|--|
-| `<Recorder>` | • In Recorder window: the Recorder name from the Recorder list.<br />• In Timeline track: the name of the Recorder clip. | `My Recorder` |
-| `<Time>` | The time the recording is generated. Uses the `00h00m` format. | `16h52m` |
-| `<Take>` | The **Take Number** value. Uses the `000` format.  | `002` |
+| `<AOV>` | The name of the [**AOV to Export** selected for recording](RecorderAOV.md#aov-to-export). | `Beauty` |
 | `<Date>` | The date the recording is generated. Uses the `yyyy-MM-dd` format. | `2020-11-03` |
-| `<Project>` | The name of the current Unity Project.  | `My Project` |
-| `<Product>` | The value of the [Product Name](https://docs.unity3d.com/Manual/class-PlayerSettings.html#ProductName) field from Unity's Player General Settings. | `My Product` |
-| `<Scene>` | The name of the current Unity Scene. | `My Scene` |
-| `<Resolution>` | The output image dimensions (width by height) in pixels. Uses the `WxH` format. | `1920x1080` |
-| `<Frame>` | The current frame number. Uses the `0000` format.<br/><br/>This is useful for Image Sequence Recorders which output each frame as a separate file. | `0154` |
 | `<Extension>` | The file extension of the output format (without the period). | `png` |
-| `<GameObject>` | The name of the GameObject being recorded. | `My GameObject` |
-| `<GameObjectScene>` | The name of the Scene containing the GameObject being Recorded. | `My Scene` |
+| `<Frame>` | The current frame number. Uses the `0000` format.<br/><br/>This is useful for Image Sequence Recorders which output each frame as a separate file. | `0154` |
+| `<GameObject>` | The name of the [**GameObject** targeted for recording](RecorderAnimation.md#capture). | `My GameObject` |
+| `<GameObjectScene>` | The name of the Scene containing the [**GameObject** targeted for recording](RecorderAnimation.md#capture). | `My Scene` |
+| `<Product>` | The value of the [Product Name](https://docs.unity3d.com/Manual/class-PlayerSettings.html#ProductName) field from Unity's Player General Settings. | `My Product` |
+| `<Project>` | The name of the current Unity Project.  | `My Project` |
+| `<Recorder>` | • In Recorder window: the Recorder name from the Recorder list.<br />• In Timeline track: the name of the Recorder clip. | `My Recorder` |
+| `<Resolution>` | The output image dimensions (width by height) in pixels. Uses the `WxH` format. | `1920x1080` |
+| `<Scene>` | The name of the current Unity Scene. | `My Scene` |
+| `<Take>` | The **Take Number** value. Uses the `000` format.  | `002` |
+| `<Time>` | The time the recording is generated. Uses the `00h00m` format. | `16h52m` |
 
 **Note:** Some placeholders might not be available depending on the Recorder type you are using.

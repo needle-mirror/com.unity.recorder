@@ -113,6 +113,16 @@ namespace UnityEditor.Recorder
 
         [SerializeField] private bool captureAlpha;
 
+        /// <summary>
+        /// The JPEG encoding quality level. Range is 1 to 100. Default value is 75.
+        /// </summary>
+        public int JpegQuality
+        {
+            get { return m_JpegQuality; }
+            set { m_JpegQuality = value; }
+        }
+
+        [SerializeField] private int m_JpegQuality = 75;
 
         /// <summary>
         /// Use this property to capture the frames in HDR (if the setup supports it).
@@ -131,7 +141,7 @@ namespace UnityEditor.Recorder
         /// </summary>
         public ImageRecorderSettings()
         {
-            fileNameGenerator.FileName = "image_" + DefaultWildcard.Take + "_" + DefaultWildcard.Frame;
+            fileNameGenerator.FileName = DefaultWildcard.Recorder + "_" + DefaultWildcard.Take + "_" + DefaultWildcard.Frame;
         }
 
         /// <inheritdoc/>

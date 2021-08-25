@@ -36,7 +36,7 @@ namespace UnityEditor.Recorder
 
             fileNameGenerator.ForceAssetsFolder = true;
             fileNameGenerator.Root = OutputPath.Root.AssetsFolder;
-            fileNameGenerator.FileName = "animation_" + goWildcard + "_" + DefaultWildcard.Take;
+            fileNameGenerator.FileName = DefaultWildcard.Recorder + "_" + goWildcard + "_" + DefaultWildcard.Take;
         }
 
         string GameObjectNameResolver(RecordingSession session)

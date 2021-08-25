@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -66,6 +67,26 @@ namespace UnityEditor.Recorder
             /// </summary>
             MOV,
         }
+
+        /// <summary>
+        /// Available options for the encoding quality of videos.
+        /// </summary>
+        public enum VideoEncodingQuality
+        {
+            /// <summary>
+            /// Low value, safe for slower internet connections or clips where visual quality is not critical.
+            /// </summary>
+            Low,
+            /// <summary>
+            /// Typical bit rate supported by internet connections.
+            /// </summary>
+            Medium,
+            /// <summary>
+            /// High value, possibly exceeding typical internet connection capabilities.
+            /// </summary>
+            High
+        }
+
         /// <summary>
         /// Indicates the output video format currently used for this Recorder.
         /// </summary>
@@ -80,13 +101,39 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Indicates the video bit rate preset currently used for this Recorder.
         /// </summary>
+        [Obsolete("Please use property 'EncodingQuality'.")]
         public VideoBitrateMode VideoBitRateMode
         {
-            get { return videoBitRateMode; }
-            set { videoBitRateMode = value; }
+            get => ConvertBitrateMode(encodingQuality);
+            set
+            {
+                switch (value)
+                {
+                    case VideoBitrateMode.High:
+                        encodingQuality = VideoEncodingQuality.High;
+                        break;
+                    case VideoBitrateMode.Medium:
+                        encodingQuality = VideoEncodingQuality.Medium;
+                        break;
+                    case VideoBitrateMode.Low:
+                        encodingQuality = VideoEncodingQuality.Low;
+                        break;
+                    default:
+                        throw new InvalidEnumArgumentException($"Unexpected video bitrate mode value '{value}'.");
+                }
+            }
         }
 
-        [SerializeField] private VideoBitrateMode videoBitRateMode = VideoBitrateMode.High;
+        /// <summary>
+        /// Indicates the encoding quality to use for this Recorder.
+        /// </summary>
+        public VideoEncodingQuality EncodingQuality
+        {
+            get { return encodingQuality; }
+            set { encodingQuality = value; }
+        }
+
+        [SerializeField, FormerlySerializedAs("videoBitRateMode")] private VideoEncodingQuality encodingQuality = VideoEncodingQuality.High;
 
         /// <summary>
         /// Use this property to capture the alpha channel (True) or not (False) in the output.
@@ -253,7 +300,7 @@ namespace UnityEditor.Recorder
         /// </summary>
         public MovieRecorderSettings()
         {
-            fileNameGenerator.FileName = "movie_" + DefaultWildcard.Take;
+            fileNameGenerator.FileName = DefaultWildcard.Recorder + "_" + DefaultWildcard.Take;
             FrameRate = 30;
 
             var iis = m_ImageInputSelector.Selected as StandardImageInputSettings;
@@ -421,6 +468,27 @@ namespace UnityEditor.Recorder
             }
 
             m_ImageInputSelector.ForceEvenResolution(OutputFormat == VideoRecorderOutputFormat.MP4);
+        }
+
+        /// <summary>
+        /// A method that converts from a Recorder enum value to a core engine enum value.
+        /// </summary>
+        /// <param name="quality">The enum value to convert.</param>
+        /// <returns>The converted core engine enum value.</returns>
+        /// <exception cref="InvalidEnumArgumentException">Throws an exception if the passed value is unexpected</exception>
+        internal static VideoBitrateMode ConvertBitrateMode(VideoEncodingQuality quality)
+        {
+            switch (quality)
+            {
+                case VideoEncodingQuality.Low:
+                    return VideoBitrateMode.Low;
+                case VideoEncodingQuality.Medium:
+                    return VideoBitrateMode.Medium;
+                case VideoEncodingQuality.High:
+                    return VideoBitrateMode.High;
+                default:
+                    throw new InvalidEnumArgumentException($"Unexpected VideoEncodingQuality value '{quality}'");
+            }
         }
     }
 }

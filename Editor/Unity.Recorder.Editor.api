@@ -37,6 +37,13 @@ namespace UnityEditor.Recorder
         public virtual void OnAfterDuplicate();
     }
 
+    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.AudioRecorder), @"Audio")] public class AudioRecorderSettings : UnityEditor.Recorder.RecorderSettings
+    {
+        protected virtual string Extension { get; }
+        public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
+        public AudioRecorderSettings() {}
+    }
+
     public abstract class BaseRenderTextureInput : UnityEditor.Recorder.RecorderInput
     {
         public int OutputHeight { get; protected set; }
@@ -135,6 +142,7 @@ namespace UnityEditor.Recorder
         protected virtual string Extension { get; }
         public UnityEditor.Recorder.Input.ImageInputSettings imageInputSettings { get; set; }
         public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
+        public int JpegQuality { get; set; }
         public UnityEditor.Recorder.ImageRecorderSettings.ColorSpaceType OutputColorSpace { get; set; }
         public UnityEditor.Recorder.ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat { get; set; }
         public ImageRecorderSettings() {}
@@ -181,17 +189,25 @@ namespace UnityEditor.Recorder
         public AccumulationSettings AccumulationSettings { get; set; }
         public UnityEditor.Recorder.Input.AudioInputSettings AudioInputSettings { get; }
         public bool CaptureAlpha { get; set; }
+        public UnityEditor.Recorder.MovieRecorderSettings.VideoEncodingQuality EncodingQuality { get; set; }
         protected virtual string Extension { get; }
         public UnityEditor.Recorder.Input.ImageInputSettings ImageInputSettings { get; set; }
         public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
         public UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat OutputFormat { get; set; }
-        public UnityEditor.VideoBitrateMode VideoBitRateMode { get; set; }
+        [System.Obsolete(@"Please use property 'EncodingQuality'.")] public UnityEditor.VideoBitrateMode VideoBitRateMode { get; set; }
         public MovieRecorderSettings() {}
         public virtual AccumulationSettings GetAccumulationSettings();
         protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
         public void GetPresetsForEncoder(int indexEncoder, out System.Collections.Generic.List<string> presetNames, out System.Collections.Generic.List<string> presetOptions);
         protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
         public virtual bool IsAccumulationSupported();
+        public enum VideoEncodingQuality
+        {
+            public const UnityEditor.Recorder.MovieRecorderSettings.VideoEncodingQuality High = 2;
+            public const UnityEditor.Recorder.MovieRecorderSettings.VideoEncodingQuality Low = 0;
+            public const UnityEditor.Recorder.MovieRecorderSettings.VideoEncodingQuality Medium = 1;
+            public int value__;
+        }
         public enum VideoRecorderOutputFormat
         {
             public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat MOV = 2;
@@ -383,6 +399,14 @@ namespace UnityEditor.Recorder
     {
         public static void Destroy(UnityEngine.Object obj, bool allowDestroyingAssets = False);
     }
+
+    public class WAVEncoder : System.IDisposable
+    {
+        public WAVEncoder(string filename) {}
+        public void AddSamples(Unity.Collections.NativeArray<float> data);
+        public virtual void Dispose();
+        public void Stop();
+    }
 }
 
 namespace UnityEditor.Recorder.AOV
@@ -395,6 +419,7 @@ namespace UnityEditor.Recorder.AOV
         protected virtual string Extension { get; }
         public UnityEditor.Recorder.Input.ImageInputSettings imageInputSettings { get; set; }
         public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
+        public int JpegQuality { get; set; }
         public UnityEditor.Recorder.ImageRecorderSettings.ColorSpaceType OutputColorSpace { get; set; }
         public UnityEditor.Recorder.ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat { get; set; }
         public AOVRecorderSettings() {}
@@ -474,6 +499,20 @@ namespace UnityEditor.Recorder.Input
             public const UnityEditor.Recorder.Input.AnimationInputSettings.CurveSimplificationOptions Lossy = 0;
             public int value__;
         }
+    }
+
+    public class AudioInput : UnityEditor.Recorder.RecorderInput
+    {
+        public UnityEditor.Recorder.Input.AudioInputSettings AudioSettings { get; }
+        public System.UInt16 ChannelCount { get; }
+        public int SampleRate { get; }
+        public AudioInput() {}
+        protected virtual void BeginRecording(UnityEditor.Recorder.RecordingSession session);
+        protected virtual void EndRecording(UnityEditor.Recorder.RecordingSession session);
+        protected virtual void FrameDone(UnityEditor.Recorder.RecordingSession session);
+        public void GetBuffer(ref Unity.Collections.NativeArray<float> userArray, out int writtenSize);
+        public int GetBufferSize();
+        protected virtual void NewFrameReady(UnityEditor.Recorder.RecordingSession session);
     }
 
     [System.ComponentModel.DisplayName(@"Audio")] public class AudioInputSettings : UnityEditor.Recorder.RecorderInputSettings
