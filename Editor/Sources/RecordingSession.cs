@@ -232,11 +232,11 @@ namespace UnityEditor.Recorder
                 currentFrameStartTS =
                     (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale)) -
                     recordingStartTS;
+                m_SubFrameIndex++;
                 if (!recorder.SkipFrame(this))
                 {
                     recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameStarting, this);
                     recorder.PrepareNewFrame(this);
-                    m_SubFrameIndex++;
                 }
             }
             catch (Exception ex)

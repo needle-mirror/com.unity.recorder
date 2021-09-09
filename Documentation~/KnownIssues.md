@@ -8,6 +8,12 @@ This page lists some known issues and limitations that you might experience with
 
 **Workaround:** The recommended use case is to limit yourself to one Movie recording at a time. Ensure that you have only one active Movie Recorder in the Recorder window and no Movie Recorder Clips in Timeline, or vice-versa. If you need to keep concurrent recordings for some reason, you can still set up lower resolutions or try different encoders (for instance, the MP4 encoding step is much faster than the ProRes one).
 
+#### ActiveCamera recording not available with SRPs
+
+**Limitation:** The use of a Scriptable Render Pipeline ([SRP](https://docs.unity3d.com/Manual/ScriptableRenderPipeline.html)) in your project prevents you from setting ActiveCamera as the source of the recording in the [Movie Recorder](RecorderMovie.md#targeted-camera-source-properties) and the [Image Sequence Recorder](RecorderImage.md#targeted-camera-source-properties). This render pipeline limitation applies to all SRPs including Unity's High Definition Render Pipeline ([HDRP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest)) and Universal Render Pipeline ([URP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest)). For the same reason, the [AOV Recorder](RecorderAOV.md#source-camera), which requires HDRP, doesn't include the ActiveCamera option by design.
+
+**Workaround:** You can use a Tagged Camera for the recording. In your project, add a [Tag](https://docs.unity3d.com/Manual/Tags.html) to the camera you want to record through, and then in the Recorder Settings, select TaggedCamera and specify your camera's Tag.
+
 #### Audio recording limited support
 
 **Limitation:** The Recorder currently supports only the recording of samples from the Unity built-in audio engine. As such, it cannot record audio from third-party audio engines such as FMOD Studio or Wwise.

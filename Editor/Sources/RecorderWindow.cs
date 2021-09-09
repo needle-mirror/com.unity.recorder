@@ -751,23 +751,11 @@ namespace UnityEditor.Recorder
             return recorderItem;
         }
 
-        string CheckRecordersIncompatibility()
+        void CheckRecordersIncompatibility()
         {
             var activeRecorders = m_ControllerSettings.RecorderSettings.Where(r => r.Enabled).ToArray();
 
-            if (activeRecorders.Length == 0)
-                return null;
-
-            var outputPaths = new Dictionary<string, RecorderSettings>();
-
-            foreach (var recorder in activeRecorders)
-            {
-                var path = recorder.fileNameGenerator.BuildAbsolutePath(null); // Does not detect all conflict or might have false positives
-                if (outputPaths.ContainsKey(path))
-                    return "Recorders '" + outputPaths[path].name + "' and '" + recorder.name + "' might try to save into the same output file.";
-
-                outputPaths.Add(path, recorder);
-            }
+            if (HasDuplicateOutputNames(activeRecorders)) return;
 
             var gameViewRecorders = new Dictionary<ImageHeight, RecorderSettings>();
 
@@ -778,9 +766,11 @@ namespace UnityEditor.Recorder
                 {
                     if (gameViewRecorders.Any() && !gameViewRecorders.ContainsKey(gameView.outputImageHeight))
                     {
-                        return "Recorders '" + gameViewRecorders.Values.First().name + "' and '" +
+                        var msg =  "Recorders '" + gameViewRecorders.Values.First().name + "' and '" +
                             recorder.name +
                             "' are recording the Game View using different resolutions. This can lead to unexpected behaviour.";
+                        ShowMessageInStatusBar(msg, MessageType.Warning);
+                        return;
                     }
 
                     gameViewRecorders[gameView.outputImageHeight] = recorder;
@@ -800,12 +790,38 @@ namespace UnityEditor.Recorder
 
                 if (numberOfSubframeRecorder >= 1 && activeRecorders.Length > 1)
                 {
-                    return "You can only use one active Recorder at a time when you capture accumulation.";
+                    var msg = "You can only use one active Recorder at a time when you capture accumulation.";
+                    ShowMessageInStatusBar(msg, MessageType.Warning);
+                    return;
                 }
             }
 
+            if (activeRecorders.Length > 0)
+                ShowMessageInStatusBar("Ready to start recording", MessageType.None);
+            return;
+        }
 
-            return null;
+        bool HasDuplicateOutputNames(RecorderSettings[] activeRecorders)
+        {
+            var duplicateNames = 0;
+            m_RecorderController.ValidateRecorderNames();
+
+            foreach (var recorder in activeRecorders)
+            {
+                if (recorder.IsOutputNameDuplicate)
+                    duplicateNames++;
+            }
+
+            if (duplicateNames > 0)
+            {
+                var msg = $"There are {duplicateNames} Recorders that do not have unique output file names.";
+                ShowMessageInStatusBar(msg, MessageType.Error);
+            }
+
+            foreach (var recorderItem in m_RecordingListItem.items)
+                recorderItem.UpdateState();
+
+            return duplicateNames > 0;
         }
 
         bool ShouldDisableRecordSettings()
@@ -1225,6 +1241,8 @@ namespace UnityEditor.Recorder
 
         void UpdateRecordingProgressGUI()
         {
+            CheckRecordersIncompatibility();
+
             if (m_State == State.Error)
             {
                 if (!HaveActiveRecordings())
@@ -1245,19 +1263,6 @@ namespace UnityEditor.Recorder
                 {
                     ShowMessageInStatusBar("No active recorder", MessageType.Info);
                 }
-                else
-                {
-                    var msg = CheckRecordersIncompatibility();
-                    if (string.IsNullOrEmpty(msg))
-                    {
-                        ShowMessageInStatusBar("Ready to start recording", MessageType.None);
-                    }
-                    else
-                    {
-                        ShowMessageInStatusBar(msg, MessageType.Warning);
-                    }
-                }
-
                 return;
             }
 

@@ -242,7 +242,12 @@ namespace UnityEditor.Recorder.Input
                     throw new ArgumentOutOfRangeException();
             }
 
-            if (cbSettings.CaptureUI)
+            if (cbSettings.CaptureUI && !UnityHelpers.UsingLegacyRP())
+            {
+                Debug.LogWarning("Capture UI is not supported with Scriptable Render Pipeline (SRP).");
+            }
+
+            if (cbSettings.CaptureUI && UnityHelpers.UsingLegacyRP())
             {
                 var uiGO = new GameObject();
                 uiGO.name = "UICamera";
@@ -320,7 +325,7 @@ namespace UnityEditor.Recorder.Input
         /// <inheritdoc/>
         protected internal override void NewFrameReady(RecordingSession session)
         {
-            if (cbSettings.CaptureUI)
+            if (cbSettings.CaptureUI && UnityHelpers.UsingLegacyRP())
             {
                 // Find canvases
                 var canvases = UnityObject.FindObjectsOfType<Canvas>();

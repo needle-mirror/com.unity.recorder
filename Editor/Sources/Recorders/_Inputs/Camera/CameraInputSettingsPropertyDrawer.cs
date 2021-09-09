@@ -1,3 +1,4 @@
+using UnityEditor.Recorder.AOV.Input;
 using UnityEngine;
 
 namespace UnityEditor.Recorder.Input
@@ -72,7 +73,11 @@ namespace UnityEditor.Recorder.Input
                 EditorGUILayout.PropertyField(m_IncludeUI, Styles.IncludeUILabel);
             }
 
-            EditorGUILayout.PropertyField(m_FlipFinalOutput, Styles.FlipVerticalLabel);
+            if (!(target is AOVCameraInputSettings))
+            {
+                // Hide the flip checkbox for AOV recorders
+                EditorGUILayout.PropertyField(m_FlipFinalOutput, Styles.FlipVerticalLabel);
+            }
             ++EditorGUI.indentLevel;
         }
     }

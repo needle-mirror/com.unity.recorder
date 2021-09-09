@@ -297,6 +297,9 @@ namespace UnityEditor.Recorder
                     Debug.LogWarning($"Failed to look for Movie Encoders in assembly '{a.FullName}': {e.Message}");
                 }
             }
+            // Enforce the alphabetical order of encoders so that CoreMediaEncoder is first and ProRes second, so that
+            // their formats are processed in that order by the MovieRecorderEditor class
+            encodersRegistered = encodersRegistered.OrderBy(a => a.GetName()).ToList();
         }
 
         /// <summary>

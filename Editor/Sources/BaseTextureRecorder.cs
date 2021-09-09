@@ -137,16 +137,21 @@ namespace UnityEditor.Recorder
         /// <inheritdoc/>
         protected internal override void EndRecording(RecordingSession session)
         {
-            base.EndRecording(session);
 #if HDRP_ACCUM_API
+
             if (UnityHelpers.CaptureAccumulation(settings))
             {
                 if (RenderPipelineManager.currentPipeline is HDRenderPipeline hdPipeline)
                 {
+                    // hdPipeline.EndRecording needs to be called before base.EndRecording because
+                    // it will restore the Time.captureFrameRate
+                    // this would otherwise override what needs to be done by base.EndRecording
                     hdPipeline.EndRecording();
                 }
             }
 #endif
+            base.EndRecording(session);
+
             if (m_OngoingAsyncGPURequestsCount > 0)
             {
                 Recording = true;

@@ -38,6 +38,7 @@ namespace UnityEditor.Recorder
         {
             m_Disabled = !value;
             settings.Enabled = value;
+            if (m_Disabled) settings.IsOutputNameDuplicate = false;
             prefs.Save();
 
             m_EditableLabel.SetLabelEnabled(value);

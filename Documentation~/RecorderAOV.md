@@ -59,10 +59,10 @@ Select the camera to use for the recording.
 
 | Property || Function |
 |:---|:---|:---|
-| **Camera** || Specifies which camera the Recorder uses to capture the AOV recording.|
-|   | Main Camera | The Camera tagged with the MainCamera [Tag](https://docs.unity3d.com/Manual/Tags.html).  |
-|   | Tagged Camera | A camera tagged with a specific [Tag](https://docs.unity3d.com/Manual/Tags.html).<br/><br/>If you select this option, you must enter a value in the **Tag** field. |
-|**Tag** |   | Specifies which Camera Tag to look for when you set **Camera** to **Tagged Camera**. |
+| **Camera** || Specifies which camera the Recorder uses to capture the AOV recording.<br/><br/>**Note:** [You can't set the Camera property to ActiveCamera](KnownIssues.md#activecamera-recording-not-available-with-srps) due to a High Definition Render Pipeline (HDRP) limitation. |
+|| MainCamera | The Camera tagged with the MainCamera [Tag](https://docs.unity3d.com/Manual/Tags.html). |
+|| TaggedCamera | A camera tagged with a specific [Tag](https://docs.unity3d.com/Manual/Tags.html).<br/><br/>If you select this option, you must enter a value in the **Tag** field. |
+|**Tag** || Specifies which Camera Tag to look for when you set **Camera** to **Tagged Camera**. |
 
 ### Recorded view
 
