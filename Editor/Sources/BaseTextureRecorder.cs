@@ -1,9 +1,11 @@
+using System;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 #if HDRP_ACCUM_API
 using UnityEngine.Rendering.HighDefinition;
 #endif
+using System.Collections.Generic;
 
 namespace UnityEditor.Recorder
 {
@@ -22,6 +24,22 @@ namespace UnityEditor.Recorder
         protected bool      UseAsyncGPUReadback;
 
         Texture2D m_ReadbackTexture;
+        Queue<float> m_AsyncReadbackTimeStamps = new Queue<float>();
+
+        internal void EnqueueTimeStamp(float time)
+        {
+            m_AsyncReadbackTimeStamps.Enqueue(time);
+        }
+
+        internal float DequeueTimeStamp()
+        {
+            if (m_AsyncReadbackTimeStamps.Count == 0)
+            {
+                throw new Exception("Timestamp queue is empty");
+            }
+
+            return m_AsyncReadbackTimeStamps.Dequeue();
+        }
 
         /// <summary>
         /// Stores the format of the texture used for the readback.
@@ -66,6 +84,7 @@ namespace UnityEditor.Recorder
             }
 #endif
             UseAsyncGPUReadback = SystemInfo.supportsAsyncGPUReadback;
+            m_AsyncReadbackTimeStamps = new Queue<float>();
             m_OngoingAsyncGPURequestsCount = 0;
             m_DelayedEncoderDispose = false;
             return true;
@@ -74,6 +93,8 @@ namespace UnityEditor.Recorder
         /// <inheritdoc/>
         protected internal override void RecordFrame(RecordingSession session)
         {
+            m_AsyncReadbackTimeStamps.Enqueue(session.recorderTime);
+
             var input = (BaseRenderTextureInput)m_Inputs[0];
 
             if (input.ReadbackTexture != null)
@@ -137,16 +158,21 @@ namespace UnityEditor.Recorder
         /// <inheritdoc/>
         protected internal override void EndRecording(RecordingSession session)
         {
-            base.EndRecording(session);
 #if HDRP_ACCUM_API
+
             if (UnityHelpers.CaptureAccumulation(settings))
             {
                 if (RenderPipelineManager.currentPipeline is HDRenderPipeline hdPipeline)
                 {
+                    // hdPipeline.EndRecording needs to be called before base.EndRecording because
+                    // it will restore the Time.captureFrameRate
+                    // this would otherwise override what needs to be done by base.EndRecording
                     hdPipeline.EndRecording();
                 }
             }
 #endif
+            base.EndRecording(session);
+
             if (m_OngoingAsyncGPURequestsCount > 0)
             {
                 Recording = true;
@@ -185,7 +211,10 @@ namespace UnityEditor.Recorder
         /// Writes the frame from a Texture2D.
         /// </summary>
         /// <param name="t">The readback target.</param>
-        protected abstract void WriteFrame(Texture2D t);
+        protected virtual void WriteFrame(Texture2D t)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Releases the encoder resources.

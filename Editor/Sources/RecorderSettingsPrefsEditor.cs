@@ -7,6 +7,8 @@ namespace UnityEditor.Recorder
     {
         SerializedProperty m_RecordModeProperty;
 
+        SerializedProperty m_RecordExitPlayModeProperty;
+
         SerializedProperty m_PlaybackProperty;
         SerializedProperty m_FrameRateTypeProperty;
         SerializedProperty m_CustomFrameRateValueProperty;
@@ -42,6 +44,7 @@ namespace UnityEditor.Recorder
                 return;
 
             m_RecordModeProperty = serializedObject.FindProperty("m_RecordMode");
+            m_RecordExitPlayModeProperty = serializedObject.FindProperty("m_ExitPlayMode");
             m_PlaybackProperty = serializedObject.FindProperty("m_FrameRatePlayback");
             m_FrameRateTypeProperty  = serializedObject.FindProperty("m_FrameRateType");
             m_CustomFrameRateValueProperty = serializedObject.FindProperty("m_CustomFrameRateValue");
@@ -63,6 +66,7 @@ namespace UnityEditor.Recorder
         {
             serializedObject.Update();
 
+            EditorGUILayout.PropertyField(m_RecordExitPlayModeProperty);
             EditorGUILayout.PropertyField(m_RecordModeProperty, Styles.RecordModeLabel);
 
             ++EditorGUI.indentLevel;

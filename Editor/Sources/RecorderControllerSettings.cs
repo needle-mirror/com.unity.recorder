@@ -25,6 +25,7 @@ namespace UnityEditor.Recorder
         [SerializeField] float m_EndTime;
 
         [SerializeField] bool m_CapFrameRate = true;
+        [SerializeField] bool m_ExitPlayMode = true;
 
         static readonly Dictionary<FrameRateType, float> s_FPSToValue = new Dictionary<FrameRateType, float>()
         {
@@ -44,6 +45,15 @@ namespace UnityEditor.Recorder
         }
 
         internal RecordMode RecordMode => m_RecordMode;
+
+        /// <summary>
+        /// Instructs the recorder to exit Play Mode once the recording has finished.
+        /// </summary>
+        public bool ExitPlayMode
+        {
+            get { return m_ExitPlayMode; }
+            set { m_ExitPlayMode = value; }
+        }
 
         /// <summary>
         /// Indicates the type of frame rate (constant or variable) for the current list of Recorders.

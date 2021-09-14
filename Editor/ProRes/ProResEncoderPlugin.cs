@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Unity.Collections;
 using System.IO;
+using JetBrains.Annotations;
 using ProResOut;
 #if UNITY_EDITOR_OSX
 using System.Text;
@@ -48,7 +49,7 @@ namespace Unity.Media
         internal static readonly string CodecFormatLabel = "Codec Format";
         internal static readonly string ColorDefinitionLabel = "Color Definition";
 
-        internal sealed override VideoRecorderOutputFormat[] SupportedFormats { get; set; }
+        internal sealed override VideoRecorderOutputFormat[] AvailableFormats { get; set; }
 
         internal override bool PerformsVerticalFlip => true;
 
@@ -138,7 +139,7 @@ namespace Unity.Media
                 }
             };
 
-            SupportedFormats = new[] { VideoRecorderOutputFormat.MOV };
+            AvailableFormats = new[] { VideoRecorderOutputFormat.MOV };
         }
 
         internal override MediaEncoderHandle Register(MediaEncoderManager mgr)
@@ -194,24 +195,38 @@ namespace Unity.Media
             return settings.ImageInputSettings.SupportsTransparent;
         }
 
+        internal override bool SupportsVFR(MovieRecorderSettings settings, out string errorMessage)
+        {
+            errorMessage = ProResEncoderCore.kVFRNotSupportedError;
+            return false;
+        }
+
         internal override string GetDefaultExtension()
         {
             return "mov";
         }
 
-        internal override bool IsFormatSupported(VideoRecorderOutputFormat format)
+        /// <summary>
+        /// Gets the list of output formats this encoder supports on the current platform and Unity version.
+        /// </summary>
+        /// <returns></returns>
+        [CanBeNull]
+        internal override ReadOnlyCollection<VideoRecorderOutputFormat> GetSupportedFormats()
         {
 #if UNITY_EDITOR_LINUX
-            // ProRes is not supported on Linux
-            return false;
+            // No formats are supported
+            return null;
 #else
-            return true;
+            // All available formats are supported
+            return GetAvailableFormats();
 #endif
         }
     }
 
     internal class ProResEncoderCore
     {
+        public const string kVFRNotSupportedError =
+            "Movie recorder does not support Variable frame rate playback for ProRes. Please consider using Constant frame rate instead.";
         private Dictionary<string, IMediaEncoderAttribute> m_Attributes =
             new Dictionary<string, IMediaEncoderAttribute>();
 
@@ -287,6 +302,11 @@ namespace Unity.Media
             return found ? result : 0;
         }
 
+        static internal bool SupportsVFR()
+        {
+            return false;
+        }
+
         public void StartEncoding()
         {
             Vector2 imageSize = new Vector2(1920, 1080);
@@ -333,6 +353,12 @@ namespace Unity.Media
                 var vmAttr = (VideoTrackMediaEncoderAttribute)(attr);
                 var vidAttr = vmAttr.Value;
                 vAttr = vidAttr;
+                if (!SupportsVFR() && (vAttr.frameRate.numerator <= 0 || vAttr.frameRate.denominator <= 0))
+                {
+                    Debug.LogError(kVFRNotSupportedError);
+                    _encoderPtr = IntPtr.Zero;
+                    return;
+                }
                 imageSize.x = vAttr.width;
                 imageSize.y = vAttr.height;
                 fps = vAttr.frameRate.numerator / (float)vAttr.frameRate.denominator;
@@ -379,6 +405,16 @@ namespace Unity.Media
 
         public bool AddFrame(Texture2D tex)
         {
+            return AddFrameImpl(tex);
+        }
+
+        public bool AddFrame(Texture2D tex, UnityEditor.Media.MediaTime t)
+        {
+            return AddFrameImpl(tex, t.count, t.rate.numerator, t.rate.denominator);
+        }
+
+        private bool AddFrameImpl(Texture2D tex, long tickCount = 0, int rateNumerator = 0, int rateDenominator = 0)
+        {
             if (_encoderPtr == IntPtr.Zero)
             {
                 // Error will have been triggered earlier
@@ -393,7 +429,7 @@ namespace Unity.Media
             }
 
             var pixels = tex.GetRawTextureData();
-            bool success = ProResWrapper.AddVideoFrame(_encoderPtr, pixels);
+            bool success = ProResWrapper.AddVideoFrame(_encoderPtr, pixels, tickCount, rateNumerator, rateDenominator);
             if (!success)
             {
                 Debug.LogError("Failed to add video frame to ProRes encoder");
@@ -401,13 +437,21 @@ namespace Unity.Media
             return success;
         }
 
-        public bool AddFrame(Texture2D tex, UnityEditor.Media.MediaTime t)
+        public bool AddFrame(
+            int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data)
         {
-            throw new NotImplementedException();
+            return AddFrameImpl(width, height, rowBytes, format, data);
         }
 
         public bool AddFrame(
-            int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data)
+            int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data, UnityEditor.Media.MediaTime time)
+        {
+            return AddFrameImpl(width, height, rowBytes, format, data, time.count, time.rate.numerator, time.rate.denominator);
+        }
+
+        private bool AddFrameImpl(
+            int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data,
+            long tickCount = 0, int rateNumerator = 0, int rateDenominator = 0)
         {
             if (_encoderPtr == IntPtr.Zero)
             {
@@ -422,18 +466,12 @@ namespace Unity.Media
                 Debug.LogError($"Unexpected pixel format {format} (expected {expectedFormat})");
             }
 
-            bool success = ProResWrapper.AddVideoFrame(_encoderPtr, data.ToArray());
+            bool success = ProResWrapper.AddVideoFrame(_encoderPtr, data.ToArray(), tickCount, rateNumerator, rateDenominator);
             if (!success)
             {
                 Debug.LogError("Failed to add video frame to ProRes encoder");
             }
             return success;
-        }
-
-        public bool AddFrame(
-            int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data, UnityEditor.Media.MediaTime time)
-        {
-            throw new NotImplementedException();
         }
 
         public bool AddSamples(ushort trackIndex, NativeArray<float> interleavedSamples)

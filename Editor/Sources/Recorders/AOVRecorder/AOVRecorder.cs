@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Recorder.AOV;
+using UnityEditor.Recorder.AOV.Input;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -9,7 +11,6 @@ namespace UnityEditor.Recorder
 {
     class AOVRecorder : BaseTextureRecorder<AOVRecorderSettings>
     {
-        public bool m_asyncShaderCompileSetting;
         Queue<string> m_PathQueue = new Queue<string>();
         protected override TextureFormat ReadbackTextureFormat
         {
@@ -38,10 +39,12 @@ namespace UnityEditor.Recorder
                 return false;
             }
 
-            // Save the async compile shader setting to restore it at the end of recording
-            m_asyncShaderCompileSetting = EditorSettings.asyncShaderCompilation;
-            // Disable async compile shader setting when recording
-            EditorSettings.asyncShaderCompilation = false;
+            // Did the user request a vertically flipped image? This is not supported.
+            var input = settings.InputsSettings.First() as AOVCameraInputSettings;
+            if (input != null && input.FlipFinalOutput)
+            {
+                Debug.LogWarning($"The '{settings.name}' AOV Recorder can't vertically flip the image as requested. This option is not supported in AOV recording context.");
+            }
 
             Settings.FileNameGenerator.CreateDirectory(session);
             return true;
@@ -50,8 +53,6 @@ namespace UnityEditor.Recorder
 
         protected internal override void EndRecording(RecordingSession session)
         {
-            // Restore the asyncShaderCompilation setting
-            EditorSettings.asyncShaderCompilation = m_asyncShaderCompileSetting;
             base.EndRecording(session);
         }
 
@@ -71,6 +72,7 @@ namespace UnityEditor.Recorder
 
         protected override void WriteFrame(Texture2D tex)
         {
+            DequeueTimeStamp();
             byte[] bytes;
 
             Profiler.BeginSample("AOVRecorder.EncodeImage");

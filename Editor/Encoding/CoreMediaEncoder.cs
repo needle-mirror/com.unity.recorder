@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using JetBrains.Annotations;
 using Unity.Collections;
 using UnityEditor.Media;
 using UnityEditor.Recorder;
@@ -14,7 +15,7 @@ namespace Unity.Media
     {
         internal override bool PerformsVerticalFlip => false;
 
-        internal sealed override VideoRecorderOutputFormat[] SupportedFormats { get; set; }
+        internal sealed override VideoRecorderOutputFormat[] AvailableFormats { get; set; }
 
         internal override unsafe MediaEncoderHandle Register(MediaEncoderManager mgr)
         {
@@ -28,7 +29,27 @@ namespace Unity.Media
 
         public CoreMediaEncoderRegister()
         {
-            SupportedFormats = new[] { VideoRecorderOutputFormat.MP4, VideoRecorderOutputFormat.WebM };
+            AvailableFormats = new[]
+            {
+                VideoRecorderOutputFormat.MP4,
+                VideoRecorderOutputFormat.WebM
+            };
+        }
+
+        /// <summary>
+        /// Gets the list of output formats this encoder supports on the current platform and Unity version.
+        /// </summary>
+        /// <returns></returns>
+        [CanBeNull]
+        internal override ReadOnlyCollection<VideoRecorderOutputFormat> GetSupportedFormats()
+        {
+#if UNITY_EDITOR_LINUX
+            // Only WebM is supported on Linux
+            return new ReadOnlyCollection<VideoRecorderOutputFormat>(new[] {VideoRecorderOutputFormat.WebM});
+#else
+            // All available formats are supported
+            return GetAvailableFormats();
+#endif
         }
 
         internal override bool SupportsResolution(MovieRecorderSettings settings, int width, int height, out string errorMessage, out string warningMessage)
@@ -67,16 +88,6 @@ namespace Unity.Media
         internal override string GetDefaultExtension()
         {
             return "mp4";
-        }
-
-        internal override bool IsFormatSupported(VideoRecorderOutputFormat format)
-        {
-#if UNITY_EDITOR_LINUX
-            // MP4 is not supported on Linux
-            return format != VideoRecorderOutputFormat.MP4;
-#else
-            return true;
-#endif
         }
     }
 

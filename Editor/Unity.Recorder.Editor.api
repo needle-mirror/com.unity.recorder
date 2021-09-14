@@ -66,7 +66,7 @@ namespace UnityEditor.Recorder
         protected virtual void PrepareNewFrame(UnityEditor.Recorder.RecordingSession ctx);
         protected virtual void RecordFrame(UnityEditor.Recorder.RecordingSession session);
         protected virtual void WriteFrame(UnityEngine.Rendering.AsyncGPUReadbackRequest r);
-        protected abstract void WriteFrame(UnityEngine.Texture2D t);
+        protected virtual void WriteFrame(UnityEngine.Texture2D t);
     }
 
     public static class BindingManager
@@ -210,10 +210,10 @@ namespace UnityEditor.Recorder
         }
         public enum VideoRecorderOutputFormat
         {
-            public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat MOV = 2;
-            public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat MP4 = 0;
+            [UnityEngine.InspectorName(@"ProRes QuickTime")] public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat MOV = 2;
+            [UnityEngine.InspectorName(@"H.264 MP4")] public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat MP4 = 0;
             public int value__;
-            public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat WebM = 1;
+            [UnityEngine.InspectorName(@"VP8 WebM")] public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat WebM = 1;
         }
     }
 
@@ -262,6 +262,7 @@ namespace UnityEditor.Recorder
     public class RecorderControllerSettings : UnityEngine.ScriptableObject
     {
         public bool CapFrameRate { get; set; }
+        public bool ExitPlayMode { get; set; }
         public float FrameRate { get; set; }
         public UnityEditor.Recorder.FrameRatePlayback FrameRatePlayback { get; set; }
         public System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderSettings> RecorderSettings { get; }

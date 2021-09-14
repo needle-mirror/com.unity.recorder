@@ -8,8 +8,6 @@ namespace UnityEditor.Recorder
     public static class RecorderOptions
     {
         const string k_ShowLegacyModeMenuItem = RecorderWindow.MenuRoot + "Options/Show Legacy Recorders";
-
-        const string k_ExitPayModeItem = RecorderWindow.MenuRoot + "Options/Exit PlayMode";
         const string k_RecorderPanelWidth = RecorderWindow.MenuRoot + "Options/Recorder Panel Width";
         const string k_SelectedRecorderIndex = RecorderWindow.MenuRoot + "Options/Selected Recorder Index";
 
@@ -33,12 +31,6 @@ namespace UnityEditor.Recorder
             {
                 RecorderPreferencesSettings.Instance.ShowGO = value;
             }
-        }
-
-        internal static bool exitPlayMode
-        {
-            get { return EditorPrefs.GetBool(k_ExitPayModeItem, false); }
-            set { EditorPrefs.SetBool(k_ExitPayModeItem, value); }
         }
 
         internal static float recorderPanelWidth

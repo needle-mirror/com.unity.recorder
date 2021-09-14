@@ -23,6 +23,7 @@ namespace UnityEditor.Recorder
     {
         static int sm_CaptureFrameRateCount;
         bool m_ModifiedCaptureFR;
+        bool m_asyncShaderCompileSetting;
 
         /// <summary>
         /// Indicates the number of frames of the current recording session.
@@ -167,6 +168,11 @@ namespace UnityEditor.Recorder
             if (RecorderOptions.VerboseMode)
                 ConsoleLogMessage($"Starting to record", LogType.Log);
 
+            // Save the async compile shader setting to restore it at the end of recording
+            m_asyncShaderCompileSetting = EditorSettings.asyncShaderCompilation;
+            // Disable async compile shader setting when recording
+            EditorSettings.asyncShaderCompilation = false;
+
             return Recording = true;
         }
 
@@ -202,6 +208,9 @@ namespace UnityEditor.Recorder
             if (RecorderOptions.VerboseMode)
                 ConsoleLogMessage($"Recording stopped, total frame count: {RecordedFramesCount}", LogType.Log);
 
+            // Restore the asyncShaderCompilation setting
+            EditorSettings.asyncShaderCompilation = m_asyncShaderCompileSetting;
+
             ++settings.Take;
         }
 
@@ -231,7 +240,7 @@ namespace UnityEditor.Recorder
         protected internal virtual bool SkipFrame(RecordingSession ctx)
         {
             return !Recording
-                || ctx.frameIndex % settings.captureEveryNthFrame != 0
+                || ctx.frameIndex % settings.captureEveryNthFrame != 0 && ctx.settings.FrameRatePlayback == FrameRatePlayback.Variable
                 || settings.RecordMode == RecordMode.TimeInterval && ctx.currentFrameStartTS < settings.StartTime
                 || settings.RecordMode == RecordMode.FrameInterval && ctx.frameIndex < settings.StartFrame
                 || settings.RecordMode == RecordMode.SingleFrame && ctx.frameIndex < settings.StartFrame;

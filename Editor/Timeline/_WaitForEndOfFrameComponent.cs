@@ -11,7 +11,15 @@ namespace UnityEditor.Recorder.Timeline
 
         public void LateUpdate()
         {
-            RequestNewFrame();
+            if (m_playable == null)
+            {
+                return;
+            }
+
+            if (m_playable.requestFrame)
+            {
+                RequestNewFrame();
+            }
         }
 
         protected override void FrameReady()

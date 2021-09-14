@@ -14,24 +14,46 @@ namespace UnityEditor.Recorder.Input
         public static int modifiedResolutionCount;
         const int miscSize = 1; // Used when no main GameView exists (ex: batchmode)
 
-        static Type s_GameViewType = Type.GetType("UnityEditor.PlayModeView,UnityEditor");
+        static Type s_PlayModeViewType = Type.GetType("UnityEditor.PlayModeView,UnityEditor");
         static string s_GetGameViewFuncName = "GetMainPlayModeView";
-        static EditorWindow GetMainGameView()
+        static EditorWindow GetMainPlayModeView()
         {
-            var getMainGameView = s_GameViewType.GetMethod(s_GetGameViewFuncName, BindingFlags.NonPublic | BindingFlags.Static);
+            var getMainGameView = s_PlayModeViewType.GetMethod(s_GetGameViewFuncName, BindingFlags.NonPublic | BindingFlags.Static);
             if (getMainGameView == null)
             {
                 Debug.LogError(string.Format("Can't find the main Game View : {0} function was not found in {1} type ! Did API change ?",
-                    s_GetGameViewFuncName, s_GameViewType));
+                    s_GetGameViewFuncName, s_PlayModeViewType));
                 return null;
             }
             var res = getMainGameView.Invoke(null, null);
             return (EditorWindow)res;
         }
 
+        public static bool IsMainPlayViewGameView()
+        {
+            var gameView = GetMainPlayModeView();
+            if (gameView == null)
+                return true;
+            return gameView.GetType().Name == "GameView";
+        }
+
+        public static void SwapMainPlayViewToGameView()
+        {
+            if (IsMainPlayViewGameView())
+                return;
+
+            var gameView = GetMainPlayModeView();
+            if (gameView == null)
+                return;
+
+            var swapMainWindow = gameView.GetType().GetMethod("SwapMainWindow",  BindingFlags.NonPublic | BindingFlags.Instance);
+            var gameViewType = Type.GetType("UnityEditor.GameView,UnityEditor");
+            swapMainWindow.Invoke(gameView, new object[] { gameViewType });
+        }
+
         public static void DisableMaxOnPlay()
         {
-            var gameView = GetMainGameView();
+            var gameView = GetMainPlayModeView();
             if (gameView == null)
                 return;
 
@@ -53,7 +75,7 @@ namespace UnityEditor.Recorder.Input
 
         public static void GetGameRenderSize(out int width, out int height)
         {
-            var gameView = GetMainGameView();
+            var gameView = GetMainPlayModeView();
 
             if (gameView == null)
             {
@@ -156,10 +178,12 @@ namespace UnityEditor.Recorder.Input
                 return;
             var index = IndexOf(size);
 
-            var gameView = GetMainGameView();
+            var gameView = GetMainPlayModeView();
             if (gameView == null)
                 return;
             var obj = gameView.GetType().GetMethod("SizeSelectionCallback", BindingFlags.Public | BindingFlags.Instance);
+            if (obj == null)
+                return;
             obj.Invoke(gameView, new[] { index, size });
         }
 
@@ -167,7 +191,7 @@ namespace UnityEditor.Recorder.Input
         {
             get
             {
-                var gv = GetMainGameView();
+                var gv = GetMainPlayModeView();
                 if (gv == null)
                     return new[] {miscSize, miscSize};
                 var prop = gv.GetType().GetProperty("currentGameViewSize", BindingFlags.NonPublic | BindingFlags.Instance);

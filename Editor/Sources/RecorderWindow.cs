@@ -39,6 +39,7 @@ namespace UnityEditor.Recorder
         private static ListRequest s_Request;
         private static bool s_NeedToResetView = false;
 
+
         private static bool HasFocus()
         {
             return (focusedWindow != null && focusedWindow.GetType() == typeof(RecorderWindow));
@@ -182,7 +183,6 @@ namespace UnityEditor.Recorder
         PanelSplitter m_PanelSplitter;
         VisualElement m_AddNewRecordPanel;
 
-        VisualElement m_RecordOptionsPanel;
         VisualElement m_RecordModeOptionsPanel;
         VisualElement m_FrameRateOptionsPanel;
 
@@ -214,6 +214,11 @@ namespace UnityEditor.Recorder
             m_RecorderController = new RecorderController(settings);
             m_RecorderSettingsPrefsEditor = (RecorderSettingsPrefsEditor)Editor.CreateEditor(m_ControllerSettings);
             ReloadRecordings();
+        }
+
+        internal RecorderControllerSettings GetRecorderControllerSettings()
+        {
+            return m_ControllerSettings;
         }
 
         void ClearView()
@@ -334,19 +339,6 @@ namespace UnityEditor.Recorder
             UpdateRecordButtonText();
 
             leftButtonsStack.Add(m_RecordButton);
-
-            m_RecordOptionsPanel = new IMGUIContainer(() =>
-            {
-                PrepareGUIState(m_RecordOptionsPanel.layout.width);
-                RecorderOptions.exitPlayMode = EditorGUILayout.Toggle(Styles.ExitPlayModeLabel, RecorderOptions.exitPlayMode);
-            })
-            {
-                name = "recordOptions"
-            };
-
-            UIElementHelper.SetFlex(m_RecordOptionsPanel, 1.0f);
-
-            leftButtonsStack.Add(m_RecordOptionsPanel);
 
             m_RecordModeOptionsPanel = new IMGUIContainer(() =>
             {
@@ -615,11 +607,16 @@ namespace UnityEditor.Recorder
 
             m_ControllerSettings.ApplyGlobalSettingToAllRecorders();
             var recorderItems = m_ControllerSettings.RecorderSettings.Select(CreateRecorderItem).ToArray();
-
             foreach (var recorderItem in recorderItems)
                 recorderItem.UpdateState();
 
             m_RecordingListItem.Reload(recorderItems);
+        }
+
+        void UpdateStateOfSelectedItem()
+        {
+            if (m_SelectedRecorderItem != null)
+                m_SelectedRecorderItem.UpdateState();
         }
 
         void OnRecorderListValidateCommand(ValidateCommandEvent evt)
@@ -762,23 +759,11 @@ namespace UnityEditor.Recorder
             return recorderItem;
         }
 
-        string CheckRecordersIncompatibility()
+        void CheckRecordersIncompatibility()
         {
             var activeRecorders = m_ControllerSettings.RecorderSettings.Where(r => r.Enabled).ToArray();
 
-            if (activeRecorders.Length == 0)
-                return null;
-
-            var outputPaths = new Dictionary<string, RecorderSettings>();
-
-            foreach (var recorder in activeRecorders)
-            {
-                var path = recorder.fileNameGenerator.BuildAbsolutePath(null); // Does not detect all conflict or might have false positives
-                if (outputPaths.ContainsKey(path))
-                    return "Recorders '" + outputPaths[path].name + "' and '" + recorder.name + "' might try to save into the same output file.";
-
-                outputPaths.Add(path, recorder);
-            }
+            if (HasDuplicateOutputNames(activeRecorders)) return;
 
             var gameViewRecorders = new Dictionary<ImageHeight, RecorderSettings>();
 
@@ -789,9 +774,11 @@ namespace UnityEditor.Recorder
                 {
                     if (gameViewRecorders.Any() && !gameViewRecorders.ContainsKey(gameView.outputImageHeight))
                     {
-                        return "Recorders '" + gameViewRecorders.Values.First().name + "' and '" +
+                        var msg =  "Recorders '" + gameViewRecorders.Values.First().name + "' and '" +
                             recorder.name +
                             "' are recording the Game View using different resolutions. This can lead to unexpected behaviour.";
+                        ShowMessageInStatusBar(msg, MessageType.Warning);
+                        return;
                     }
 
                     gameViewRecorders[gameView.outputImageHeight] = recorder;
@@ -811,12 +798,38 @@ namespace UnityEditor.Recorder
 
                 if (numberOfSubframeRecorder >= 1 && activeRecorders.Length > 1)
                 {
-                    return "You can only use one active Recorder at a time when you capture accumulation.";
+                    var msg = "You can only use one active Recorder at a time when you capture accumulation.";
+                    ShowMessageInStatusBar(msg, MessageType.Warning);
+                    return;
                 }
             }
 
+            if (activeRecorders.Length > 0)
+                ShowMessageInStatusBar("Ready to start recording", MessageType.None);
+            return;
+        }
 
-            return null;
+        bool HasDuplicateOutputNames(RecorderSettings[] activeRecorders)
+        {
+            var duplicateNames = 0;
+            m_RecorderController.ValidateRecorderNames();
+
+            foreach (var recorder in activeRecorders)
+            {
+                if (recorder.IsOutputNameDuplicate)
+                    duplicateNames++;
+            }
+
+            if (duplicateNames > 0)
+            {
+                var msg = $"There are {duplicateNames} Recorders that do not have unique output file names.";
+                ShowMessageInStatusBar(msg, MessageType.Error);
+            }
+
+            foreach (var recorderItem in m_RecordingListItem.items)
+                recorderItem.UpdateState();
+
+            return duplicateNames > 0;
         }
 
         bool ShouldDisableRecordSettings()
@@ -952,7 +965,7 @@ namespace UnityEditor.Recorder
             // Settings might have changed after the session ended
             m_ControllerSettings.Save();
 
-            if (RecorderOptions.exitPlayMode)
+            if (m_RecorderController.Settings.ExitPlayMode)
                 EditorApplication.isPlaying = false;
         }
 
@@ -1191,6 +1204,14 @@ namespace UnityEditor.Recorder
 
         void OnRecordSelectionChanged()
         {
+            var previousSelection = m_SelectedRecorderItem;
+            if (previousSelection != null)
+            {
+                // Remove the action trigger
+                var recorderEditor = (RecorderEditor)(previousSelection.editor);
+                recorderEditor.OnSelectedSettingsChangedAfterTheFact -= UpdateStateOfSelectedItem;
+            }
+
             m_SelectedRecorderItem = m_RecordingListItem.selection;
 
             foreach (var r in m_RecordingListItem.items)
@@ -1199,7 +1220,12 @@ namespace UnityEditor.Recorder
             }
 
             if (m_SelectedRecorderItem != null)
+            {
                 UIElementHelper.SetDirty(m_RecorderSettingPanel);
+                // Listen to the action trigger
+                var recorderEditor = (RecorderEditor)(m_SelectedRecorderItem.editor);
+                recorderEditor.OnSelectedSettingsChangedAfterTheFact += UpdateStateOfSelectedItem;
+            }
 
             Repaint();
         }
@@ -1236,6 +1262,8 @@ namespace UnityEditor.Recorder
 
         void UpdateRecordingProgressGUI()
         {
+            CheckRecordersIncompatibility();
+
             if (m_State == State.Error)
             {
                 if (!HaveActiveRecordings())
@@ -1256,19 +1284,6 @@ namespace UnityEditor.Recorder
                 {
                     ShowMessageInStatusBar("No active recorder", MessageType.Info);
                 }
-                else
-                {
-                    var msg = CheckRecordersIncompatibility();
-                    if (string.IsNullOrEmpty(msg))
-                    {
-                        ShowMessageInStatusBar("Ready to start recording", MessageType.None);
-                    }
-                    else
-                    {
-                        ShowMessageInStatusBar(msg, MessageType.Warning);
-                    }
-                }
-
                 return;
             }
 
@@ -1280,7 +1295,7 @@ namespace UnityEditor.Recorder
 
             var recordingSessions = m_RecorderController.GetRecordingSessions();
 
-            var session = recordingSessions.FirstOrDefault(); // Hack. We know each session uses the same global settings so take the first one...
+            var session = recordingSessions.FirstOrDefault(); // Follow the progress of the first recorder, since they all share the same timing.
 
             if (session == null)
                 return;

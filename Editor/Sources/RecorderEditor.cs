@@ -15,6 +15,11 @@ namespace UnityEditor.Recorder
         SerializedProperty m_FileNameGenerator;
         SerializedProperty m_Take;
 
+        /// <summary>
+        /// An action that gets triggered when a change of the settings happens in the Editor and must notify the Recorder Window.
+        /// </summary>
+        internal event Action OnSelectedSettingsChangedAfterTheFact;
+
         internal event Action OnRecorderValidated;
         SavedBool showFormat;
         SavedBool showOutputFile;
@@ -32,6 +37,11 @@ namespace UnityEditor.Recorder
             internal static readonly GUIContent SourceLabel = new GUIContent("Source", "The input type to use for the recording.");
             internal static readonly GUIContent TakeNumberLabel = new GUIContent("Take Number", "Value that the Recorder uses to number the recordings. It increases by one after each recording.");
             internal static readonly GUIContent RenderStepFrameLabel = new GUIContent("Render Frame Step", "The interval between every frame to render in Play mode during the recording.");
+        }
+
+        internal void InvokeItemStateRefresh()
+        {
+            OnSelectedSettingsChangedAfterTheFact?.Invoke();
         }
 
         /// <summary>

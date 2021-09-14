@@ -4,8 +4,8 @@ These properties appear when you set **Source** to **Targeted Camera**.
 
 |Property||Function|
 |-|-|-|
-| **Camera** ||Specifies which camera the Recorder uses to capture the recording.<br/><br/>**Note:** some options might not appear if you're using certain render pipelines (for example [HDRP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest)).|
-|   | ActiveCamera  | The Camera that is active when you launch the recording.  |
+| **Camera** ||Specifies which camera the Recorder uses to capture the recording. |
+|   | ActiveCamera  | The Camera that is active when you launch the recording.<br/><br/>**Note:** [The ActiveCamera option is not available](KnownIssues.md#activecamera-recording-not-available-with-srps) when your project uses a Scriptable Render Pipeline (SRP). |
 |   | MainCamera   | The Camera tagged with the MainCamera [Tag](https://docs.unity3d.com/Manual/Tags.html).  |
 |   | TaggedCamera  | A camera tagged with a specific [Tag](https://docs.unity3d.com/Manual/Tags.html).<br/><br/>If you select this option, you must enter a value in the **Tag** field. |
 |**Tag**   |   | Specifies which Camera Tag to look for when you set **Camera** to **Tagged Camera**.|

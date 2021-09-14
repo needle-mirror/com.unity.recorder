@@ -1,13 +1,13 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Recorder",
-  "version": "4.0.0-pre.1",
+  "version": "4.0.0-pre.2",
   "unity": "2019.4",
   "unityRelease": "1f1",
   "dependencies": {
     "com.unity.timeline": "1.0.0"
   },
-  "description": "The Recorder allows you to capture and save data from the Unity Editor during Play mode: animations, videos, images, audio, arbitrary output variables (AOVs), and more.\n\nIMPORTANT NOTE: Troubleshooting options can now be found in User Preferences.",
+  "description": "The Recorder allows you to capture and save data from the Unity Editor during Play mode: animations, videos, images, audio, arbitrary output variables (AOVs), and more.",
   "keywords": [
     "unity",
     "recorder",
@@ -23,15 +23,15 @@
     "layer"
   ],
   "relatedPackages": {
-    "com.unity.recorder.tests": "4.0.0-pre.1"
+    "com.unity.recorder.tests": "4.0.0-pre.2"
   },
   "upmCi": {
-    "footprint": "c463baceed09dbc3866cb0f825921dfd1b368d47"
+    "footprint": "6e2e98579b9d928b0bb9f478a28b3fe61ed2c931"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.recorder.git",
     "type": "git",
-    "revision": "7beaa698687cb27a2185d9d2c2fcfd0980584e52"
+    "revision": "cc83cd9449ed4254de31bfd506aeba5fc097d598"
   },
   "samples": [
     {

@@ -318,7 +318,7 @@ namespace UnityEditor.Recorder
             var data = new RecorderSessionStartEvent
             {
                 recorder_session_guid = guid,
-                exit_play_mode = RecorderOptions.exitPlayMode,
+                exit_play_mode = false, // not available in timeline
                 target_fps = session.settings.FrameRate,
                 triggered_by = "timeline",
                 render_pipeline = GetCurrentRenderPipeline(),
@@ -349,7 +349,7 @@ namespace UnityEditor.Recorder
             var data = new RecorderSessionStartEvent
             {
                 recorder_session_guid = guid,
-                exit_play_mode = RecorderOptions.exitPlayMode,
+                exit_play_mode = controllerSettings.ExitPlayMode,
                 recording_mode = controllerSettings.RecordMode.ConvertToString(),
                 playback_mode = controllerSettings.FrameRatePlayback.ConvertToString(),
                 target_fps = controllerSettings.FrameRate,

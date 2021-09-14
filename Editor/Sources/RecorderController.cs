@@ -57,6 +57,7 @@ namespace UnityEditor.Recorder
 
             int numberOfSubframeRecorder = 0;
             int numberOfRecorderEnabled = 0;
+            ValidateRecorderNames();
 
             foreach (var recorderSetting in m_Settings.RecorderSettings)
             {
@@ -187,6 +188,29 @@ namespace UnityEditor.Recorder
         internal IEnumerable<RecordingSession> GetRecordingSessions()
         {
             return m_SceneHook.GetRecordingSessions();
+        }
+
+        internal void ValidateRecorderNames()
+        {
+            var outputPaths = new Dictionary<string, RecorderSettings>();
+            foreach (var recSettings in m_Settings.RecorderSettings)
+            {
+                var path = recSettings.FileNameGenerator.BuildAbsolutePath(null);
+                if (outputPaths.ContainsKey(path))
+                {
+                    var matchingRecorder = outputPaths[path];
+                    if (!matchingRecorder.Enabled || !recSettings.Enabled) continue;
+
+                    recSettings.IsOutputNameDuplicate = true;
+                    matchingRecorder.IsOutputNameDuplicate = true;
+                }
+                else
+                {
+                    if (!recSettings.Enabled) continue;
+                    recSettings.IsOutputNameDuplicate = false;
+                    outputPaths.Add(path, recSettings);
+                }
+            }
         }
     }
 }

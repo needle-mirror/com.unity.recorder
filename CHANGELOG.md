@@ -4,6 +4,30 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0-pre.2] - 2021-09-14
+### Added
+- Added variable frame rate support to the Movie Recorder.
+
+### Changed
+- Make VP8 WebM the default output format for Movie Recorders on Linux, MP4 not being supported.
+- Log errors when setting up a Recorder for H.264 MP4 or ProRes on Linux.
+- Hide the Flip Vertical property in AOV Recorder Settings, as it is not supported.
+- Disable asynchronous shader compilation before recording.
+- The Exit Play Mode option, which used to be a per-user setting, is now a per-Recorder-List asset.
+
+### Fixed
+- Prevent recording when multiple Recorders use the same output file name.
+- Ensure recording the expected frames with accumulation when the recording range doesn't start at 0.
+- Add missing output location browse button in the Animation Clip Recorder.
+- Ignore the unsupported "Capture UI" option in Scriptable Render Pipeline (SRP) projects to prevent recordings from being corrupted
+- Prevent users from editing Recorder bindings through the UI.
+- Add contextual feedback about Simulator view not supported when selecting "Game View" as the recorded source.
+- Automatically switch to Game view if Simulator view is selected when starting to record the "Game View" source.
+- Prevent the Recorder Timeline integration from outputting files when the timeline is paused.
+- Ignore the Render Frame Step property when the Frame Rate Playback mode is set to Constant.
+- Fix valid Recorders only recording the first frame when the first Recorder in the Recorder Window list is invalid.
+- Prevent users from getting issues when renaming recorders in the Recorder List.
+
 ## [4.0.0-pre.1] - 2021-08-25
 ### Added
 - Added a slider to change the JPEG quality when using Image Recorders or AOV Recorders.

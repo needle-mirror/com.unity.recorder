@@ -63,24 +63,46 @@ namespace UnityEditor.Recorder
         /// Gets the list of supported formats (as strings) for the registered Encoders.
         /// </summary>
         /// <returns></returns>
-        private List<string> GetFormatsSupportedByRegisteredEncoders()
+        private List<VideoRecorderOutputFormat> GetFormatsAvailableInRegisteredEncoders()
         {
-            if (_mFormatsSupportedByRegisteredEncoders != null)
-                return _mFormatsSupportedByRegisteredEncoders;
+            if (_mFormatsAvailableInRegisteredEncoders != null)
+                return _mFormatsAvailableInRegisteredEncoders;
             // Look at the formats that are supported by the registered encoders
-            _mFormatsSupportedByRegisteredEncoders = new List<string>();
+            _mFormatsAvailableInRegisteredEncoders = new List<VideoRecorderOutputFormat>();
+            foreach (var encoder in RegisteredEncoders)
+            {
+                var currFormats = encoder.GetAvailableFormats();
+                // Add to the list of formats for the GUI
+                foreach (var format in currFormats)
+                    _mFormatsAvailableInRegisteredEncoders.Add(format);
+            }
+
+            return _mFormatsAvailableInRegisteredEncoders;
+        }
+
+        private List<VideoRecorderOutputFormat> _mFormatsAvailableInRegisteredEncoders = null;
+
+        private List<VideoRecorderOutputFormat> GetFormatsSupportedInRegisteredEncoders()
+        {
+            if (_mFormatsSupportedInRegisteredEncoders != null)
+                return _mFormatsSupportedInRegisteredEncoders;
+            // Look at the formats that are supported by the registered encoders
+            _mFormatsSupportedInRegisteredEncoders = new List<VideoRecorderOutputFormat>();
             foreach (var encoder in RegisteredEncoders)
             {
                 var currFormats = encoder.GetSupportedFormats();
-                // Add to the list of formats for the GUI
-                foreach (var format in currFormats)
-                    _mFormatsSupportedByRegisteredEncoders.Add(format.FormatToName());
+                if (currFormats != null)
+                {
+                    // Add to the list of formats for the GUI
+                    foreach (var format in currFormats)
+                        _mFormatsSupportedInRegisteredEncoders.Add(format);
+                }
             }
 
-            return _mFormatsSupportedByRegisteredEncoders;
+            return _mFormatsSupportedInRegisteredEncoders;
         }
 
-        private List<string> _mFormatsSupportedByRegisteredEncoders = null;
+        private List<VideoRecorderOutputFormat> _mFormatsSupportedInRegisteredEncoders = null;
 
         /// Whether or not we need to show the choices of encoders. This is only enabled if there is at least one
         /// format that is supported by multiple encoders.
@@ -99,7 +121,7 @@ namespace UnityEditor.Recorder
                     var supportedCount = 0;
                     foreach (var encoder in RegisteredEncoders)
                     {
-                        if (encoder.GetSupportedFormats().Contains(value))
+                        if (encoder.GetAvailableFormats().Contains(value))
                             supportedCount++;
                     }
 
@@ -153,11 +175,23 @@ namespace UnityEditor.Recorder
         {
         }
 
+        /// <summary>
+        /// Indicates whether or not this output format is supported in the current operating system and Unity version.
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns>True if and only if the output format is supported.</returns>
+        private bool IsVideoOutputFormatSupported(Enum arg)
+        {
+            var toCheck = (VideoRecorderOutputFormat)arg;
+            var fmtSupported = GetFormatsSupportedInRegisteredEncoders().Contains(toCheck);
+            return fmtSupported;
+        }
+
         protected override void FileTypeAndFormatGUI()
         {
-            // Display and save the selected format
-            m_ContainerFormatSelected.intValue = EditorGUILayout.Popup(Styles.FormatLabel, m_ContainerFormatSelected.intValue, GetFormatsSupportedByRegisteredEncoders().ToArray());
+            m_ContainerFormatSelected.intValue = (int)(VideoRecorderOutputFormat)EditorGUILayout.EnumPopup(Styles.FormatLabel, (VideoRecorderOutputFormat)m_ContainerFormatSelected.intValue, IsVideoOutputFormatSupported, true);
 
+            var currentFormatChoice = GetFormatsAvailableInRegisteredEncoders()[m_ContainerFormatSelected.intValue];
             // Get the encoders that support the current format
             var lsEncoderNamesSupportingSelectedFormat = new List<string>();
             int indexLastEncoderForSelectedFormat = 0; // the last encoder supporting the selected format
@@ -165,10 +199,8 @@ namespace UnityEditor.Recorder
             int i = 0;
             foreach (var encoder in RegisteredEncoders)
             {
-                var currFormats = encoder.GetSupportedFormats();
-                var compare = GetFormatsSupportedByRegisteredEncoders()[m_ContainerFormatSelected.intValue].NameToFormat();
-
-                if (currFormats.Contains(compare))
+                var currFormats = encoder.GetAvailableFormats();
+                if (currFormats.Contains(currentFormatChoice))
                 {
                     lsEncoderNamesSupportingSelectedFormat.Add(encoder.GetName());
                     indexLastEncoderForSelectedFormat = i;
@@ -194,111 +226,127 @@ namespace UnityEditor.Recorder
 
             // Display popup of codec formats for this encoder
             var movieSettings = target as MovieRecorderSettings;
-            var anAttr = attr.FirstOrDefault(a => a.GetName() == AttributeLabels[MovieRecorderSettingsAttributes.CodecFormat]);
-            if (anAttr != null)
+            // Is the format supported?
+            var supported = GetFormatsSupportedInRegisteredEncoders().Contains(currentFormatChoice);
+            using (new EditorGUI.DisabledScope(!supported))
             {
-                MediaPresetAttribute pAttr = (MediaPresetAttribute)anAttr;
-
-                // Present a popup for the presets (if any) of the selected encoder
-                List<string> presetName = new List<string>();
-                List<string> presetOptions = new List<string>();
-                List<string> presetSuffixes = new List<string>();
-                foreach (var p in pAttr.Value)
+                var anAttr = attr.FirstOrDefault(a =>
+                    a.GetName() == AttributeLabels[MovieRecorderSettingsAttributes.CodecFormat]);
+                if (anAttr != null)
                 {
-                    presetName.Add(p.displayName);
-                    presetOptions.Add(p.options);
-                    presetSuffixes.Add(p.suffix);
-                }
+                    MediaPresetAttribute pAttr = (MediaPresetAttribute)anAttr;
 
-                if (presetName.Count > 0)
-                {
-                    ++EditorGUI.indentLevel;
-                    m_EncoderPresetSelected.intValue =
-                        EditorGUILayout.Popup(pAttr.GetLabel(), m_EncoderPresetSelected.intValue,
-                            presetName.ToArray());
-                    --EditorGUI.indentLevel;
-                    m_EncoderPresetSelectedOptions.stringValue =
-                        presetOptions[m_EncoderPresetSelected.intValue];
-                    m_EncoderPresetSelectedName.stringValue =
-                        presetName[m_EncoderPresetSelected.intValue];
-                    m_EncoderPresetSelectedSuffixes.stringValue =
-                        presetSuffixes[m_EncoderPresetSelected.intValue];
-
-                    // Save the selected preset value
-                    movieSettings.encoderPresetSelected = m_EncoderPresetSelected.intValue;
-                    // Display Preset options in the custom field
-                    var customEnabled = m_EncoderPresetSelectedName.stringValue == "Custom";
-                    if (customEnabled)
+                    // Present a popup for the presets (if any) of the selected encoder
+                    List<string> presetName = new List<string>();
+                    List<string> presetOptions = new List<string>();
+                    List<string> presetSuffixes = new List<string>();
+                    foreach (var p in pAttr.Value)
                     {
-                        m_EncoderCustomOptions.stringValue = EditorGUILayout.TextField(Styles.EncoderCustomOptionsLabel, m_EncoderCustomOptions.stringValue);
-                        movieSettings.encoderCustomOptions = m_EncoderCustomOptions.stringValue;
+                        presetName.Add(p.displayName);
+                        presetOptions.Add(p.options);
+                        presetSuffixes.Add(p.suffix);
                     }
-                    else
+
+                    if (presetName.Count > 0)
                     {
-                        if (presetOptions[movieSettings.encoderPresetSelected].Length != 0)
+                        ++EditorGUI.indentLevel;
+                        m_EncoderPresetSelected.intValue =
+                            EditorGUILayout.Popup(pAttr.GetLabel(), m_EncoderPresetSelected.intValue,
+                                presetName.ToArray());
+                        --EditorGUI.indentLevel;
+                        m_EncoderPresetSelectedOptions.stringValue =
+                            presetOptions[m_EncoderPresetSelected.intValue];
+                        m_EncoderPresetSelectedName.stringValue =
+                            presetName[m_EncoderPresetSelected.intValue];
+                        m_EncoderPresetSelectedSuffixes.stringValue =
+                            presetSuffixes[m_EncoderPresetSelected.intValue];
+
+                        // Save the selected preset value
+                        movieSettings.encoderPresetSelected = m_EncoderPresetSelected.intValue;
+                        // Display Preset options in the custom field
+                        var customEnabled = m_EncoderPresetSelectedName.stringValue == "Custom";
+                        if (customEnabled)
                         {
-                            EditorGUI.indentLevel += 2;
-                            EditorGUILayout.SelectableLabel(string.Format("Preset options: {0}", presetOptions[movieSettings.encoderPresetSelected]));
-                            EditorGUI.indentLevel -= 2;
+                            m_EncoderCustomOptions.stringValue =
+                                EditorGUILayout.TextField(Styles.EncoderCustomOptionsLabel,
+                                    m_EncoderCustomOptions.stringValue);
+                            movieSettings.encoderCustomOptions = m_EncoderCustomOptions.stringValue;
+                        }
+                        else
+                        {
+                            if (presetOptions[movieSettings.encoderPresetSelected].Length != 0)
+                            {
+                                EditorGUI.indentLevel += 2;
+                                EditorGUILayout.SelectableLabel(string.Format("Preset options: {0}",
+                                    presetOptions[movieSettings.encoderPresetSelected]));
+                                EditorGUI.indentLevel -= 2;
+                            }
                         }
                     }
                 }
-            }
 
-            // Support for color definition in encoder
-            anAttr = attr.FirstOrDefault(a => a.GetName() == AttributeLabels[MovieRecorderSettingsAttributes.ColorDefinition]);
-            if (anAttr != null)
-            {
-                MediaPresetAttribute pAttr = (MediaPresetAttribute)anAttr;
-
-                // Present a popup for the color definitions (if any) of the selected encoder
-                var presetName = new List<string>();
-                foreach (var p in pAttr.Value)
+                // Support for color definition in encoder
+                anAttr = attr.FirstOrDefault(a =>
+                    a.GetName() == AttributeLabels[MovieRecorderSettingsAttributes.ColorDefinition]);
+                if (anAttr != null)
                 {
-                    presetName.Add(p.displayName);
+                    MediaPresetAttribute pAttr = (MediaPresetAttribute)anAttr;
+
+                    // Present a popup for the color definitions (if any) of the selected encoder
+                    var presetName = new List<string>();
+                    foreach (var p in pAttr.Value)
+                    {
+                        presetName.Add(p.displayName);
+                    }
+
+                    if (presetName.Count > 0)
+                    {
+                        ++EditorGUI.indentLevel;
+                        m_EncoderColorDefinitionSelected.intValue =
+                            EditorGUILayout.Popup(pAttr.GetLabel(), m_EncoderColorDefinitionSelected.intValue,
+                                presetName.ToArray());
+                        --EditorGUI.indentLevel;
+
+                        // Save the selected preset value
+                        movieSettings.encoderColorDefinitionSelected = m_EncoderColorDefinitionSelected.intValue;
+                    }
                 }
 
-                if (presetName.Count > 0)
+                var showAlphaCheckbox = false;
+                if (RegisteredEncoders[m_EncoderSelected.intValue].GetType() == typeof(CoreMediaEncoderRegister))
+                {
+                    string errorMsg;
+                    showAlphaCheckbox = RegisteredEncoders[m_EncoderSelected.intValue]
+                        .SupportsTransparency(movieSettings, out errorMsg);
+                }
+                else if (RegisteredEncoders[m_EncoderSelected.intValue].GetType() == typeof(ProResEncoderRegister))
+                {
+                    string errorMsg;
+                    showAlphaCheckbox = RegisteredEncoders[m_EncoderSelected.intValue]
+                        .SupportsTransparency(movieSettings, out errorMsg);
+                }
+                var format = (VideoRecorderOutputFormat)m_ContainerFormatSelected.intValue;
+                if (movieSettings.OutputFormat != format)
+                {
+                    movieSettings.OutputFormat = format; // force the right format
+                    InvokeItemStateRefresh(); // the underlying data has changed after the initial loading, so refresh its state in the Recorder Window
+                }
+
+                // Special case for the core media encoder show the encoding bit rate popup
+                if (RegisteredEncoders[m_EncoderSelected.intValue].GetType() == typeof(CoreMediaEncoderRegister))
                 {
                     ++EditorGUI.indentLevel;
-                    m_EncoderColorDefinitionSelected.intValue =
-                        EditorGUILayout.Popup(pAttr.GetLabel(), m_EncoderColorDefinitionSelected.intValue,
-                            presetName.ToArray());
+                    EditorGUILayout.PropertyField(m_EncodingQuality, Styles.VideoBitRateLabel);
                     --EditorGUI.indentLevel;
-
-                    // Save the selected preset value
-                    movieSettings.encoderColorDefinitionSelected = m_EncoderColorDefinitionSelected.intValue;
                 }
-            }
 
-            var showAlphaCheckbox = false;
-            if (RegisteredEncoders[m_EncoderSelected.intValue].GetType() == typeof(CoreMediaEncoderRegister))
-            {
-                var format = (VideoRecorderOutputFormat)m_ContainerFormatSelected.intValue;
-                movieSettings.OutputFormat = format; // update the selected output format
-                string errorMsg;
-                showAlphaCheckbox = RegisteredEncoders[m_EncoderSelected.intValue].SupportsTransparency(movieSettings, out errorMsg);
-            }
-            else if (RegisteredEncoders[m_EncoderSelected.intValue].GetType() == typeof(ProResEncoderRegister))
-            {
-                string errorMsg;
-                showAlphaCheckbox = RegisteredEncoders[m_EncoderSelected.intValue].SupportsTransparency(movieSettings, out errorMsg);
-            }
-
-            // Special case for the core media encoder show the encoding bit rate popup
-            if (RegisteredEncoders[m_EncoderSelected.intValue].GetType() == typeof(CoreMediaEncoderRegister))
-            {
-                ++EditorGUI.indentLevel;
-                EditorGUILayout.PropertyField(m_EncodingQuality, Styles.VideoBitRateLabel);
-                --EditorGUI.indentLevel;
-            }
-
-            // Show transparency checkbox
-            if (showAlphaCheckbox)
-            {
-                ++EditorGUI.indentLevel;
-                EditorGUILayout.PropertyField(m_CaptureAlpha, Styles.CaptureAlphaLabel);
-                --EditorGUI.indentLevel;
+                // Show transparency checkbox
+                if (showAlphaCheckbox)
+                {
+                    ++EditorGUI.indentLevel;
+                    EditorGUILayout.PropertyField(m_CaptureAlpha, Styles.CaptureAlphaLabel);
+                    --EditorGUI.indentLevel;
+                }
             }
         }
 

@@ -39,6 +39,7 @@ namespace UnityEditor.Recorder
             Add(m_Label);
 
             UIElementHelper.RegisterTrickleDownCallback<KeyUpEvent>(this, OnKeyUpCallback);
+            UIElementHelper.RegisterTrickleDownCallback<KeyDownEvent>(this, OnKeyDownCallback);
 
             m_TextField.RegisterCallback<FocusOutEvent>(OnTextFieldLostFocus);
         }
@@ -104,7 +105,17 @@ namespace UnityEditor.Recorder
             ApplyEditing();
         }
 
+        void OnKeyDownCallback(KeyDownEvent evt)
+        {
+            KeyPressedCallback(evt);
+        }
+
         void OnKeyUpCallback(KeyUpEvent evt)
+        {
+            KeyPressedCallback(evt);
+        }
+
+        void KeyPressedCallback<T>(KeyboardEventBase<T> evt) where T : KeyboardEventBase<T>, new()
         {
             if (!m_IsEditing)
                 return;

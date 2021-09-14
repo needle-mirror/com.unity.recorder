@@ -7,8 +7,13 @@ namespace UnityEditor.Recorder.Timeline
     {
         PlayState m_PlayState = PlayState.Paused;
         public RecordingSession session { get; set; }
+
+        public bool requestFrame => m_RequestFrame;
+
         WaitForEndOfFrameComponent endOfFrameComp;
         bool m_FirstOneSkipped;
+        bool m_RequestFrame;
+
 
         public override void OnGraphStart(Playable playable)
         {
@@ -32,7 +37,7 @@ namespace UnityEditor.Recorder.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            if (session != null)
+            if (session != null && session.isRecording)
             {
                 if (endOfFrameComp == null)
                 {
@@ -44,6 +49,7 @@ namespace UnityEditor.Recorder.Timeline
             if (session != null && session.isRecording)
             {
                 session.PrepareNewFrame();
+                m_RequestFrame = true;
             }
         }
 
@@ -85,7 +91,10 @@ namespace UnityEditor.Recorder.Timeline
         public void FrameEnded()
         {
             if (session != null && session.isRecording)
+            {
                 session.RecordFrame();
+                m_RequestFrame = false;
+            }
         }
     }
 }

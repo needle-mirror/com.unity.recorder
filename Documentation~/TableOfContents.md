@@ -11,4 +11,5 @@
   * [Audio Recorder](RecorderAudio.md)
   * [AOV Recorder](RecorderAOV.md)
 * [Debugging recorders](RecorderDebugging.md)
+* [Recorder preferences](ref-window-preferences-recorder.md)
 * [Known issues](KnownIssues.md)

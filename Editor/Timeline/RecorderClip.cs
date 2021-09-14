@@ -78,6 +78,7 @@ namespace UnityEditor.Recorder.Timeline
 #endif
         }
 
+        // Find the timeline asset that matches this clip
         internal TimelineAsset FindTimelineAsset()
         {
             if (!AssetDatabase.Contains(this))
@@ -88,7 +89,7 @@ namespace UnityEditor.Recorder.Timeline
 
             foreach (var obj in objs)
             {
-                if (obj != null && AssetDatabase.IsMainAsset(obj))
+                if (obj != null && obj is TimelineAsset)
                     return obj as TimelineAsset;
             }
             return null;

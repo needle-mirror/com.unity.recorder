@@ -21,6 +21,10 @@ namespace UnityEditor.Recorder.Input
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            if (!GameViewSize.IsMainPlayViewGameView())
+            {
+                EditorGUILayout.HelpBox("Simulator view recording is not supported. If you start recording, Unity will automatically switch the current Simulator view to Game view.", MessageType.Info);
+            }
             Initialize(property);
             --EditorGUI.indentLevel;
             EditorGUILayout.PropertyField(m_OutputResolution, Styles.OutputResolutionLabel);

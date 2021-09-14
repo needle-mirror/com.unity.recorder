@@ -90,6 +90,32 @@ namespace UnityEditor.Recorder
             }
         }
 
+        bool ValidateFrameRate(float frameRate)
+        {
+            if (frameRate == 0F)
+            {
+                Debug.LogErrorFormat("{0} does not support 0 fps frame rate.", recorder.GetType().Name);
+                return false;
+            }
+
+            if (frameRate < 0F)
+            {
+                Debug.LogErrorFormat(
+                    "{0} does not support negative frame rate ({1}).", recorder.GetType().Name, frameRate);
+                return false;
+            }
+
+            if (float.IsNaN(frameRate) || float.IsInfinity(frameRate))
+            {
+                Debug.LogErrorFormat(
+                    "{0} does not support invalid floating point value for frame rate ({1}).",
+                    recorder.GetType().Name, frameRate);
+                return false;
+            }
+
+            return true;
+        }
+
         internal bool SessionCreated()
         {
             try
@@ -119,12 +145,18 @@ namespace UnityEditor.Recorder
 
                 AllowInBackgroundMode();
 
+                if (!ValidateFrameRate(recorder.settings.FrameRate))
+                    return false;
+
                 recordingStartTS = (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale));
                 recorder.SignalInputsOfStage(ERecordingSessionStage.BeginRecording, this);
 
                 // This must be after the above call otherwise GameView will not be initialized
                 if (!recorder.BeginRecording(this))
+                {
+                    UnityHelpers.Destroy(recorderComponent); // so that the time scale is immediately reset (REC-834)
                     return false;
+                }
 
                 m_InitialFrame = Time.renderedFrameCount;
                 m_FPSTimeStart = Time.unscaledTime;
@@ -188,16 +220,31 @@ namespace UnityEditor.Recorder
                 var frameLen = 1.0f / recorder.settings.FrameRate;
                 var elapsed = Time.unscaledTime - m_FPSTimeStart;
                 var target = frameLen * (frameCount + 1);
-                var sleep = (int)((target - elapsed) * 1000);
+                var sleepSec = Math.Min(target - elapsed, 1F);
 
-                if (sleep > 2)
+                if (sleepSec > 0.002F)
                 {
+                    var curRealTime = Time.realtimeSinceStartup;
+                    var endWaitTime = curRealTime + sleepSec;
+
                     if (RecorderOptions.VerboseMode)
-                        Debug.Log(string.Format("Recording session info => dT: {0:F1}s, Target dT: {1:F1}s, Retarding: {2}ms, fps: {3:F1}", elapsed, target, sleep, frameCount / elapsed));
-                    System.Threading.Thread.Sleep(Math.Min(sleep, 1000));
+                        Debug.Log(string.Format("Recording session info => dT: {0:F1}s, Target dT: {1:F1}s, Retarding: {2}s, fps: {3:F1}", elapsed, target, sleepSec, frameCount / elapsed));
+
+                    // We have a delta between the expected and actual current time. We'll sleep part of this delta, and
+                    // use a busy loop for the rest. The idea is that typically, OS-level sleep calls are imprecise and
+                    // may return "some time after the wanted duration".
+                    var sleepMS = (int)(sleepSec * 1000) - 3;
+                    if (sleepMS > 0)
+                        System.Threading.Thread.Sleep(sleepMS);
+
+                    // Do the rest of the wait using a busy loop to maximize chances of keeping the main thread running
+                    // on the CPU.
+                    while (Time.realtimeSinceStartup < endWaitTime) ;
                 }
-                else if (sleep < -frameLen)
+                else if (sleepSec < -frameLen)
+                {
                     m_InitialFrame--;
+                }
                 else if (RecorderOptions.VerboseMode)
                     Debug.Log(string.Format("Recording session info => fps: {0:F1}", frameCount / elapsed));
 
@@ -232,11 +279,11 @@ namespace UnityEditor.Recorder
                 currentFrameStartTS =
                     (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale)) -
                     recordingStartTS;
+                m_SubFrameIndex++;
                 if (!recorder.SkipFrame(this))
                 {
                     recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameStarting, this);
                     recorder.PrepareNewFrame(this);
-                    m_SubFrameIndex++;
                 }
             }
             catch (Exception ex)

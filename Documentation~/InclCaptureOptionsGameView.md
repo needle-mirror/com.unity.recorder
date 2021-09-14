@@ -1,8 +1,9 @@
 These properties appear when you set **Source** to **Game View**.
 
->[!NOTE]
+>**Note:**
 >* If you have multiple Game Views in your project, the Recorder captures only the last one you selected in the Editor.
 >* If you are using more than one Recorder to capture Game View, they must all use the same resolution settings.
+>* Recording the Simulator view is [not supported](KnownIssues.md#simulator-view-recording-not-supported).
 
 ![](Images/CaptureOptionsGameView.png)
 

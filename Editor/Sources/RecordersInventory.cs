@@ -179,6 +179,7 @@ namespace UnityEditor.Recorder
             if (recorderinfo != null)
             {
                 var settings = (RecorderSettings)ObjectFactory.CreateInstance(recorderinfo.settingsType);
+                // Make sure we use a supported format as default
                 settings.name = recorderinfo.displayName;
 
                 return settings;

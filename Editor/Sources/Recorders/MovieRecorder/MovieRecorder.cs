@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEditor.Recorder;
@@ -63,7 +64,21 @@ namespace UnityEditor.Recorder
             int height = input.OutputHeight;
 
             var currentEncoderReg = Settings.GetCurrentEncoder();
-            string errorMessage;
+            string errorMessage, warningMessage;
+            if (!currentEncoderReg.SupportsResolution(Settings, width, height, out errorMessage, out warningMessage))
+            {
+                ConsoleLogMessage(errorMessage, LogType.Error);
+                Recording = false;
+                return false;
+            }
+
+            if (Settings.FrameRatePlayback == FrameRatePlayback.Variable && !currentEncoderReg.SupportsVFR(Settings, out errorMessage))
+            {
+                ConsoleLogMessage(errorMessage, LogType.Error);
+                Recording = false;
+                return false;
+            }
+
             // Detect unsupported codec
             if (!currentEncoderReg.IsFormatSupported(Settings.OutputFormat))
             {
@@ -81,9 +96,13 @@ namespace UnityEditor.Recorder
             }
 
             var bitrateMode = ConvertBitrateMode(Settings.EncodingQuality);
+            var frameRate = session.settings.FrameRatePlayback == FrameRatePlayback.Constant
+                ? RationalFromDouble(session.settings.FrameRate)
+                : new MediaRational { numerator = 0, denominator = 0 };
+
             var videoAttrs = new VideoTrackAttributes
             {
-                frameRate = RationalFromDouble(session.settings.FrameRate),
+                frameRate = frameRate,
                 width = (uint)width,
                 height = (uint)height,
                 includeAlpha = alphaWillBeInImage,
@@ -111,11 +130,7 @@ namespace UnityEditor.Recorder
 #endif
                 var audioAttrs = new AudioTrackAttributes
                 {
-                    sampleRate = new MediaRational
-                    {
-                        numerator = audioInput.SampleRate,
-                        denominator = 1
-                    },
+                    sampleRate = new MediaRational(audioInput.SampleRate),
                     channelCount = audioInput.ChannelCount,
                     language = ""
                 };
@@ -162,6 +177,14 @@ namespace UnityEditor.Recorder
                     // For custom
                     attr.Add(new StringAttribute(AttributeLabels[MovieRecorderSettingsAttributes.CustomOptions], Settings.encoderCustomOptions));
                 }
+
+                var requestedFormat = Settings.OutputFormat;
+                if (currentEncoderReg.GetSupportedFormats() == null || !currentEncoderReg.GetSupportedFormats().Contains(requestedFormat))
+                {
+                    ConsoleLogMessage($"Format '{requestedFormat}' is not supported on this platform.", LogType.Error);
+                    return false;
+                }
+
                 // Construct the encoder given the list of attributes
                 Settings.m_EncoderManager.Construct(m_EncoderHandle, path, attr);
 
@@ -221,22 +244,21 @@ namespace UnityEditor.Recorder
 
         protected override void WriteFrame(Texture2D t)
         {
-            Settings.m_EncoderManager.AddFrame(m_EncoderHandle, t);
+            var recorderTime = DequeueTimeStamp();
+            Settings.m_EncoderManager.AddFrame(m_EncoderHandle, t, ComputeMediaTime(recorderTime));
             WarnOfConcurrentRecorders();
         }
 
-        // Override the parent code from BaseTextureRecorder because it converts the GPU readback request to a Texture2D, a costly operation.
-        // The encoder API already provides a way to encode frames coming from a GPU readback request, leading to better performance.
         protected override void WriteFrame(AsyncGPUReadbackRequest r)
         {
+            var recorderTime = DequeueTimeStamp();
             if (r.hasError)
             {
                 ConsoleLogMessage("The rendered image has errors. Skipping this frame.", LogType.Error);
                 return;
             }
-
             var format = Settings.GetCurrentEncoder().GetTextureFormat(Settings);
-            Settings.m_EncoderManager.AddFrame(m_EncoderHandle, r.width, r.height, 0, format, r.GetData<byte>());
+            Settings.m_EncoderManager.AddFrame(m_EncoderHandle, r.width, r.height, 0, format, r.GetData<byte>(), ComputeMediaTime(recorderTime));
             WarnOfConcurrentRecorders();
         }
 
@@ -256,6 +278,16 @@ namespace UnityEditor.Recorder
                 AssetDatabase.Refresh();
         }
 
+        private MediaTime ComputeMediaTime(float recorderTime)
+        {
+            if (Settings.FrameRatePlayback == FrameRatePlayback.Constant)
+                return new Media.MediaTime { count = 0, rate = Media.MediaRational.Invalid };
+
+            const uint kUSPerSecond = 10000000;
+            long count = (long)((double)recorderTime * (double)kUSPerSecond);
+            return new Media.MediaTime(count, kUSPerSecond);
+        }
+
         // https://stackoverflow.com/questions/26643695/converting-decimal-to-fraction-c
         static long GreatestCommonDivisor(long a, long b)
         {
@@ -270,6 +302,13 @@ namespace UnityEditor.Recorder
 
         static MediaRational RationalFromDouble(double value)
         {
+            if (double.IsNaN(value))
+                return new MediaRational { numerator = 0, denominator = 0 };
+            if (double.IsPositiveInfinity(value))
+                return new MediaRational { numerator = Int32.MaxValue, denominator = 1 };
+            if (double.IsNegativeInfinity(value))
+                return new MediaRational { numerator = Int32.MinValue, denominator = 1 };
+
             var integral = Math.Floor(value);
             var frac = value - integral;
 
@@ -278,7 +317,7 @@ namespace UnityEditor.Recorder
             var gcd = GreatestCommonDivisor((long)Math.Round(frac * precision), precision);
             var denom = precision / gcd;
 
-            return new MediaRational()
+            return new MediaRational
             {
                 numerator = (int)((long)integral * denom + ((long)Math.Round(frac * precision)) / gcd),
                 denominator = (int)denom

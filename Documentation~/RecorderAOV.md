@@ -59,10 +59,10 @@ Select the camera to use for the recording.
 
 | Property || Function |
 |:---|:---|:---|
-| **Camera** || Specifies which camera the Recorder uses to capture the AOV recording.|
-|   | Main Camera | The Camera tagged with the MainCamera [Tag](https://docs.unity3d.com/Manual/Tags.html).  |
-|   | Tagged Camera | A camera tagged with a specific [Tag](https://docs.unity3d.com/Manual/Tags.html).<br/><br/>If you select this option, you must enter a value in the **Tag** field. |
-|**Tag** |   | Specifies which Camera Tag to look for when you set **Camera** to **Tagged Camera**. |
+| **Camera** || Specifies which camera the Recorder uses to capture the AOV recording.<br/><br/>**Note:** [You can't set the Camera property to ActiveCamera](KnownIssues.md#activecamera-recording-not-available-with-srps) due to a High Definition Render Pipeline (HDRP) limitation. |
+|| MainCamera | The Camera tagged with the MainCamera [Tag](https://docs.unity3d.com/Manual/Tags.html). |
+|| TaggedCamera | A camera tagged with a specific [Tag](https://docs.unity3d.com/Manual/Tags.html).<br/><br/>If you select this option, you must enter a value in the **Tag** field. |
+|**Tag** || Specifies which Camera Tag to look for when you set **Camera** to **Tagged Camera**. |
 
 ### Recorded view
 
@@ -77,7 +77,6 @@ Set the dimensions and other properties of the recorded view.
 | **Aspect Ratio** || Specifies the ratio of width to height (w:h) of the recorded view when you set the **Output Resolution** to a preset resolution. |
 |   | _[PRESET ASPECT RATIOS]_ | Choose from several standard aspect ratios such as 16:9 (1.7778) and 4:3 (1.3333). |
 |   | Custom   | Uses custom aspect ratio that you supply in the displayed fields (w:h). |
-| **Flip Vertical** || When you enable this option, the Recorder flips the output image vertically.<br/><br/>This is useful to correct for systems that output video upside down. |
 
 
 ## Format

@@ -36,7 +36,7 @@ namespace UnityEditor.Recorder
             const float rootWidth = 125.0f;
             const float btnWidth = 30.0f;
 
-            var leafWidth = target.forceAssetsFolder ? position.width - rootWidth : position.width - rootWidth - btnWidth - 10;
+            var leafWidth = position.width - rootWidth - btnWidth - 10;
             var rootRect = new Rect(position.x, position.y, rootWidth, position.height);
             var leafRect = new Rect(position.x + rootWidth + 5, position.y, leafWidth, position.height);
             var btnRect = new Rect(position.x + rootWidth + leafWidth + 10, position.y, btnWidth, position.height);
@@ -68,6 +68,30 @@ namespace UnityEditor.Recorder
                             m_AbsolutePathProperty.stringValue = newValue.leaf;
                         else
                             m_LeafProperty.stringValue = newValue.leaf;
+                    }
+                }
+            }
+            else
+            {
+                if (GUI.Button(btnRect, new GUIContent("...", "Select the output location in Unity Assets through your file browser")))
+                {
+                    var newPath = EditorUtility.OpenFolderPanel("Select output location",
+                        Application.dataPath, "");
+                    if (!string.IsNullOrEmpty(newPath))
+                    {
+                        if (!newPath.Contains(Application.dataPath))
+                            EditorUtility.DisplayDialog("Invalid Path",
+                                "Selected path " + newPath + " must be in the Unity Assets directory",
+                                "Ok");
+                        else
+                        {
+                            var newValue = OutputPath.FromPath(newPath);
+                            m_RootProperty.intValue = (int)newValue.root;
+                            if (newValue.root == OutputPath.Root.Absolute)
+                                m_AbsolutePathProperty.stringValue = newValue.leaf;
+                            else
+                                m_LeafProperty.stringValue = newValue.leaf;
+                        }
                     }
                 }
             }

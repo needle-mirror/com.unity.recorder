@@ -14,35 +14,6 @@ using UnityEngine.Serialization;
 [assembly: InternalsVisibleTo("Unity.Recorder.TestsCodebase")]
 namespace UnityEditor.Recorder
 {
-    internal static class Extensions
-    {
-        internal static MovieRecorderSettings.VideoRecorderOutputFormat NameToFormat(this string format)
-        {
-            foreach (var v in Enum.GetValues(typeof(MovieRecorderSettings.VideoRecorderOutputFormat)))
-            {
-                var value = (MovieRecorderSettings.VideoRecorderOutputFormat)v;
-                if (value.FormatToName() == format)
-                    return value;
-            }
-            throw new Exception($"The video recorder output format '{format}' was not found in the list of supported formats");
-        }
-
-        internal static string FormatToName(this MovieRecorderSettings.VideoRecorderOutputFormat format)
-        {
-            switch (format)
-            {
-                case MovieRecorderSettings.VideoRecorderOutputFormat.MP4:
-                    return "H.264 MP4";
-                case MovieRecorderSettings.VideoRecorderOutputFormat.WebM:
-                    return "VP8 WebM";
-                case MovieRecorderSettings.VideoRecorderOutputFormat.MOV:
-                    return "ProRes QuickTime";
-                default:
-                    throw new ArgumentOutOfRangeException($"Unexpected video format {format}");
-            }
-        }
-    }
-
     /// <summary>
     /// A class that represents the settings of a Movie Recorder.
     /// </summary>
@@ -57,15 +28,15 @@ namespace UnityEditor.Recorder
             /// <summary>
             /// Output the recording with the H.264 codec in an MP4 container.
             /// </summary>
-            MP4,
+            [InspectorName("H.264 MP4")] MP4,
             /// <summary>
             /// Output the recording with the VP9 codec in a WebM container.
             /// </summary>
-            WebM,
+            [InspectorName("VP8 WebM")] WebM,
             /// <summary>
             /// Output the recording with the ProRes codec in a MOV container.
             /// </summary>
-            MOV,
+            [InspectorName("ProRes QuickTime")] MOV,
         }
 
         /// <summary>
@@ -303,6 +274,13 @@ namespace UnityEditor.Recorder
             fileNameGenerator.FileName = DefaultWildcard.Recorder + "_" + DefaultWildcard.Take;
             FrameRate = 30;
 
+#if UNITY_EDITOR_LINUX
+            // Default to WebM, the only supported format
+            OutputFormat = VideoRecorderOutputFormat.WebM;
+            // For the inspector, make sure that the selected container matches the WebM
+            containerFormatSelected = (int)VideoRecorderOutputFormat.WebM;
+#endif
+
             var iis = m_ImageInputSelector.Selected as StandardImageInputSettings;
             if (iis != null)
                 iis.maxSupportedSize = ImageHeight.x2160p_4K;
@@ -326,12 +304,6 @@ namespace UnityEditor.Recorder
                     var encoders = allTypes.Where(
                         type => type.IsSubclassOf(typeof(MediaEncoderRegister))
                     );
-    #if UNITY_EDITOR_LINUX
-                    // Ignore ProRes
-                    encoders = encoders.Where(
-                        type => type != typeof(ProResEncoderRegister)
-                    );
-    #endif
                     foreach (var e in encoders)
                     {
                         var o = Activator.CreateInstance(e);
@@ -344,6 +316,9 @@ namespace UnityEditor.Recorder
                     Debug.LogWarning($"Failed to look for Movie Encoders in assembly '{a.FullName}': {e.Message}");
                 }
             }
+            // Enforce the alphabetical order of encoders so that CoreMediaEncoder is first and ProRes second, so that
+            // their formats are processed in that order by the MovieRecorderEditor class
+            encodersRegistered = encodersRegistered.OrderBy(a => a.GetName()).ToList();
         }
 
         /// <summary>
@@ -409,15 +384,19 @@ namespace UnityEditor.Recorder
         {
             base.GetErrors(errors);
 
-            if (FrameRatePlayback == FrameRatePlayback.Variable)
-                errors.Add("Movie Recorder does not properly support variable frame rate playback. Consider using Constant frame rate instead.");
+            string errorMsg;
+            if (FrameRatePlayback == FrameRatePlayback.Variable && !encodersRegistered[encoderSelected].SupportsVFR(this, out errorMsg))
+                errors.Add(errorMsg);
 
             var iis = m_ImageInputSelector.Selected as ImageInputSettings;
             if (iis != null)
             {
-                string errorMsg, warningMsg;
+                string warningMsg;
                 if (!encodersRegistered[encoderSelected].SupportsResolution(this, iis.OutputWidth, iis.OutputHeight, out errorMsg, out warningMsg))
                     errors.Add(errorMsg);
+
+                if (encodersRegistered[encoderSelected].GetSupportedFormats() == null || !encodersRegistered[encoderSelected].GetSupportedFormats().Contains(OutputFormat))
+                    errors.Add($"Format '{OutputFormat}' is not supported on this platform.");
             }
         }
 

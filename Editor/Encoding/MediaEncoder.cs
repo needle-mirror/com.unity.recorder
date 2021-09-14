@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor.Media;
@@ -193,7 +194,7 @@ namespace Unity.Media
     {
         internal int PresetSelected = 0;
         internal virtual bool PerformsVerticalFlip { get; } // whether or not the encoder will flip its input vertically
-        internal virtual VideoRecorderOutputFormat[] SupportedFormats { get; set; }
+        internal virtual VideoRecorderOutputFormat[] AvailableFormats { get; set; }
 
         internal abstract unsafe MediaEncoderHandle Register(MediaEncoderManager mgr);
         internal abstract string GetName();
@@ -204,12 +205,22 @@ namespace Unity.Media
         }
 
         /// <summary>
-        /// Gets the list of output formats that are supported by this encoder.
+        /// Gets the list of output formats that are available with this encoder.
         /// </summary>
         /// <returns></returns>
+        internal virtual ReadOnlyCollection<VideoRecorderOutputFormat> GetAvailableFormats()
+        {
+            return new ReadOnlyCollection<VideoRecorderOutputFormat>(AvailableFormats);
+        }
+
+        /// <summary>
+        /// Gets the list of output formats this encoder supports on the current platform and Unity version.
+        /// </summary>
+        /// <returns></returns>
+        [CanBeNull]
         internal virtual ReadOnlyCollection<VideoRecorderOutputFormat> GetSupportedFormats()
         {
-            return new ReadOnlyCollection<VideoRecorderOutputFormat>(SupportedFormats);
+            return GetAvailableFormats();
         }
 
         /// <summary>
@@ -253,6 +264,12 @@ namespace Unity.Media
             return true;
         }
 
+        internal virtual bool SupportsVFR(MovieRecorderSettings settings, out string errorMessage)
+        {
+            errorMessage = "";
+            return true;
+        }
+
         /// <summary>
         /// Get the default extension of the encoder.
         /// </summary>
@@ -262,9 +279,9 @@ namespace Unity.Media
             throw new NotImplementedException();
         }
 
-        internal virtual bool IsFormatSupported(VideoRecorderOutputFormat format)
+        internal bool IsFormatSupported(VideoRecorderOutputFormat format)
         {
-            return true;
+            return GetSupportedFormats() != null && GetSupportedFormats().Contains(format);
         }
     }
 
@@ -383,46 +400,16 @@ namespace Unity.Media
             m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.Construct(path, attributes);
         }
 
-        public void Construct(MediaEncoderHandle handle, string path, VideoTrackAttributes vAttr, AudioTrackAttributes aAttr)
-        {
-            DisposeCheck(handle);
-            m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.Construct(path, vAttr, aAttr);
-        }
-
-        public void Construct(MediaEncoderHandle handle, string path, VideoTrackAttributes vAttr, NativeArray<AudioTrackAttributes> aAttr)
-        {
-            DisposeCheck(handle);
-            m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.Construct(path, vAttr, aAttr);
-        }
-
-        public bool AddFrame(MediaEncoderHandle handle, int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data)
-        {
-            DisposeCheck(handle);
-            return m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.AddFrame(width, height, rowBytes, format, data);
-        }
-
         public bool AddFrame(MediaEncoderHandle handle, int width, int height, int rowBytes, TextureFormat format, NativeArray<byte> data, MediaTime time)
         {
             DisposeCheck(handle);
             return m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.AddFrame(width, height, rowBytes, format, data, time);
         }
 
-        public bool AddFrame(MediaEncoderHandle handle, Texture2D texture)
-        {
-            DisposeCheck(handle);
-            return m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.AddFrame(texture);
-        }
-
         public bool AddFrame(MediaEncoderHandle handle, Texture2D texture, MediaTime time)
         {
             DisposeCheck(handle);
             return m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.AddFrame(texture, time);
-        }
-
-        public bool AddSamples(MediaEncoderHandle handle, ushort trackIndex, NativeArray<float> interleavedSamples)
-        {
-            DisposeCheck(handle);
-            return m_Encoders[handle.m_VersionHandle.Index].m_encoderInterface.AddSamples(trackIndex, interleavedSamples);
         }
 
         public bool AddSamples(MediaEncoderHandle handle, NativeArray<float> interleavedSamples)

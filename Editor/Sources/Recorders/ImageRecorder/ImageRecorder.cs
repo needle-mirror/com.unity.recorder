@@ -43,6 +43,7 @@ namespace UnityEditor.Recorder
 
         protected override void WriteFrame(Texture2D tex)
         {
+            DequeueTimeStamp();
             byte[] bytes;
             Profiler.BeginSample("ImageRecorder.EncodeImage");
             try

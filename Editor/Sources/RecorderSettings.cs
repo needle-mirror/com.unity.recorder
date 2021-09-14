@@ -130,6 +130,12 @@ namespace UnityEditor.Recorder
 
         [SerializeField] internal FileNameGenerator fileNameGenerator;
 
+        internal bool IsOutputNameDuplicate
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// The object that resolves wildcards into a final path for output files.
         /// </summary>
@@ -242,6 +248,11 @@ namespace UnityEditor.Recorder
             if (string.IsNullOrEmpty(fileNameGenerator.FileName))
             {
                 errors.Add("Missing file name");
+            }
+
+            if (IsOutputNameDuplicate)
+            {
+                errors.Add("Output file name is not unique");
             }
 
             if (Math.Abs(FrameRate) <= float.Epsilon)

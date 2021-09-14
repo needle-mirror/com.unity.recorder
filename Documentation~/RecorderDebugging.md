@@ -8,9 +8,11 @@ The Recorder adds a **Unity-RecorderSessions** GameObject to Scenes to help mana
 
 By default, Unity hides the **Unity-RecorderSessions** GameObject, but you can make it visible in the [Hierarchy window](https://docs.unity3d.com/Manual/Hierarchy.html). This is useful for debugging. For example, if a Recorder is not working properly, you can toggle the **Unity-RecorderSessions** GameObject on to make sure that Unity creates it properly when you launch the recording session.
 
-To toggle the **Unity-RecorderSessions** GameObject's visibility:
+To enable the **Unity-RecorderSessions** GameObject's visibility:
 
-- From Unity's main menu, select **Window > General > Recorder > Options > Show Recorder GameObject**.
+1. From the Unity Editor main menu, select **Edit > Preferences**.
+2. In the Preferences window, in the left pane, select **[Recorder](ref-window-preferences-recorder.md)**.
+3. In the right pane, enable **Show Recorder GameObject**.
 
 ## Recording in Verbose mode
 
@@ -18,6 +20,8 @@ If your Recorders are not working as expected, you can activate Verbose mode to 
 
 Verbose mode logs information to the [Console window](https://docs.unity3d.com/Manual/Console.html), which is  useful when you want to troubleshoot.
 
-To toggle Verbose mode:
+To enable the Verbose mode:
 
-- From Unity's main menu, select **Window > General > Recorder > Options > Verbose Mode**.
+1. From the Unity Editor main menu, select **Edit > Preferences**.
+2. In the Preferences window, in the left pane, select **[Recorder](ref-window-preferences-recorder.md)**.
+3. In the right pane, enable **Verbose Mode**.
