@@ -255,6 +255,9 @@ namespace UnityEditor.Recorder
                     encodersRegistered.Add(mr);
                 }
             }
+            // Enforce the alphabetical order of encoders so that CoreMediaEncoder is first and ProRes second, so that
+            // their formats are processed in that order by the MovieRecorderEditor class
+            encodersRegistered = encodersRegistered.OrderBy(a => a.GetName()).ToList();
         }
 
         /// <summary>
