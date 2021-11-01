@@ -16,7 +16,6 @@ namespace UnityEditor.Recorder
         public Type settingsType;
         public string displayName;
         public string iconName;
-        public bool deprecated;
     }
 
     static class RecordersInventory
@@ -72,8 +71,7 @@ namespace UnityEditor.Recorder
                             settingsType = settingsType,
                             recorderType = settingsAttrib.recorderType,
                             displayName = settingsAttrib.displayName,
-                            iconName = settingsAttrib.iconName,
-                            deprecated = settingsAttrib.deprecated
+                            iconName = settingsAttrib.iconName
                         };
 
                         s_Recorders.Add(settingsType, info);

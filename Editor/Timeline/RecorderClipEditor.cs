@@ -52,7 +52,7 @@ namespace UnityEditor.Recorder.Timeline
                         EditorGUILayout.LabelField("Frame Rate");
                         EditorGUI.indentLevel++;
                         EditorGUILayout.LabelField("Playback", FrameRatePlayback.Constant.ToString());
-                        EditorGUILayout.LabelField("Target (Timeline FPS)", m_Timeline.editorSettings.fps.ToString(CultureInfo.InvariantCulture));
+                        EditorGUILayout.LabelField("Target (Timeline FPS)", m_Timeline.editorSettings.frameRate.ToString(CultureInfo.InvariantCulture));
                         EditorGUI.indentLevel--;
 
                         EditorGUILayout.Separator();

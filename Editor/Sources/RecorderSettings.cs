@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Media;
+using UnityEditor.Recorder.Encoder;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -72,7 +74,7 @@ namespace UnityEditor.Recorder
     /// Main base class for a Recorder settings.
     /// Each Recorder needs to have its corresponding settings properly configured.
     /// </summary>
-    public abstract class RecorderSettings : ScriptableObject
+    public abstract class RecorderSettings : ScriptableObject, ISerializationCallbackReceiver
     {
         private static string s_OutputFileErrorMessage = "Recorder output file cannot be empty";
         /// <summary>
@@ -152,7 +154,7 @@ namespace UnityEditor.Recorder
         /// </summary>
         public FrameRatePlayback FrameRatePlayback { get; set; }
 
-        float frameRate = 30;
+        float frameRate = 30.0f;
 
         /// <summary>
         /// The number of recorded frames per second. In constant frame rate mode, this represent a target value, while
@@ -292,17 +294,19 @@ namespace UnityEditor.Recorder
         }
 
         /// <summary>
+        /// Indicates whether the input must be flipped vertically (True) or not (False) for the output format.
+        /// </summary>
+        /// <remarks>
+        /// Some output formats might expect the image to be vertically flipped while others expect it as it comes from the engine,
+        /// due to different coordinate conventions.
+        /// </remarks>
+        /// <seealso cref="UnityEditor.Recorder.Encoder.EncoderCoordinateConvention"/>
+        internal virtual bool NeedToFlipVerticallyForOutputFormat => false;
+
+        /// <summary>
         /// Stores the list of Input settings required by this Recorder.
         /// </summary>
         public abstract IEnumerable<RecorderInputSettings> InputsSettings { get; }
-
-        /// <summary>
-        /// Performs additional changes on the selected input's settings based on the context of the recording,
-        /// such as enforcing limitations due to file formats.
-        /// </summary>
-        internal virtual void SelfAdjustSettings()
-        {
-        }
 
         /// <summary>
         /// Override this method if any post treatment needs to be done after this Recorder is duplicated in the Recorder Window.
@@ -337,6 +341,7 @@ namespace UnityEditor.Recorder
         {
             captureEveryNthFrame = Mathf.Max(1, captureEveryNthFrame);
             take = Mathf.Max(0, take);
+            OnValidateUpgrade();
         }
 
         /// <summary>
@@ -348,13 +353,57 @@ namespace UnityEditor.Recorder
             return false;
         }
 
-        internal bool EncoderAlreadyFlips()
+        // Obsolete and asset upgrade stuff. Should be moved to a new file (Trunk bug prevents it for now)
+
+        internal enum Versions
         {
-            var movieRecorderSettings = this as MovieRecorderSettings;
-            bool encoderAlreadyFlips = false;
-            if (movieRecorderSettings != null)
-                encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-            return encoderAlreadyFlips;
+            Initial = 0,
+            MovieEncoders = 1,
         }
+
+        internal const int k_LatestVersion = (int)Versions.MovieEncoders;
+
+        [SerializeField, HideInInspector] int m_Version = 0;
+
+        internal int Version => m_Version;
+
+        /// <inheritdoc/>
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+            OnBeforeSerialize();
+        }
+
+        /// <inheritdoc/>
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+            if (m_Version < k_LatestVersion)
+            {
+                OnUpgradeFromVersion((Versions)m_Version); //upgrade derived classes
+            }
+
+            OnAfterDeserialize();
+        }
+
+        void OnEnable()
+        {
+            OnValidateUpgrade();
+        }
+
+        void OnValidateUpgrade()
+        {
+            m_Version = k_LatestVersion;
+        }
+
+        /// <summary>
+        /// Called before a RecorderSetting is serialized.
+        /// </summary>
+        protected virtual void OnBeforeSerialize() {}// Do not clean up since users can only override this
+
+        /// <summary>
+        /// Called after a RecorderSetting has been deserialized.
+        /// </summary>
+        protected virtual void OnAfterDeserialize() {} // Do not clean up since users can only override this
+
+        internal virtual void OnUpgradeFromVersion(Versions oldVersion) {}
     }
 }

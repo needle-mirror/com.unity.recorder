@@ -2,17 +2,17 @@ using System.ComponentModel;
 using System.IO;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
+using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Input;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
-#if HDRP_ACCUM_API
+#if HDRP_AVAILABLE
 using UnityEngine.Rendering.HighDefinition;
 #endif
 using UnityObject = UnityEngine.Object;
-
 
 namespace UnityEditor.Recorder
 {
@@ -201,7 +201,7 @@ namespace UnityEditor.Recorder
         /// <returns>bool</returns>
         internal static bool CaptureAccumulation(RecorderSettings settings)
         {
-#if HDRP_ACCUM_API
+#if HDRP_AVAILABLE
             var hdPipeline = RenderPipelineManager.currentPipeline as HDRenderPipeline;
             if (hdPipeline != null && settings.IsAccumulationSupported())
             {
@@ -247,17 +247,22 @@ namespace UnityEditor.Recorder
             }
         }
 
-        // Whether or not to perform a manual vertical flip, based on the user's intention as well as the characteristics
-        // of the current graphics API (OpenGL is vflipped compared to Metal & D3D) and capture source.
-        // wantFlippedTexture: If true, the user expects a vertically flipped texture.
-        // calledFrom: The object that calls this method.
-        internal static bool NeedToActuallyFlip(bool wantFlippedTexture, BaseRenderTextureInput calledFrom,
-            bool encoderAlreadyFlips)
+        /// <summary>
+        /// Returns True if a manual vertical flip is required, False otherwise.
+        /// The decision is based on the user's intention as well as the characteristics of the current graphics API
+        /// (OpenGL is flipped vertically compared to Metal & DirectX) and the type of capture source.
+        /// </summary>
+        /// <param name="wantFlippedTexture">True if the user expects a vertically flipped texture, False otherwise.</param>
+        /// <param name="captureSource">The input source for the encoder.</param>
+        /// <param name="flipForEncoder">True if the encoder requires a flipped image, False otherwise.</param>
+        /// <returns></returns>
+        internal static bool NeedToActuallyFlip(bool wantFlippedTexture, BaseRenderTextureInput captureSource,
+            bool flipForEncoder)
         {
             // We need to take several things into account: what the user expects, whether or not the rendering is made
             // on a GameView source, and whether or not the hardware is OpenGL.
-            bool isGameView = calledFrom is GameViewInput; // game view is already flipped
-            bool isCameraInputLegacyRP = calledFrom is CameraInput && UsingLegacyRP(); // legacy RP has vflipped camera input
+            bool isGameView = captureSource is GameViewInput; // game view is already flipped
+            bool isCameraInputLegacyRP = captureSource is CameraInput && UsingLegacyRP(); // legacy RP has vflipped camera input
 
             // OpenGL causes a flipped image except if:
             // * source is 360 camera
@@ -265,11 +270,17 @@ namespace UnityEditor.Recorder
             // * source is RenderTextureSampler
             // * source is CameraInput in a URP project
             bool isFlippedBecauseOfOpenGL = !SystemInfo.graphicsUVStartsAtTop &&
-                !(calledFrom is Camera360Input || calledFrom is RenderTextureInput
-                    || calledFrom is RenderTextureSampler
-                    || (calledFrom is CameraInput && UsingURP()));
-            bool willBeFlipped = isGameView ^ encoderAlreadyFlips ^ isCameraInputLegacyRP ^ isFlippedBecauseOfOpenGL;
+                !(captureSource is Camera360Input || captureSource is RenderTextureInput
+                    || captureSource is RenderTextureSampler
+                    || (captureSource is CameraInput && UsingURP()));
 
+            // The image will already be flipped if:
+            // * the input comes from the GameView, OR
+            // * the input comes from a TargetCamera in a LRP project, OR
+            // * the OpenGL context flips it
+            bool willBeFlipped = isGameView ^ flipForEncoder ^ isCameraInputLegacyRP ^ isFlippedBecauseOfOpenGL;
+
+            // We flip if the user's intention is different from the result, and take into account the Y axis convention of the encoder
             return willBeFlipped != wantFlippedTexture;
         }
     }

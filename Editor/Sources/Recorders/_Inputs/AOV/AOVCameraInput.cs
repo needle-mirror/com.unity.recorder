@@ -105,7 +105,6 @@ namespace UnityEditor.Recorder.Input
                     m_AovBuffers = AOVBuffers.Color
                 }
             },
-#if HDRP_LIGHTDECO_API
             {
                 AOVType.DirectDiffuse,
                 new AOVInfo()
@@ -154,7 +153,6 @@ namespace UnityEditor.Recorder.Input
                     m_AovBuffers = AOVBuffers.Color
                 }
             },
-#endif
             {
                 AOVType.MotionVectors,
                 new AOVInfo()

@@ -4,8 +4,8 @@ using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using ProResOut;
 using Unity.Media;
+using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -144,18 +144,18 @@ namespace UnityEditor.Recorder
                     output_resolution_h = r.Settings.ImageInputSettings.OutputHeight,
                     output_resolution_w = r.Settings.ImageInputSettings.OutputWidth,
                     source = r.Settings.ImageInputSettings.ConvertToString(),
-                    include_audio = ((AudioInputSettings)(r.Settings.InputsSettings.First(x => x is AudioInputSettings))).PreserveAudio,
+                    include_audio = r.Settings.CaptureAudio,
                 };
 
-                if (r.Settings.GetCurrentEncoder().GetType() == typeof(ProResEncoderRegister))
+                if (r.Settings.EncoderSettings.GetType() == typeof(ProResEncoderSettings))
                 {
-                    ret.codec_format = ((ProResCodecFormat)r.Settings.encoderPresetSelected).ConvertToString();
-                    ret.media_format = MovieRecorderSettings.VideoRecorderOutputFormat.MOV.ConvertToString();
+                    ret.codec_format = ((ProResEncoderSettings)(r.Settings.EncoderSettings)).Format.ConvertToString();
+                    ret.media_format = "MOV";
                 }
-                else
+                else if (r.Settings.EncoderSettings.GetType() == typeof(CoreEncoderSettings))
                 {
-                    ret.media_format = r.Settings.OutputFormat.ConvertToString();
-                    ret.quality = r.Settings.EncodingQuality.ConvertToString();
+                    ret.media_format = ((CoreEncoderSettings)(r.Settings.EncoderSettings)).Codec.ConvertToString();
+                    ret.quality = ((CoreEncoderSettings)(r.Settings.EncoderSettings)).EncodingQuality.ConvertToString();
                 }
 
                 return ret;

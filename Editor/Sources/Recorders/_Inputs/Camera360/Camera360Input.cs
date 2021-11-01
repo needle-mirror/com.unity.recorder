@@ -47,8 +47,7 @@ namespace UnityEditor.Recorder.Input
 
         protected internal override void BeginRecording(RecordingSession session)
         {
-            var encoderAlreadyFlips = session.settings.EncoderAlreadyFlips();
-            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(settings360.FlipFinalOutput, this, encoderAlreadyFlips);
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(settings360.FlipFinalOutput, this, session.settings.NeedToFlipVerticallyForOutputFormat);
 
             OutputWidth = settings360.OutputWidth;
             OutputHeight = settings360.OutputHeight;

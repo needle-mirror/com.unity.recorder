@@ -1,6 +1,6 @@
 namespace UnityEditor.Recorder.FrameCapturer
 {
-    [RecorderSettings(typeof(EXRRecorder), "Legacy/OpenEXR", true)]
+    [RecorderSettings(typeof(EXRRecorder), "Legacy/OpenEXR")]
 #pragma warning disable 618
     class EXRRecorderSettings : BaseFCRecorderSettings
     {

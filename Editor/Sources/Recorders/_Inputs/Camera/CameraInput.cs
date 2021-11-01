@@ -200,8 +200,7 @@ namespace UnityEditor.Recorder.Input
         /// <inheritdoc/>
         protected internal override void BeginRecording(RecordingSession session)
         {
-            var encoderAlreadyFlips = session.settings.EncoderAlreadyFlips();
-            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(cbSettings.FlipFinalOutput, this, encoderAlreadyFlips);
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(cbSettings.FlipFinalOutput, this, session.settings.NeedToFlipVerticallyForOutputFormat);
 
             if (UnityHelpers.UsingLegacyRP())
                 m_InputStrategy = new CameraCommandBufferLegacyInputStrategy(cbSettings.RecordTransparency);

@@ -107,12 +107,7 @@ namespace UnityEditor.Recorder.Input
             m_CaptureTexture.Create();
             m_CaptureTexture.name = "GameViewInput_mCaptureTexture";
 
-            var movieRecorderSettings = session.settings as MovieRecorderSettings;
-            bool encoderAlreadyFlips = false;
-            if (movieRecorderSettings != null)
-                encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-
-            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(false, this, encoderAlreadyFlips);
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(false, this, session.settings.NeedToFlipVerticallyForOutputFormat);
             OutputRenderTexture = m_CaptureTexture;
 #endif
         }

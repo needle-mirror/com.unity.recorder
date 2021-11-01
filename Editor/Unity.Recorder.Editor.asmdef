@@ -28,18 +28,8 @@
         },
         {
             "name": "com.unity.render-pipelines.high-definition",
-            "expression": "10.3.0",
-            "define": "HDRP_ACCUM_API"
-        },
-        {
-            "name": "com.unity.render-pipelines.high-definition",
-            "expression": "7.3",
+            "expression": "12.0.0",
             "define": "HDRP_AVAILABLE"
-        },
-        {
-            "name": "com.unity.render-pipelines.high-definition",
-            "expression": "8.9.9",
-            "define": "HDRP_LIGHTDECO_API"
         }
     ],
     "noEngineReferences": false

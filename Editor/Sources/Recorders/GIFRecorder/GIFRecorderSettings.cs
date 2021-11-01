@@ -8,7 +8,7 @@ namespace UnityEditor.Recorder
     /// Deprecated GIF Recorder.
     /// </summary>
     [Obsolete("The GIFRecorder is deprecated")]
-    [RecorderSettings(typeof(GIFRecorder), "GIF Animation", "imagesequence_16", true)]
+    [RecorderSettings(typeof(GIFRecorder), "GIF Animation", "imagesequence_16")]
     public class GIFRecorderSettings : BaseFCRecorderSettings
     {
         /// <summary>

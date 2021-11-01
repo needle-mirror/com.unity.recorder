@@ -2,6 +2,10 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
+    // Hack to make new a new MonoBehaviour discovery feature in the engine.
+    // This is because there is a mismatched between the MB name and the file name, all inside an Editor assembly (double nono).
+    class _RecorderComponent {}
+
     class RecorderComponent : _FrameRequestComponent
     {
         public RecordingSession session { get; set; }

@@ -72,6 +72,12 @@ namespace UnityEditor.Recorder
             }
         }
 
+        [MenuItem(MenuRoot + "Quick Recording _F10", true, MenuRootIndex + 1)]
+        static bool QuickRecordingValidate()
+        {
+            return !EditorUtility.scriptCompilationFailed;
+        }
+
         static void Progress()
         {
             if (s_NeedToResetView)
@@ -513,6 +519,11 @@ namespace UnityEditor.Recorder
         /// </summary>
         public void StartRecording()
         {
+            if (EditorUtility.scriptCompilationFailed)
+            {
+                return;
+            }
+
             if (EditorApplication.isPlaying)
             {
                 // Already in play mode, so start recording now
@@ -866,7 +877,7 @@ namespace UnityEditor.Recorder
                 }
                 else
                 {
-                    SetRecordButtonsEnabled(true);
+                    SetRecordButtonsEnabled(!EditorUtility.scriptCompilationFailed);
                 }
             }
             else
@@ -1209,7 +1220,7 @@ namespace UnityEditor.Recorder
             {
                 // Remove the action trigger
                 var recorderEditor = (RecorderEditor)(previousSelection.editor);
-                recorderEditor.OnSelectedSettingsChangedAfterTheFact -= UpdateStateOfSelectedItem;
+                recorderEditor.OnRecorderDataHasChaged -= RecorderDataHasChanged;
             }
 
             m_SelectedRecorderItem = m_RecordingListItem.selection;
@@ -1224,10 +1235,17 @@ namespace UnityEditor.Recorder
                 UIElementHelper.SetDirty(m_RecorderSettingPanel);
                 // Listen to the action trigger
                 var recorderEditor = (RecorderEditor)(m_SelectedRecorderItem.editor);
-                recorderEditor.OnSelectedSettingsChangedAfterTheFact += UpdateStateOfSelectedItem;
+                recorderEditor.OnRecorderDataHasChaged += RecorderDataHasChanged;
             }
 
             Repaint();
+        }
+
+        void RecorderDataHasChanged()
+        {
+            // Save the controller settings when the data has changed
+            if (m_ControllerSettings != null)
+                m_ControllerSettings.Save();
         }
 
         bool HaveActiveRecordings()

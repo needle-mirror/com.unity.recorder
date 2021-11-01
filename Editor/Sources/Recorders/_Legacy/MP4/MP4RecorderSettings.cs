@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder.FrameCapturer
 {
-    [RecorderSettings(typeof(MP4Recorder), "Legacy/MP4", true)]
+    [RecorderSettings(typeof(MP4Recorder), "Legacy/MP4")]
 #pragma warning disable 618
     class MP4RecorderSettings : BaseFCRecorderSettings
     {

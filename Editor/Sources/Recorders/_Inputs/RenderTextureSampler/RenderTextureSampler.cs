@@ -107,13 +107,7 @@ namespace UnityEditor.Recorder.Input
             accumulateShader = Shader.Find("Hidden/BeautyShot/Accumulate");
             normalizeShader = Shader.Find("Hidden/BeautyShot/Normalize");
 
-            var movieRecorderSettings = session.settings as MovieRecorderSettings;
-            bool encoderAlreadyFlips = false;
-            if (movieRecorderSettings != null)
-            {
-                encoderAlreadyFlips = movieRecorderSettings.encodersRegistered[movieRecorderSettings.encoderSelected].PerformsVerticalFlip;
-            }
-            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(rtsSettings.FlipFinalOutput, this, encoderAlreadyFlips);
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(rtsSettings.FlipFinalOutput, this, session.settings.NeedToFlipVerticallyForOutputFormat);
 
             var requiredColorSpace = ImageRecorderSettings.ColorSpaceType.sRGB_sRGB;
             if (session.settings is ImageRecorderSettings)

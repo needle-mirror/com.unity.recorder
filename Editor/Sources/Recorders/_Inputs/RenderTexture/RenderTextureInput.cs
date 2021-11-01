@@ -46,8 +46,7 @@ namespace UnityEditor.Recorder.Input
             OutputWidth = cbSettings.OutputWidth;
             OutputRenderTexture = cbSettings.renderTexture;
 
-            var encoderAlreadyFlips = session.settings.EncoderAlreadyFlips();
-            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(cbSettings.FlipFinalOutput, this, encoderAlreadyFlips);
+            NeedToFlipVertically = UnityHelpers.NeedToActuallyFlip(cbSettings.FlipFinalOutput, this, session.settings.NeedToFlipVerticallyForOutputFormat);
 
             var requiredColorSpace = ImageRecorderSettings.ColorSpaceType.sRGB_sRGB;
             if (session.settings is ImageRecorderSettings)

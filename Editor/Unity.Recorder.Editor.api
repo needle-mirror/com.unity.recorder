@@ -116,7 +116,7 @@ namespace UnityEditor.Recorder
         protected GenericRecorder() {}
     }
 
-    [System.Obsolete(@"The GIFRecorder is deprecated")] [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.GIFRecorder), @"GIF Animation", @"imagesequence_16", true)] public class GIFRecorderSettings : UnityEditor.Recorder.FrameCapturer.BaseFCRecorderSettings
+    [System.Obsolete(@"The GIFRecorder is deprecated")] [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.GIFRecorder), @"GIF Animation", @"imagesequence_16")] public class GIFRecorderSettings : UnityEditor.Recorder.FrameCapturer.BaseFCRecorderSettings
     {
         protected virtual string Extension { get; }
         [System.Obsolete(@"The GIFRecorder is deprecated")] public GIFRecorderSettings() {}
@@ -189,26 +189,27 @@ namespace UnityEditor.Recorder
         public AccumulationSettings AccumulationSettings { get; set; }
         public UnityEditor.Recorder.Input.AudioInputSettings AudioInputSettings { get; }
         public bool CaptureAlpha { get; set; }
-        public UnityEditor.Recorder.MovieRecorderSettings.VideoEncodingQuality EncodingQuality { get; set; }
+        public bool CaptureAudio { get; set; }
+        public UnityEditor.Recorder.Encoder.IEncoderSettings EncoderSettings { get; set; }
+        [System.Obsolete(@"Please use the EncoderSettings API to set/get the bitrate/encoding quality of each Encoder.")] public UnityEditor.Recorder.MovieRecorderSettings.VideoEncodingQuality EncodingQuality { get; set; }
         protected virtual string Extension { get; }
         public UnityEditor.Recorder.Input.ImageInputSettings ImageInputSettings { get; set; }
         public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
-        public UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat OutputFormat { get; set; }
-        [System.Obsolete(@"Please use property 'EncodingQuality'.")] public UnityEditor.VideoBitrateMode VideoBitRateMode { get; set; }
+        [System.Obsolete(@"Please use the EncoderSettings API to set/get the format/codec of each Encoder.")] public UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat OutputFormat { get; set; }
+        [System.Obsolete(@"Please use the EncoderSettings API to set/get the bitrate/encoding quality of each Encoder.")] public UnityEditor.VideoBitrateMode VideoBitRateMode { get; set; }
         public MovieRecorderSettings() {}
         public virtual AccumulationSettings GetAccumulationSettings();
         protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
-        public void GetPresetsForEncoder(int indexEncoder, out System.Collections.Generic.List<string> presetNames, out System.Collections.Generic.List<string> presetOptions);
         protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
         public virtual bool IsAccumulationSupported();
-        public enum VideoEncodingQuality
+        [System.Obsolete(@"Please use the EncoderSettings API to access the encoding quality of each Encoder.")] public enum VideoEncodingQuality
         {
             public const UnityEditor.Recorder.MovieRecorderSettings.VideoEncodingQuality High = 2;
             public const UnityEditor.Recorder.MovieRecorderSettings.VideoEncodingQuality Low = 0;
             public const UnityEditor.Recorder.MovieRecorderSettings.VideoEncodingQuality Medium = 1;
             public int value__;
         }
-        public enum VideoRecorderOutputFormat
+        [System.Obsolete(@"Please use the EncoderSettings API to access the format/codec of each Encoder.")] public enum VideoRecorderOutputFormat
         {
             [UnityEngine.InspectorName(@"ProRes QuickTime")] public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat MOV = 2;
             [UnityEngine.InspectorName(@"H.264 MP4")] public const UnityEditor.Recorder.MovieRecorderSettings.VideoRecorderOutputFormat MP4 = 0;
@@ -331,7 +332,7 @@ namespace UnityEditor.Recorder
         public static bool VerboseMode { get; set; }
     }
 
-    public abstract class RecorderSettings : UnityEngine.ScriptableObject
+    public abstract class RecorderSettings : UnityEngine.ScriptableObject, UnityEngine.ISerializationCallbackReceiver
     {
         public bool CapFrameRate { get; set; }
         public bool Enabled { get; set; }
@@ -353,16 +354,16 @@ namespace UnityEditor.Recorder
         protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
         protected virtual bool HasErrors();
         public virtual bool IsAccumulationSupported();
+        protected virtual void OnAfterDeserialize();
         public virtual void OnAfterDuplicate();
+        protected virtual void OnBeforeSerialize();
         [System.Obsolete(@"Please use methods GetErrors() and GetWarnings()")] protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
     }
 
     [System.AttributeUsage(4, Inherited = false)] public class RecorderSettingsAttribute : System.Attribute
     {
         public RecorderSettingsAttribute(System.Type recorderType, string displayName) {}
-        public RecorderSettingsAttribute(System.Type recorderType, string displayName, bool deprecated) {}
         public RecorderSettingsAttribute(System.Type recorderType, string displayName, string iconName) {}
-        public RecorderSettingsAttribute(System.Type recorderType, string displayName, string iconName, bool deprecated) {}
     }
 
     public class RecorderWindow : UnityEditor.EditorWindow
@@ -458,6 +459,113 @@ namespace UnityEditor.Recorder.AOV.Input
     {
         protected virtual System.Type InputType { get; }
         public AOVCameraInputSettings() {}
+    }
+}
+
+namespace UnityEditor.Recorder.Encoder
+{
+    [System.ComponentModel.DisplayName(@"Unity Media Encoder")] [UnityEditor.Recorder.Encoder.EncoderSettings(typeof(UnityEditor.Recorder.Encoder.CoreEncoder))] public sealed class CoreEncoderSettings : System.IEquatable<UnityEditor.Recorder.Encoder.CoreEncoderSettings>, UnityEditor.Recorder.Encoder.IEncoderSettings
+    {
+        public UnityEditor.Recorder.Encoder.CoreEncoderSettings.OutputCodec Codec { get; set; }
+        public UnityEditor.Recorder.Encoder.CoreEncoderSettings.H264EncodingProfile EncodingProfile { get; set; }
+        public UnityEditor.Recorder.Encoder.CoreEncoderSettings.VideoEncodingQuality EncodingQuality { get; set; }
+        public System.UInt32 GopSize { get; set; }
+        public System.UInt32 KeyframeDistance { get; set; }
+        public System.UInt32 NumConsecutiveBFrames { get; set; }
+        public float TargetBitRate { get; set; }
+        public CoreEncoderSettings() {}
+        public virtual bool Equals(object obj);
+        public virtual int GetHashCode();
+        public virtual bool SupportsCurrentPlatform();
+        public enum H264EncodingProfile
+        {
+            [UnityEngine.InspectorName(@"H.264 Baseline")] public const UnityEditor.Recorder.Encoder.CoreEncoderSettings.H264EncodingProfile Baseline = 0;
+            [UnityEngine.InspectorName(@"H.264 High")] public const UnityEditor.Recorder.Encoder.CoreEncoderSettings.H264EncodingProfile High = 2;
+            [UnityEngine.InspectorName(@"H.264 Main")] public const UnityEditor.Recorder.Encoder.CoreEncoderSettings.H264EncodingProfile Main = 1;
+            public int value__;
+        }
+        public enum OutputCodec
+        {
+            [UnityEngine.InspectorName(@"H.264 MP4")] public const UnityEditor.Recorder.Encoder.CoreEncoderSettings.OutputCodec MP4 = 0;
+            public int value__;
+            [UnityEngine.InspectorName(@"VP8 WebM")] public const UnityEditor.Recorder.Encoder.CoreEncoderSettings.OutputCodec WEBM = 1;
+        }
+        public enum VideoEncodingQuality
+        {
+            public const UnityEditor.Recorder.Encoder.CoreEncoderSettings.VideoEncodingQuality Custom = 3;
+            public const UnityEditor.Recorder.Encoder.CoreEncoderSettings.VideoEncodingQuality High = 2;
+            public const UnityEditor.Recorder.Encoder.CoreEncoderSettings.VideoEncodingQuality Low = 0;
+            public const UnityEditor.Recorder.Encoder.CoreEncoderSettings.VideoEncodingQuality Medium = 1;
+            public int value__;
+        }
+    }
+
+    public enum EncoderCoordinateConvention
+    {
+        public const UnityEditor.Recorder.Encoder.EncoderCoordinateConvention OriginIsBottomLeft = 1;
+        public const UnityEditor.Recorder.Encoder.EncoderCoordinateConvention OriginIsTopLeft = 0;
+        public int value__;
+    }
+
+    [System.AttributeUsage(4, Inherited = false)] public class EncoderSettingsAttribute : System.Attribute
+    {
+        public EncoderSettingsAttribute(System.Type encoderType) {}
+    }
+
+    public interface IEncoder
+    {
+        public abstract void AddAudioFrame(Unity.Collections.NativeArray<float> bytes);
+        public abstract void AddVideoFrame(Unity.Collections.NativeArray<byte> bytes, UnityEditor.Media.MediaTime time);
+        public virtual void AddVideoFrame(UnityEngine.Texture2D frame, UnityEditor.Media.MediaTime time);
+        public abstract void CloseStream();
+        public abstract void OpenStream(UnityEditor.Recorder.Encoder.IEncoderSettings settings, UnityEditor.Recorder.Encoder.RecordingContext ctx);
+    }
+
+    public interface IEncoderSettings
+    {
+        public abstract bool CanCaptureAlpha { get; }
+        public abstract bool CanCaptureAudio { get; }
+        public virtual UnityEditor.Recorder.Encoder.EncoderCoordinateConvention CoordinateConvention { get; }
+        public abstract string Extension { get; }
+        public abstract UnityEngine.TextureFormat GetTextureFormat(bool inputContainsAlpha);
+        public virtual bool RequiresEvenResolution();
+        public abstract bool SupportsCurrentPlatform();
+        public abstract void ValidateRecording(UnityEditor.Recorder.Encoder.RecordingContext ctx, System.Collections.Generic.List<string> errors, System.Collections.Generic.List<string> warnings);
+    }
+
+    [System.ComponentModel.DisplayName(@"ProRes Encoder")] [UnityEditor.Recorder.Encoder.EncoderSettings(typeof(UnityEditor.Recorder.Encoder.ProResEncoder))] public sealed class ProResEncoderSettings : System.IEquatable<UnityEditor.Recorder.Encoder.ProResEncoderSettings>, UnityEditor.Recorder.Encoder.IEncoderSettings
+    {
+        public UnityEditor.Recorder.Encoder.ProResEncoderSettings.OutputFormat Format { get; set; }
+        public ProResEncoderSettings() {}
+        public virtual bool Equals(object obj);
+        public virtual int GetHashCode();
+        public virtual bool SupportsCurrentPlatform();
+        public enum OutputFormat
+        {
+            [UnityEngine.InspectorName(@"Apple ProRes 422 (apcn)")] public const UnityEditor.Recorder.Encoder.ProResEncoderSettings.OutputFormat ProRes422 = 3;
+            [UnityEngine.InspectorName(@"Apple ProRes 422 HQ (apch)")] public const UnityEditor.Recorder.Encoder.ProResEncoderSettings.OutputFormat ProRes422HQ = 2;
+            [UnityEngine.InspectorName(@"Apple ProRes 422 LT (apcs)")] public const UnityEditor.Recorder.Encoder.ProResEncoderSettings.OutputFormat ProRes422LT = 4;
+            [UnityEngine.InspectorName(@"Apple ProRes 422 Proxy (apco)")] public const UnityEditor.Recorder.Encoder.ProResEncoderSettings.OutputFormat ProRes422Proxy = 5;
+            [UnityEngine.InspectorName(@"Apple ProRes 4444 (ap4h)")] public const UnityEditor.Recorder.Encoder.ProResEncoderSettings.OutputFormat ProRes4444 = 1;
+            [UnityEngine.InspectorName(@"Apple ProRes 4444 XQ (ap4x)")] public const UnityEditor.Recorder.Encoder.ProResEncoderSettings.OutputFormat ProRes4444XQ = 0;
+            public int value__;
+        }
+        public enum ProResColorDefinition
+        {
+            public const UnityEditor.Recorder.Encoder.ProResEncoderSettings.ProResColorDefinition HD_Rec709 = 2;
+            public int value__;
+        }
+    }
+
+    public struct RecordingContext
+    {
+        public bool doCaptureAlpha;
+        public bool doCaptureAudio;
+        public UnityEditor.Media.MediaRational fps;
+        public UnityEditor.Recorder.FrameRatePlayback frameRateMode;
+        public int height;
+        public string path;
+        public int width;
     }
 }
 

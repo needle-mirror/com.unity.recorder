@@ -8,13 +8,14 @@ using UnityEditor.Recorder;
 using UnityEditor.Recorder.Input;
 using UnityEditor.Media;
 using Unity.Media;
+using UnityEditor.Recorder.Encoder;
 using static UnityEditor.Recorder.MovieRecorderSettings;
 
 namespace UnityEditor.Recorder
 {
     class MovieRecorder : BaseTextureRecorder<MovieRecorderSettings>
     {
-        MediaEncoderHandle m_EncoderHandle = new MediaEncoderHandle();
+        IEncoder m_Encoder;
 
         // The count of concurrent Movie Recorder instances. It is used to log a warning.
         static private int s_ConcurrentCount = 0;
@@ -28,13 +29,7 @@ namespace UnityEditor.Recorder
         // Whether or not the recording has already been ended. To avoid messing with the count of concurrent recorders.
         private bool m_RecordingAlreadyEnded = false;
 
-        protected override TextureFormat ReadbackTextureFormat
-        {
-            get
-            {
-                return Settings.GetCurrentEncoder().GetTextureFormat(Settings);
-            }
-        }
+        protected override TextureFormat ReadbackTextureFormat => Settings.EncoderSettings.GetTextureFormat(Settings.CaptureAlpha && Settings.EncoderSettings.CanCaptureAlpha && Settings.ImageInputSettings.SupportsTransparent);
 
         protected internal override bool BeginRecording(RecordingSession session)
         {
@@ -62,137 +57,42 @@ namespace UnityEditor.Recorder
             }
             int width = input.OutputWidth;
             int height = input.OutputHeight;
+            var audioInput = (AudioInput)m_Inputs[1];
 
-            var currentEncoderReg = Settings.GetCurrentEncoder();
-            string errorMessage, warningMessage;
-            if (!currentEncoderReg.SupportsResolution(Settings, width, height, out errorMessage, out warningMessage))
-            {
-                ConsoleLogMessage(errorMessage, LogType.Error);
-                Recording = false;
-                return false;
-            }
+            // Create the encoder
+            m_Encoder = EncoderTypeUtilities.CreateEncoderInstance(Settings.EncoderSettings.GetType());
 
-            if (Settings.FrameRatePlayback == FrameRatePlayback.Variable && !currentEncoderReg.SupportsVFR(Settings, out errorMessage))
-            {
-                ConsoleLogMessage(errorMessage, LogType.Error);
-                Recording = false;
-                return false;
-            }
-
-            // Detect unsupported codec
-            if (!currentEncoderReg.IsFormatSupported(Settings.OutputFormat))
-            {
-                Debug.LogError($"The '{Settings.OutputFormat}' format is not supported on this platform");
-                return false;
-            }
-
-            var imageInputSettings = m_Inputs[0].settings as ImageInputSettings;
-            var alphaWillBeInImage = imageInputSettings != null && imageInputSettings.SupportsTransparent && imageInputSettings.RecordTransparency;
-            if (alphaWillBeInImage && !currentEncoderReg.SupportsTransparency(Settings, out errorMessage))
-            {
-                ConsoleLogMessage(errorMessage, LogType.Error);
-                Recording = false;
-                return false;
-            }
-
-            var bitrateMode = ConvertBitrateMode(Settings.EncodingQuality);
             var frameRate = session.settings.FrameRatePlayback == FrameRatePlayback.Constant
                 ? RationalFromDouble(session.settings.FrameRate)
                 : new MediaRational { numerator = 0, denominator = 0 };
+            var lsErrors = new List<string>();
+            var lsWarnings = new List<string>();
 
-            var videoAttrs = new VideoTrackAttributes
+            // Get a recording context
+            var recordingContext = Settings.GetRecordingContext();
+            // Set locally determined fields
+            recordingContext.path = Settings.fileNameGenerator.BuildAbsolutePath(session);
+            recordingContext.fps = frameRate;
+
+            // Update the context and detect errors
+            Settings.EncoderSettings.ValidateRecording(recordingContext, lsErrors, lsWarnings);
+            if (lsErrors.Count > 0)
             {
-                frameRate = frameRate,
-                width = (uint)width,
-                height = (uint)height,
-                includeAlpha = alphaWillBeInImage,
-                bitRateMode = bitrateMode
-            };
-
-            if (RecorderOptions.VerboseMode)
-                ConsoleLogMessage(
-                    $"MovieRecorder starting to write video {width}x{height}@[{videoAttrs.frameRate.numerator}/{videoAttrs.frameRate.denominator}] fps into {Settings.fileNameGenerator.BuildAbsolutePath(session)}",
-                    LogType.Log);
-
-            var audioInput = (AudioInput)m_Inputs[1];
-            var audioAttrsList = new List<AudioTrackAttributes>();
-
-            if (audioInput.AudioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
-            {
-#if UNITY_EDITOR_OSX
-                // Special case with WebM and audio on older Apple computers: deactivate async GPU readback because there
-                // is a risk of not respecting the WebM standard and receiving audio frames out of sync (see "monotonically
-                // increasing timestamps"). This happens only with Target Cameras.
-                if (m_Inputs[0].settings is CameraInputSettings && Settings.OutputFormat == VideoRecorderOutputFormat.WebM)
-                {
-                    UseAsyncGPUReadback = false;
-                }
-#endif
-                var audioAttrs = new AudioTrackAttributes
-                {
-                    sampleRate = new MediaRational(audioInput.SampleRate),
-                    channelCount = audioInput.ChannelCount,
-                    language = ""
-                };
-
-                audioAttrsList.Add(audioAttrs);
-
-                if (RecorderOptions.VerboseMode)
-                    ConsoleLogMessage($"Starting to write audio {audioAttrs.channelCount}ch @ {audioAttrs.sampleRate.numerator}Hz", LogType.Log);
+                foreach (var e in lsErrors)
+                    ConsoleLogMessage(e, LogType.Error);
+                Recording = false;
+                return false;
             }
-            else
+
+            // Show warnings
+            foreach (var w in lsWarnings)
             {
-                if (RecorderOptions.VerboseMode)
-                    ConsoleLogMessage("Starting with no audio.", LogType.Log);
+                ConsoleLogMessage(w, LogType.Warning);
             }
 
             try
             {
-                var path =  Settings.fileNameGenerator.BuildAbsolutePath(session);
-
-                // If an encoder already exist destroy it
-                Settings.DestroyIfExists(m_EncoderHandle);
-
-                // Get the currently selected encoder register and create an encoder
-                m_EncoderHandle = currentEncoderReg.Register(Settings.m_EncoderManager);
-
-                // Create the list of attributes for the encoder, Video, Audio and preset
-                // TODO: Query the list of attributes from the encoder attributes
-                var attr = new List<IMediaEncoderAttribute>();
-                attr.Add(new VideoTrackMediaEncoderAttribute("VideoAttributes", videoAttrs));
-
-                if (audioInput.AudioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
-                {
-                    if (audioAttrsList.Count > 0)
-                    {
-                        attr.Add(new AudioTrackMediaEncoderAttribute("AudioAttributes", audioAttrsList.ToArray()[0]));
-                    }
-                }
-
-                attr.Add(new IntAttribute(AttributeLabels[MovieRecorderSettingsAttributes.CodecFormat], Settings.encoderPresetSelected));
-                attr.Add(new IntAttribute(AttributeLabels[MovieRecorderSettingsAttributes.ColorDefinition], Settings.encoderColorDefinitionSelected));
-
-                if (Settings.encoderPresetSelectedName == "Custom")
-                {
-                    // For custom
-                    attr.Add(new StringAttribute(AttributeLabels[MovieRecorderSettingsAttributes.CustomOptions], Settings.encoderCustomOptions));
-                }
-
-                var requestedFormat = Settings.OutputFormat;
-                if (currentEncoderReg.GetSupportedFormats() == null || !currentEncoderReg.GetSupportedFormats().Contains(requestedFormat))
-                {
-                    ConsoleLogMessage($"Format '{requestedFormat}' is not supported on this platform.", LogType.Error);
-                    return false;
-                }
-
-                // Construct the encoder given the list of attributes
-                Settings.m_EncoderManager.Construct(m_EncoderHandle, path, attr);
-
-                s_ConcurrentCount++;
-
-                m_RecordingStartedProperly = true;
-                m_RecordingAlreadyEnded = false;
-                return true;
+                m_Encoder.OpenStream(Settings.EncoderSettings, recordingContext);
             }
             catch (Exception ex)
             {
@@ -200,6 +100,27 @@ namespace UnityEditor.Recorder
                 Recording = false;
                 return false;
             }
+
+            if (RecorderOptions.VerboseMode)
+                ConsoleLogMessage(
+                    $"MovieRecorder starting to write video {width}x{height}@[{recordingContext.fps.numerator}/{recordingContext.fps.denominator}] fps into {Settings.fileNameGenerator.BuildAbsolutePath(session)}",
+                    LogType.Log);
+
+            if (audioInput.AudioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
+            {
+                if (RecorderOptions.VerboseMode)
+                    ConsoleLogMessage($"Starting to write audio {audioInput.ChannelCount}ch @ {audioInput.SampleRate}Hz", LogType.Log);
+            }
+            else
+            {
+                if (RecorderOptions.VerboseMode)
+                    ConsoleLogMessage("Starting with no audio.", LogType.Log);
+            }
+
+            s_ConcurrentCount++;
+            m_RecordingStartedProperly = true;
+            m_RecordingAlreadyEnded = false;
+            return true;
         }
 
         protected internal override void RecordFrame(RecordingSession session)
@@ -212,13 +133,14 @@ namespace UnityEditor.Recorder
 
             base.RecordFrame(session);
             var audioInput = (AudioInput)m_Inputs[1];
-            if (audioInput.AudioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
-                Settings.m_EncoderManager.AddSamples(m_EncoderHandle, audioInput.MainBuffer);
+            if (Settings.CaptureAudio && Settings.EncoderSettings.CanCaptureAudio && audioInput.AudioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
+                m_Encoder.AddAudioFrame(audioInput.MainBuffer);
         }
 
         protected internal override void EndRecording(RecordingSession session)
         {
             base.EndRecording(session);
+
             if (m_RecordingStartedProperly && !m_RecordingAlreadyEnded)
             {
                 s_ConcurrentCount--;
@@ -245,7 +167,7 @@ namespace UnityEditor.Recorder
         protected override void WriteFrame(Texture2D t)
         {
             var recorderTime = DequeueTimeStamp();
-            Settings.m_EncoderManager.AddFrame(m_EncoderHandle, t, ComputeMediaTime(recorderTime));
+            m_Encoder.AddVideoFrame(t, ComputeMediaTime(recorderTime));
             WarnOfConcurrentRecorders();
         }
 
@@ -257,20 +179,14 @@ namespace UnityEditor.Recorder
                 ConsoleLogMessage("The rendered image has errors. Skipping this frame.", LogType.Error);
                 return;
             }
-            var format = Settings.GetCurrentEncoder().GetTextureFormat(Settings);
-            Settings.m_EncoderManager.AddFrame(m_EncoderHandle, r.width, r.height, 0, format, r.GetData<byte>(), ComputeMediaTime(recorderTime));
+            m_Encoder.AddVideoFrame(r.GetData<byte>(), ComputeMediaTime(recorderTime));
             WarnOfConcurrentRecorders();
         }
 
         protected override void DisposeEncoder()
         {
-            if (!Settings.m_EncoderManager.Exists(m_EncoderHandle))
-            {
-                base.DisposeEncoder();
-                return;
-            }
-
-            Settings.m_EncoderManager.Destroy(m_EncoderHandle);
+            if (m_Encoder != null)
+                m_Encoder.CloseStream();
             base.DisposeEncoder();
 
             // When adding a file to Unity's assets directory, trigger a refresh so it is detected.
@@ -300,7 +216,7 @@ namespace UnityEditor.Recorder
             return (a < b) ? GreatestCommonDivisor(a, b % a) : GreatestCommonDivisor(b, a % b);
         }
 
-        static MediaRational RationalFromDouble(double value)
+        internal static MediaRational RationalFromDouble(double value)
         {
             if (double.IsNaN(value))
                 return new MediaRational { numerator = 0, denominator = 0 };
@@ -322,6 +238,14 @@ namespace UnityEditor.Recorder
                 numerator = (int)((long)integral * denom + ((long)Math.Round(frac * precision)) / gcd),
                 denominator = (int)denom
             };
+        }
+
+        internal static double DoubleFromRational(MediaRational rational)
+        {
+            if (rational.denominator == 0)
+                return 0;
+            else
+                return (float)rational.numerator / (float)rational.denominator;
         }
     }
 }

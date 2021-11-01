@@ -53,7 +53,7 @@ To install this package, follow the instructions in the [Package Manager documen
 
 This version of the Recorder is compatible with the following versions of the Unity Editor:
 
-* 2019.4 and later (recommended)
+* 2022.1 and later (recommended)
 
 ### Known issues and limitations
 

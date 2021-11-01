@@ -4,6 +4,23 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0-pre.3] - 2021-11-01
+### Added
+- Added a new "Encoder" drop down with the Unity Media Encoder and ProRes Encoder.
+- Added a new public Encoder API to allow users to create their own Encoders for seamless integration into the Movie Recorder.
+- Added a new "Custom" quality for the Unity Media Encoder, with different options for H.264 MP4 and VP8 WebM.
+
+### Changed
+- Updated minimum required Unity Editor version to 2022.1.
+- Renamed the "Capture" section to "Input" and the "Format" section to "Output Format".
+- Moved the "Include Audio" option to the "Output Format" section of the Recorder Window.
+- Ignore "Capture Alpha" in Movie Recorder instead of logging an error when the encoder doesn't support an alpha channel.
+- Changed the encoder API to improve the readability of scripted Recorders and allow users to use the ProRes encoder from script.
+
+### Fixed
+- Prevent the user from starting a recording session from the Recorder window if the Unity Editor has compiler errors.
+- Make sure to always restore the asynchronous shader compilation setting's original value when the recording session ends.
+
 ## [4.0.0-pre.2] - 2021-09-14
 ### Added
 - Added variable frame rate support to the Movie Recorder.

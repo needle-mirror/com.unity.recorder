@@ -236,26 +236,6 @@ namespace UnityEditor.Recorder
             return (formatSupportAlpha && inputSupportAlpha && !UnityHelpers.UsingURP());
         }
 
-        internal override void SelfAdjustSettings()
-        {
-            var input = m_ImageInputSelector.Selected;
-
-            if (input == null)
-                return;
-            var renderTextureSamplerSettings = input as RenderTextureSamplerSettings;
-            if (renderTextureSamplerSettings != null)
-            {
-                var colorSpace = OutputFormat == ImageRecorderOutputFormat.EXR ? UnityEngine.ColorSpace.Linear : UnityEngine.ColorSpace.Gamma;
-                renderTextureSamplerSettings.ColorSpace = colorSpace;
-            }
-
-            var cbis = input as CameraInputSettings;
-            if (cbis != null)
-            {
-                cbis.RecordTransparency = CanCaptureAlpha() && CaptureAlpha;
-            }
-        }
-
         [SerializeReference] AccumulationSettings _accumulationSettings = new AccumulationSettings();
 
         /// <summary>

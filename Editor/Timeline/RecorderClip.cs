@@ -19,7 +19,6 @@ namespace UnityEditor.Recorder.Timeline
         [SerializeField]
         public RecorderSettings settings;
 
-
         readonly SceneHook m_SceneHook = new SceneHook(Guid.NewGuid().ToString());
 
         Type recorderType
@@ -99,7 +98,7 @@ namespace UnityEditor.Recorder.Timeline
         {
             if (settings == null || timelineAsset == null)
                 return;
-            settings.FrameRate = timelineAsset.editorSettings.fps;
+            settings.FrameRate = (float)timelineAsset.editorSettings.frameRate;
             settings.FrameRatePlayback = FrameRatePlayback.Constant;
             settings.CapFrameRate = true;
         }

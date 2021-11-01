@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Recorder;
+using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Input;
 
 namespace UnityEngine.Recorder.Examples
@@ -50,16 +51,18 @@ namespace UnityEngine.Recorder.Examples
             m_Settings.Enabled = true;
 
             // This example performs an MP4 recording
-            m_Settings.OutputFormat = MovieRecorderSettings.VideoRecorderOutputFormat.MP4;
-            m_Settings.EncodingQuality = MovieRecorderSettings.VideoEncodingQuality.High;
+            m_Settings.EncoderSettings = new CoreEncoderSettings
+            {
+                EncodingQuality = CoreEncoderSettings.VideoEncodingQuality.High,
+                Codec = CoreEncoderSettings.OutputCodec.MP4
+            };
+            m_Settings.CaptureAlpha = true;
 
             m_Settings.ImageInputSettings = new GameViewInputSettings
             {
                 OutputWidth = 1920,
                 OutputHeight = 1080
             };
-
-            m_Settings.AudioInputSettings.PreserveAudio = m_RecordAudio;
 
             // Simple file name (no wildcards) so that FileInfo constructor works in OutputFile getter.
             m_Settings.OutputFile = mediaOutputFolder.FullName + "/" + "video";

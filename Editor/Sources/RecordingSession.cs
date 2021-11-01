@@ -1,4 +1,5 @@
 using System;
+using UnityEditor.Media;
 using UnityEngine;
 using UnityEngine.LowLevel;
 
@@ -154,6 +155,7 @@ namespace UnityEditor.Recorder
                 // This must be after the above call otherwise GameView will not be initialized
                 if (!recorder.BeginRecording(this))
                 {
+                    recorder.CleanupFailedRecording();
                     UnityHelpers.Destroy(recorderComponent); // so that the time scale is immediately reset (REC-834)
                     return false;
                 }
@@ -217,7 +219,7 @@ namespace UnityEditor.Recorder
                 settings.FrameRatePlayback == FrameRatePlayback.Constant && recorder.settings.CapFrameRate)
             {
                 var frameCount = Time.renderedFrameCount - m_InitialFrame;
-                var frameLen = 1.0f / recorder.settings.FrameRate;
+                var frameLen = 1.0f / recorder.settings.FrameRate; // seconds
                 var elapsed = Time.unscaledTime - m_FPSTimeStart;
                 var target = frameLen * (frameCount + 1);
                 var sleepSec = Math.Min(target - elapsed, 1F);

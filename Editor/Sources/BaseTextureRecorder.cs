@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
-#if HDRP_ACCUM_API
+#if HDRP_AVAILABLE
 using UnityEngine.Rendering.HighDefinition;
 #endif
 using System.Collections.Generic;
@@ -51,7 +51,7 @@ namespace UnityEditor.Recorder
         {
             if (!base.BeginRecording(session))
                 return false;
-#if HDRP_ACCUM_API
+#if HDRP_AVAILABLE
             var hdPipeline = RenderPipelineManager.currentPipeline as HDRenderPipeline;
             if (hdPipeline != null)
             {
@@ -105,6 +105,12 @@ namespace UnityEditor.Recorder
 
             var renderTexture = input.OutputRenderTexture;
 
+            if (renderTexture == null)
+            {
+                Debug.LogWarning($"Ignoring the current frame because the source has been disposed");
+                return;
+            }
+
             if (UseAsyncGPUReadback)
             {
                 AsyncGPUReadback.Request(
@@ -144,7 +150,7 @@ namespace UnityEditor.Recorder
         protected internal override void PrepareNewFrame(RecordingSession ctx)
         {
             base.PrepareNewFrame(ctx);
-#if HDRP_ACCUM_API
+#if HDRP_AVAILABLE
             if (UnityHelpers.CaptureAccumulation(settings))
             {
                 if (RenderPipelineManager.currentPipeline is HDRenderPipeline hdPipeline)
@@ -158,8 +164,7 @@ namespace UnityEditor.Recorder
         /// <inheritdoc/>
         protected internal override void EndRecording(RecordingSession session)
         {
-#if HDRP_ACCUM_API
-
+#if HDRP_AVAILABLE
             if (UnityHelpers.CaptureAccumulation(settings))
             {
                 if (RenderPipelineManager.currentPipeline is HDRenderPipeline hdPipeline)
@@ -172,7 +177,6 @@ namespace UnityEditor.Recorder
             }
 #endif
             base.EndRecording(session);
-
             if (m_OngoingAsyncGPURequestsCount > 0)
             {
                 Recording = true;

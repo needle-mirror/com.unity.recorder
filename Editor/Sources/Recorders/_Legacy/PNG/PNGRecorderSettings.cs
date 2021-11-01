@@ -1,6 +1,6 @@
 namespace UnityEditor.Recorder.FrameCapturer
 {
-    [RecorderSettings(typeof(PNGRecorder), "Legacy/PNG", true)]
+    [RecorderSettings(typeof(PNGRecorder), "Legacy/PNG")]
 #pragma warning disable 618
     class PNGRecorderSettings : BaseFCRecorderSettings
     {

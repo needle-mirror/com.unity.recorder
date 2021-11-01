@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEditor.Media;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -23,7 +24,10 @@ namespace UnityEditor.Recorder
     {
         static int sm_CaptureFrameRateCount;
         bool m_ModifiedCaptureFR;
-        bool m_asyncShaderCompileSetting;
+
+        private static bool s_asyncShaderCompileSetting;
+        private static bool s_asyncShaderCompileAlreadyRestored = false; // have we already restored the value of the setting?
+        private static bool s_asyncShaderCompileAlreadyDisabled = false; // have we already disabled the setting?
 
         /// <summary>
         /// Indicates the number of frames of the current recording session.
@@ -98,13 +102,11 @@ namespace UnityEditor.Recorder
             if (RecorderOptions.VerboseMode)
                 ConsoleLogMessage("Session created", LogType.Log);
 
-            settings.SelfAdjustSettings(); // ignore return value.
-
             var fixedRate = settings.FrameRatePlayback == FrameRatePlayback.Constant ? settings.FrameRate : 0.0f;
             if (fixedRate > 0)
             {
-                var toCompare = 1.0f / fixedRate;
-                if (Time.captureFramerate != 0 && Math.Abs(toCompare - Time.captureDeltaTime) > float.Epsilon)
+                var toComparePeriodSeconds = 1.0f / fixedRate; // Hz -> secs
+                if (Time.captureFramerate != 0 && Math.Abs(toComparePeriodSeconds - Time.captureDeltaTime) > float.Epsilon)
                     ConsoleLogMessage($"Recorder {GetType().Name} is set to record at a fixed rate and another component has already set a conflicting value for [Time.captureFramerate], new value being applied : {fixedRate}!", LogType.Error);
                 else if (Time.captureFramerate == 0 && RecorderOptions.VerboseMode)
                     ConsoleLogMessage($"Frame recorder set fixed frame rate to {fixedRate}", LogType.Log);
@@ -168,10 +170,7 @@ namespace UnityEditor.Recorder
             if (RecorderOptions.VerboseMode)
                 ConsoleLogMessage($"Starting to record", LogType.Log);
 
-            // Save the async compile shader setting to restore it at the end of recording
-            m_asyncShaderCompileSetting = EditorSettings.asyncShaderCompilation;
-            // Disable async compile shader setting when recording
-            EditorSettings.asyncShaderCompilation = false;
+            DisableAsyncShaderCompil();
 
             return Recording = true;
         }
@@ -208,9 +207,7 @@ namespace UnityEditor.Recorder
             if (RecorderOptions.VerboseMode)
                 ConsoleLogMessage($"Recording stopped, total frame count: {RecordedFramesCount}", LogType.Log);
 
-            // Restore the asyncShaderCompilation setting
-            EditorSettings.asyncShaderCompilation = m_asyncShaderCompileSetting;
-
+            RestoreAsynchronousShaderCompilation();
             ++settings.Take;
         }
 
@@ -322,6 +319,42 @@ namespace UnityEditor.Recorder
                 default:
                     throw new ArgumentOutOfRangeException("stage", stage, null);
             }
+        }
+
+        /// <summary>
+        /// Disable asynchronous shader compilation and save the status.
+        /// </summary>
+        private static void DisableAsyncShaderCompil()
+        {
+            if (s_asyncShaderCompileAlreadyDisabled)
+                return;
+
+            // Save the async compile shader setting to restore it at the end of recording
+            s_asyncShaderCompileSetting = EditorSettings.asyncShaderCompilation;
+            // Disable async compile shader setting when recording
+            EditorSettings.asyncShaderCompilation = false;
+            s_asyncShaderCompileAlreadyRestored = false;
+            s_asyncShaderCompileAlreadyDisabled = true;
+        }
+
+        /// <summary>
+        /// If we have not already restored the setting of asynchronous shader compilation, restore it.
+        /// </summary>
+        private static void RestoreAsynchronousShaderCompilation()
+        {
+            if (s_asyncShaderCompileAlreadyRestored || !s_asyncShaderCompileAlreadyDisabled)
+                return;
+            EditorSettings.asyncShaderCompilation = s_asyncShaderCompileSetting;
+            s_asyncShaderCompileAlreadyRestored = true;
+            s_asyncShaderCompileAlreadyDisabled = false;
+        }
+
+        /// <summary>
+        /// If a recording fails, clean up after it.
+        /// </summary>
+        internal void CleanupFailedRecording()
+        {
+            RestoreAsynchronousShaderCompilation();
         }
     }
 }

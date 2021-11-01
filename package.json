@@ -1,8 +1,8 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Recorder",
-  "version": "4.0.0-pre.2",
-  "unity": "2019.4",
+  "version": "4.0.0-pre.3",
+  "unity": "2022.1",
   "unityRelease": "1f1",
   "dependencies": {
     "com.unity.timeline": "1.0.0"
@@ -23,15 +23,15 @@
     "layer"
   ],
   "relatedPackages": {
-    "com.unity.recorder.tests": "4.0.0-pre.2"
+    "com.unity.recorder.tests": "4.0.0-pre.3"
   },
   "upmCi": {
-    "footprint": "6e2e98579b9d928b0bb9f478a28b3fe61ed2c931"
+    "footprint": "8cf5d7158d7aa3357167f933c65ef0a7473a06dc"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.recorder.git",
     "type": "git",
-    "revision": "cc83cd9449ed4254de31bfd506aeba5fc097d598"
+    "revision": "aaaa6232a08d48cf94b5ddfa8f5195c0ceb16700"
   },
   "samples": [
     {

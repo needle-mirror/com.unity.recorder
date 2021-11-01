@@ -280,8 +280,6 @@ namespace UnityEditor.Recorder
             recorder.EndTime = m_EndTime;
             recorder.CapFrameRate = m_CapFrameRate;
             recorder.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy;
-
-            recorder.SelfAdjustSettings();
         }
 
         internal void ApplyGlobalSettingToAllRecorders()

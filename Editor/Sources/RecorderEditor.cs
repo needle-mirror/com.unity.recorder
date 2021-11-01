@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
 
@@ -15,23 +16,19 @@ namespace UnityEditor.Recorder
         SerializedProperty m_FileNameGenerator;
         SerializedProperty m_Take;
 
-        /// <summary>
-        /// An action that gets triggered when a change of the settings happens in the Editor and must notify the Recorder Window.
-        /// </summary>
-        internal event Action OnSelectedSettingsChangedAfterTheFact;
-
         internal event Action OnRecorderValidated;
-        SavedBool showFormat;
+        internal event Action OnRecorderDataHasChaged;
+        SavedBool showOutputFormat;
         SavedBool showOutputFile;
-        SavedBool showCapture;
+        SavedBool showInput;
 
         // Used to differentiate if drawing from timeline or RecorderWindow
         internal static bool FromRecorderWindow = true;
 
         static class Styles
         {
-            internal static readonly GUIContent CaptureLabel = new GUIContent("Capture");
-            internal static readonly GUIContent FormatLabel = new GUIContent("Format");
+            internal static readonly GUIContent InputLabel = new GUIContent("Input");
+            internal static readonly GUIContent OutputFormatLabel = new GUIContent("Output Format");
             internal static readonly GUIContent OutputFileLabel = new GUIContent("Output File");
             internal static readonly GUIContent FileNameLabel = new GUIContent("File Name", "Pattern for the name of the output files. It can include a mix of regular text and dynamic placeholders (use the “+ Wildcards” button).");
             internal static readonly GUIContent SourceLabel = new GUIContent("Source", "The input type to use for the recording.");
@@ -39,10 +36,6 @@ namespace UnityEditor.Recorder
             internal static readonly GUIContent RenderStepFrameLabel = new GUIContent("Render Frame Step", "The interval between every frame to render in Play mode during the recording.");
         }
 
-        internal void InvokeItemStateRefresh()
-        {
-            OnSelectedSettingsChangedAfterTheFact?.Invoke();
-        }
 
         /// <summary>
         /// Initializes the attributes and styling of the editor based on the serialized data, when the object becomes active.
@@ -56,9 +49,9 @@ namespace UnityEditor.Recorder
                 m_FileNameGenerator = pf.Find(w => w.fileNameGenerator);
                 m_Take = pf.Find(w => w.take);
 
-                showFormat = new SavedBool($"{target.GetType()}.showFormat", true);
+                showOutputFormat = new SavedBool($"{target.GetType()}.showOutputFormat", true);
                 showOutputFile = new SavedBool($"{target.GetType()}.showOutputFile", true);;
-                showCapture = new SavedBool($"{target.GetType()}.showCapture", true);;
+                showInput = new SavedBool($"{target.GetType()}.showInput", true);;
             }
         }
 
@@ -140,25 +133,23 @@ namespace UnityEditor.Recorder
             serializedObject.Update();
             if (DrawCaptureSection())
             {
-                showCapture.value = DrawHeaderFoldout(Styles.CaptureLabel, showCapture, false);
-                if (showCapture)
+                showInput.value = DrawHeaderFoldout(Styles.InputLabel, showInput, false);
+                if (showInput)
                 {
                     EditorGUILayout.Separator();
                     AOVGUI();
                     ImageRenderOptionsGUI();
                     ExtraOptionsGUI();
-#if HDRP_ACCUM_API
                     if (UnityHelpers.UsingHDRP())
                     {
                         AccumulationGUI();
                     }
-#endif
                     EditorGUILayout.Separator();
                 }
             }
 
-            showFormat.value = DrawHeaderFoldout(Styles.FormatLabel, showFormat, false);
-            if (showFormat)
+            showOutputFormat.value = DrawHeaderFoldout(Styles.OutputFormatLabel, showOutputFormat, false);
+            if (showOutputFormat)
             {
                 EditorGUILayout.Separator();
                 FileTypeAndFormatGUI();
@@ -179,9 +170,6 @@ namespace UnityEditor.Recorder
 
             EditorGUI.EndChangeCheck();
 
-            if (GUI.changed)
-                ((RecorderSettings)target).SelfAdjustSettings();
-
             OnValidateSettingsGUI();
         }
 
@@ -201,17 +189,28 @@ namespace UnityEditor.Recorder
             }
 
             var warnings = new List<string>();
+            var errors = new List<string>();
+
             targetSettings.GetWarnings(warnings);
             foreach (var w in warnings)
                 EditorGUILayout.HelpBox(w, MessageType.Warning);
 
-            var errors = new List<string>();
             targetSettings.GetErrors(errors);
             foreach (var e in errors)
                 EditorGUILayout.HelpBox(e, MessageType.Error);
 
             if (oldWarnings.Count > 0 || warnings.Count > 0 || errors.Count > 0)
-                OnRecorderValidated?.Invoke();
+                InvokeRecorderValidated();
+        }
+
+        internal void InvokeRecorderValidated()
+        {
+            OnRecorderValidated?.Invoke();
+        }
+
+        internal void InvokeRecorderDataHasChanged()
+        {
+            OnRecorderDataHasChaged?.Invoke();
         }
 
         internal virtual bool DrawCaptureSection()
@@ -312,7 +311,6 @@ namespace UnityEditor.Recorder
         /// </summary>
         protected virtual void AccumulationGUI()
         {
-#if HDRP_ACCUM_API
             if (!FromRecorderWindow)
                 return;
             var settings = (RecorderSettings)target;
@@ -323,7 +321,6 @@ namespace UnityEditor.Recorder
                 if (prop != null)
                     EditorGUILayout.PropertyField(prop);
             }
-#endif
         }
 
         class SavedBool

@@ -3,6 +3,7 @@
 using System.IO;
 using UnityEditor;
 using UnityEditor.Recorder;
+using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Input;
 
 namespace UnityEngine.Recorder.Examples
@@ -35,8 +36,12 @@ namespace UnityEngine.Recorder.Examples
             videoRecorder.name = "My Video Recorder";
             videoRecorder.Enabled = true;
 
-            videoRecorder.OutputFormat = MovieRecorderSettings.VideoRecorderOutputFormat.MP4;
-            videoRecorder.EncodingQuality = MovieRecorderSettings.VideoEncodingQuality.Low;
+            videoRecorder.EncoderSettings = new CoreEncoderSettings
+            {
+                EncodingQuality = CoreEncoderSettings.VideoEncodingQuality.Low,
+                Codec = CoreEncoderSettings.OutputCodec.MP4
+            };
+            videoRecorder.CaptureAudio = false;
 
             videoRecorder.ImageInputSettings = new GameViewInputSettings
             {
@@ -44,7 +49,6 @@ namespace UnityEngine.Recorder.Examples
                 OutputHeight = 1080
             };
 
-            videoRecorder.AudioInputSettings.PreserveAudio = true;
             videoRecorder.OutputFile = Path.Combine(mediaOutputFolder, "video_v") + DefaultWildcard.Take;
 
             // Animation
