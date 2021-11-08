@@ -84,6 +84,12 @@ namespace UnityEditor.Recorder
 
             var renderTexture = input.OutputRenderTexture;
 
+            if (renderTexture == null)
+            {
+                Debug.LogWarning($"Ignoring the current frame because the source has been disposed");
+                return;
+            }
+
             if (UseAsyncGPUReadback)
             {
                 AsyncGPUReadback.Request(
