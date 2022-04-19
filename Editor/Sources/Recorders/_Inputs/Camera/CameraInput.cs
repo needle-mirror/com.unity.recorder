@@ -18,7 +18,6 @@ namespace UnityEditor.Recorder.Input
         }
 
         private InputStrategy  m_InputStrategy;
-        private bool           m_ModifiedResolution;
         private Camera         m_UICamera;
         private CanvasBackup[] m_CanvasBackups;
 
@@ -220,20 +219,7 @@ namespace UnityEditor.Recorder.Input
 
                     if (cbSettings.outputImageHeight != ImageHeight.Window)
                     {
-                        var size = GameViewSize.SetCustomSize(OutputWidth, OutputHeight);
-                        if (size == null)
-                            size = GameViewSize.AddSize(OutputWidth, OutputHeight);
-
-                        if (GameViewSize.modifiedResolutionCount == 0)
-                            GameViewSize.BackupCurrentSize();
-                        else
-                        {
-                            if (size != GameViewSize.currentSize)
-                                Debug.LogError($"Requesting a resolution change (to {OutputWidth}x{OutputHeight}) while a recorder's input has already requested one! Undefined behaviour. Count: {GameViewSize.modifiedResolutionCount}");
-                        }
-                        GameViewSize.modifiedResolutionCount++;
-                        m_ModifiedResolution = true;
-                        GameViewSize.SelectSize(size);
+                        GameViewSize.SetCustomSize(OutputWidth, OutputHeight);
                     }
                     break;
                 }
@@ -373,14 +359,6 @@ namespace UnityEditor.Recorder.Input
             {
                 m_InputStrategy.ReleaseCamera();
                 UnityHelpers.Destroy(m_UICamera);
-
-                if (m_ModifiedResolution)
-                {
-                    if (GameViewSize.modifiedResolutionCount > 0)
-                        GameViewSize.modifiedResolutionCount--; // don't allow negative if called twice
-                    if (GameViewSize.modifiedResolutionCount == 0)
-                        GameViewSize.RestoreSize();
-                }
             }
 
             base.Dispose(disposing);

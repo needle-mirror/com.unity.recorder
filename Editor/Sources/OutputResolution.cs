@@ -22,9 +22,8 @@ namespace UnityEditor.Recorder
 
             if (imageHeight == ImageHeight.Window)
             {
-                int w, h;
-                GameViewSize.GetGameRenderSize(out w, out h);
-                return w;
+                GameViewSize.GetGameRenderSize(out var w, out var h);
+                return (int)w;
             }
 
             var aspect = m_AspectRatio.GetAspect();
@@ -38,9 +37,8 @@ namespace UnityEditor.Recorder
 
             if (imageHeight == ImageHeight.Window)
             {
-                int w, h;
-                GameViewSize.GetGameRenderSize(out w, out h);
-                return h;
+                GameViewSize.GetGameRenderSize(out var w, out var h);
+                return (int)h;
             }
 
             return (int)imageHeight;

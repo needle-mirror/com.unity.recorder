@@ -24,4 +24,4 @@ Use this section to [create and manage your list of Recorders](RecorderManage.md
 
 ### ![](Images/Label-C.png) Recorder properties
 
-Use this section to [set up the properties of a Recorder](RecorderProperties.md) selected in the Recorder list. Recorder properties include **Capture**, **Format** and **Output File**.
+Use this section to [set up the properties of a Recorder](RecorderProperties.md) selected in the Recorder list. Recorder properties include **Input**, **Output Format** and **Output File**.

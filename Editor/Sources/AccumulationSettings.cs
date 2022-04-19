@@ -40,10 +40,18 @@ public class AccumulationSettings
     public int Samples
     {
         get { return samples; }
-        set { samples = value; }
+        set
+        {
+            if (value < 1)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            samples = value;
+        }
     }
 
-    [SerializeField] private int samples = 1;
+    [SerializeField, Min(1)] private int samples = 1;
 
     /// <summary>
     /// The portion of the interval between two subsequent frames in which the shutter actually opens and closes according to the specified shutter profile. The value 1.0f applies the shutter profile to the whole interval between the two frames, while the value 0.0f disables the shutter and the accumulation. Any value in between proportionally rescales the shutter profile and makes the shutter remain closed for the rest of the interval to the next frame.
@@ -99,4 +107,15 @@ public class AccumulationSettings
     }
 
     [SerializeField] private float shutterBeginsClosing = 0.75f;
+
+    /// <summary>
+    /// Indicates whether this Recorder is set to use subpixel jitter antialiasing or not.
+    /// </summary>
+    public bool UseSubPixelJitter
+    {
+        get { return useSubPixelJitter; }
+        set { useSubPixelJitter = value; }
+    }
+
+    [SerializeField] bool useSubPixelJitter = true;
 }

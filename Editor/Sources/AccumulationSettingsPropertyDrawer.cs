@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -13,16 +14,22 @@ namespace UnityEditor.Recorder
             internal static readonly GUIContent ShutterProfile = new GUIContent("Shutter Profile", "Defines a response profile to simulate the physical motion of a camera shutter at each frame when capturing sub-frames. Either specify a Range to set up a trapezoid-based profile or select an animation Curve.");
             internal static readonly GUIContent AccumulationSamples = new GUIContent("Samples", "The number of sub-frames to capture and accumulate on each final recorded frame.");
             internal static readonly GUIContent ShutterProfileType = new GUIContent("");
+            internal static readonly GUIContent UseSubPixelJitter = new GUIContent("Anti-aliasing", "Enables subpixel jitter anti-aliasing.");
         }
 
-        private SerializedProperty m_CaptureAccumulation;
-        private SerializedProperty m_Samples;
-        private SerializedProperty m_ShutterInterval;
-        private SerializedProperty m_ShutterType;
-        private SerializedProperty m_ShutterProfileCurve;
-        private SerializedProperty m_ShutterFullyOpen;
-        private SerializedProperty m_ShutterBeginsClosing;
-        private const int k_MaxSamples = 8192;
+        SerializedProperty m_CaptureAccumulation;
+        SerializedProperty m_Samples;
+        SerializedProperty m_ShutterInterval;
+        SerializedProperty m_ShutterType;
+        SerializedProperty m_ShutterProfileCurve;
+        SerializedProperty m_ShutterFullyOpen;
+        SerializedProperty m_ShutterBeginsClosing;
+        SerializedProperty m_UseSubPixelJitter;
+        RecorderEditor.SavedBool shutterIntervalInAngle;
+
+        static string[] s_IntervalStrings = { "Normalized", "Angle" };
+
+
         void Initialize(SerializedProperty property)
         {
             m_CaptureAccumulation = property.FindPropertyRelative("captureAccumulation");
@@ -32,79 +39,109 @@ namespace UnityEditor.Recorder
             m_ShutterProfileCurve = property.FindPropertyRelative("shutterProfileCurve");
             m_ShutterFullyOpen = property.FindPropertyRelative("shutterFullyOpen");
             m_ShutterBeginsClosing = property.FindPropertyRelative("shutterBeginsClosing");
+            m_UseSubPixelJitter = property.FindPropertyRelative("useSubPixelJitter");
+            shutterIntervalInAngle = new RecorderEditor.SavedBool("RecorderAccumulation.shutterIntervalInAngle", false);
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Initialize(property);
-            var captureAccumulation = m_CaptureAccumulation.boolValue;
-            var samples = m_Samples.intValue;
-            var shutterInterval = m_ShutterInterval.floatValue;
 
-            EditorGUI.BeginProperty(position, label, property);
-            captureAccumulation = EditorGUILayout.Toggle(Styles.CaptureAccumulationLabel, captureAccumulation);
-            m_CaptureAccumulation.boolValue = captureAccumulation;
-            EditorGUI.indentLevel++;
-
-            using (new EditorGUI.DisabledScope(!captureAccumulation))
+            using (new EditorGUI.PropertyScope(position, label, property))
             {
-                m_Samples.intValue = (int)EditorGUILayout.Slider(
-                    Styles.AccumulationSamples,
-                    samples, 1, k_MaxSamples);
-                m_ShutterInterval.floatValue =
-                    EditorGUILayout.Slider(Styles.ShutterInterval, shutterInterval, 0.0f,
-                        1.0f);
-                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.PropertyField(m_CaptureAccumulation, Styles.CaptureAccumulationLabel);
+                using (new EditorGUI.IndentLevelScope(1))
                 {
-                    EditorGUILayout.PrefixLabel(Styles.ShutterProfile);
-                    EditorGUI.indentLevel--;
-                    EditorGUILayout.PropertyField(m_ShutterType, Styles.ShutterProfileType);
-
-                    if (m_ShutterType.intValue == 1) // curve value
+                    using (new EditorGUI.DisabledScope(!m_CaptureAccumulation.boolValue))
                     {
-                        m_ShutterProfileCurve.animationCurveValue = EditorGUILayout.CurveField(
-                            m_ShutterProfileCurve.animationCurveValue, Color.red, new Rect(0.0f, 0.0f, 1.0f, 1.0f));
-                    }
-                    else
-                    {
-                        float fullyOpen = m_ShutterFullyOpen.floatValue;
-                        float beginsClosing = m_ShutterBeginsClosing.floatValue;
+                        EditorGUILayout.PropertyField(m_Samples, Styles.AccumulationSamples);
 
-                        EditorGUI.BeginChangeCheck();
-                        fullyOpen = EditorGUILayout.FloatField(fullyOpen);
-                        fullyOpen = Mathf.Clamp(
-                            fullyOpen, 0.0f,
-                            beginsClosing);
-                        if (EditorGUI.EndChangeCheck())
+                        using (new EditorGUILayout.HorizontalScope())
                         {
-                            m_ShutterFullyOpen.floatValue = fullyOpen;
+                            EditorGUILayout.PrefixLabel(Styles.ShutterInterval);
+                            using (new EditorGUI.IndentLevelScope(-1))
+                            {
+                                var selected = shutterIntervalInAngle.value == false ? 0 : 1;
+                                shutterIntervalInAngle.value = EditorGUILayout.Popup(selected, s_IntervalStrings,
+                                    GUILayout.Width(70)) == 1;
+                                if (shutterIntervalInAngle.value)
+                                {
+                                    m_ShutterInterval.floatValue =
+                                        EditorGUILayout.Slider(m_ShutterInterval.floatValue * 360, 0.0f,
+                                            360.0f) / 360;
+                                }
+                                else
+                                {
+                                    m_ShutterInterval.floatValue =
+                                        EditorGUILayout.Slider(m_ShutterInterval.floatValue, 0.0f,
+                                            1.0f);
+                                }
+                            }
                         }
 
-                        float minValue = fullyOpen;
-                        float maxValue = beginsClosing;
-
-                        EditorGUI.BeginChangeCheck();
-                        EditorGUILayout.MinMaxSlider(ref minValue, ref maxValue, 0.0f, 1.0f, null);
-                        minValue = Mathf.Round(minValue * 100) / 100.0f;
-                        maxValue = Mathf.Round(maxValue * 100) / 100.0f;
-
-                        fullyOpen = minValue;
-                        beginsClosing = maxValue;
-                        beginsClosing =  EditorGUILayout.FloatField(beginsClosing);
-                        beginsClosing =  Mathf.Clamp(beginsClosing,
-                            fullyOpen, 1.0f);
-                        if (EditorGUI.EndChangeCheck())
+                        using (new EditorGUILayout.HorizontalScope())
                         {
-                            m_ShutterFullyOpen.floatValue = fullyOpen;
-                            m_ShutterBeginsClosing.floatValue = beginsClosing;
+                            EditorGUILayout.PrefixLabel(Styles.ShutterProfile);
+                            using (new EditorGUI.IndentLevelScope(-1))
+                            {
+                                EditorGUILayout.PropertyField(m_ShutterType, Styles.ShutterProfileType,
+                                    GUILayout.Width(70));
+
+                                if (m_ShutterType.intValue == 1) // curve value
+                                {
+                                    m_ShutterProfileCurve.animationCurveValue = EditorGUILayout.CurveField(
+                                        m_ShutterProfileCurve.animationCurveValue, Color.red,
+                                        new Rect(0.0f, 0.0f, 1.0f, 1.0f));
+                                }
+                                else
+                                {
+                                    var fullyOpen = m_ShutterFullyOpen.floatValue;
+                                    var beginsClosing = m_ShutterBeginsClosing.floatValue;
+
+                                    using (var c = new EditorGUI.ChangeCheckScope())
+                                    {
+                                        fullyOpen = EditorGUILayout.FloatField(fullyOpen);
+                                        fullyOpen = Mathf.Clamp(
+                                            fullyOpen, 0.0f,
+                                            beginsClosing);
+                                        if (c.changed)
+                                        {
+                                            m_ShutterFullyOpen.floatValue = fullyOpen;
+                                        }
+                                    }
+
+                                    var minValue = fullyOpen;
+                                    var maxValue = beginsClosing;
+
+                                    using (var c = new EditorGUI.ChangeCheckScope())
+                                    {
+                                        EditorGUILayout.MinMaxSlider(ref minValue, ref maxValue, 0.0f, 1.0f);
+                                        minValue = Mathf.Round(minValue * 100) / 100.0f;
+                                        maxValue = Mathf.Round(maxValue * 100) / 100.0f;
+
+                                        fullyOpen = minValue;
+                                        beginsClosing = maxValue;
+                                        beginsClosing =
+                                            EditorGUILayout.FloatField(beginsClosing);
+                                        beginsClosing = Mathf.Clamp(beginsClosing,
+                                            fullyOpen, 1.0f);
+                                        if (c.changed)
+                                        {
+                                            m_ShutterFullyOpen.floatValue = fullyOpen;
+                                            m_ShutterBeginsClosing.floatValue = beginsClosing;
+                                        }
+                                    }
+                                }
+                            }
                         }
+
+                        EditorGUILayout.PropertyField(m_UseSubPixelJitter, Styles.UseSubPixelJitter);
+
+                        var effectiveNumSamples = Math.Max((int)(m_Samples.intValue * m_ShutterInterval.floatValue), 1);
+                        EditorGUILayout.HelpBox($"Effective number of accumulated samples: {effectiveNumSamples}", MessageType.None);
                     }
-                    EditorGUI.indentLevel++;
                 }
-                EditorGUILayout.EndHorizontal();
-                EditorGUI.indentLevel--;
             }
-            EditorGUI.EndProperty();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

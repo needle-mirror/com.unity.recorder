@@ -303,14 +303,21 @@ namespace UnityEditor.Recorder.Encoder
             return codec == other.codec && encodingQuality == other.encodingQuality && targetBitRate == other.targetBitRate && gopSize == other.gopSize && numConsecutiveBFrames == other.numConsecutiveBFrames && encodingProfile == other.encodingProfile && keyframeDistance == other.keyframeDistance;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Compares the current object with another one.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current one.</param>
+        /// <returns>True if the two objects are equal, false otherwise.</returns>
         public override bool Equals(object obj)
         {
             return ReferenceEquals(this, obj) ||
                 obj is CoreEncoderSettings other && ((IEquatable<CoreEncoderSettings>) this).Equals(other);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Returns a hash code of all serialized fields.
+        /// </summary>
+        /// <returns>The hash code.</returns>
         public override int GetHashCode()
         {
             return HashCode.Combine((int)codec, (int)encodingQuality);

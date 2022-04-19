@@ -10,7 +10,7 @@ These specify the name, path, and other data for the files the Recorder outputs.
 
 ## Recorder-specific properties
 
-Each type of Recorder has specific **Capture** and **Format** properties you must set to specify what you want to record, and how. For example, a Recorder that captures via a Camera needs to know which Camera to use.
+Each type of Recorder has specific **Input** and **Output Format** properties you must set to specify what you want to record, and how. For example, a Recorder that captures via a Camera needs to know which Camera to use.
 
 - [**Animation Clip Recorder properties**](RecorderAnimation.md)
 

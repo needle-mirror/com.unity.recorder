@@ -9,10 +9,10 @@ This page covers all properties specific to the Audio Recorder type.
 ![](Images/RecorderAudio.png)
 
 The Audio Recorder properties fall into two main categories:
-* [Format](#format)
+* [Output Format](#output-format)
 * [Output File](#output-file)
 
-## Format
+## Output Format
 
 Use this section to set up the media format you need to save the recorded images in.
 

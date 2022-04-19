@@ -311,8 +311,6 @@ namespace UnityEditor.Recorder
         /// </summary>
         protected virtual void AccumulationGUI()
         {
-            if (!FromRecorderWindow)
-                return;
             var settings = (RecorderSettings)target;
 
             if (settings.IsAccumulationSupported())
@@ -323,7 +321,7 @@ namespace UnityEditor.Recorder
             }
         }
 
-        class SavedBool
+        internal class SavedBool
         {
             bool m_Value;
             string m_Name;

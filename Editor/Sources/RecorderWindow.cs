@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -61,6 +62,12 @@ namespace UnityEditor.Recorder
         static void QuickRecording()
         {
             var recorderWindow = (RecorderWindow)GetWindow(typeof(RecorderWindow), false, s_WindowTitle, false);
+
+            if (recorderWindow.m_State == State.Error || recorderWindow.m_State == State.AccumulationErrors)
+            {
+                Debug.LogError($"There are errors in your Recorder Window. Please address them before launching a quick recording.");
+                return;
+            }
 
             if (!recorderWindow.IsRecording())
             {
@@ -201,6 +208,7 @@ namespace UnityEditor.Recorder
             WaitingForPlayModeToStartRecording,
             WaitingForScenesData,
             Error,
+            AccumulationErrors,
             Recording
         }
 
@@ -776,6 +784,10 @@ namespace UnityEditor.Recorder
 
             if (HasDuplicateOutputNames(activeRecorders)) return;
 
+            // Refresh the state of all items in the window
+            foreach (var recorderItem in m_RecordingListItem.items)
+                recorderItem.UpdateState();
+
             var gameViewRecorders = new Dictionary<ImageHeight, RecorderSettings>();
 
             foreach (var recorder in activeRecorders)
@@ -789,35 +801,36 @@ namespace UnityEditor.Recorder
                             recorder.name +
                             "' are recording the Game View using different resolutions. This can lead to unexpected behaviour.";
                         ShowMessageInStatusBar(msg, MessageType.Warning);
-                        return;
                     }
 
                     gameViewRecorders[gameView.outputImageHeight] = recorder;
                 }
             }
 
-            // Validate that only one recorder support enable capture SubFrames
-            //
-            int numberOfSubframeRecorder = 0;
-            foreach (var recorderSetting in activeRecorders)
+            if (m_ControllerSettings.InvalidContextBecauseOfAccumulation())
             {
-                if (UnityHelpers.CaptureAccumulation(recorderSetting))
+                ShowMessageInStatusBar("You can only use one active Recorder at a time when you capture accumulation.", MessageType.Error);
+                m_State = State.AccumulationErrors;
+                // Flag all the recorders that support accumulation with a warning (important to perform this after calling UpdateState on all items)
+                foreach (var recorderItem in m_RecordingListItem.items)
                 {
-                    numberOfSubframeRecorder++;
+                    if (recorderItem.settings.Enabled && recorderItem.settings is IAccumulation)
+                    {
+                        recorderItem.state = RecorderItem.State.HasWarnings;
+                    }
                 }
-
-
-                if (numberOfSubframeRecorder >= 1 && activeRecorders.Length > 1)
-                {
-                    var msg = "You can only use one active Recorder at a time when you capture accumulation.";
-                    ShowMessageInStatusBar(msg, MessageType.Warning);
-                    return;
-                }
+                return;
+            }
+            if (m_State == State.AccumulationErrors)
+            {
+                // There were accumulation errors but now the context has been fixed. Return to idle state.
+                m_State = State.Idle;
             }
 
             if (activeRecorders.Length > 0)
+            {
                 ShowMessageInStatusBar("Ready to start recording", MessageType.None);
-            return;
+            }
         }
 
         bool HasDuplicateOutputNames(RecorderSettings[] activeRecorders)
@@ -836,9 +849,6 @@ namespace UnityEditor.Recorder
                 var msg = $"There are {duplicateNames} Recorders that do not have unique output file names.";
                 ShowMessageInStatusBar(msg, MessageType.Error);
             }
-
-            foreach (var recorderItem in m_RecordingListItem.items)
-                recorderItem.UpdateState();
 
             return duplicateNames > 0;
         }
@@ -877,7 +887,7 @@ namespace UnityEditor.Recorder
                 }
                 else
                 {
-                    SetRecordButtonsEnabled(!EditorUtility.scriptCompilationFailed);
+                    SetRecordButtonsEnabled(!EditorUtility.scriptCompilationFailed && !m_ControllerSettings.InvalidContextBecauseOfAccumulation());
                 }
             }
             else
@@ -907,7 +917,16 @@ namespace UnityEditor.Recorder
             if (RecorderOptions.VerboseMode)
                 Debug.Log("Start Recording.");
 
-            m_RecorderController.PrepareRecording();
+            try
+            {
+                m_RecorderController.PrepareRecording();
+            }
+            catch (InvalidOperationException)
+            {
+                StopRecordingInternal(false);
+                m_State = State.AccumulationErrors;
+                return;
+            }
             var success = m_RecorderController.StartRecording();
             RecorderAnalytics.SendStartEvent(m_RecorderController);
 
@@ -1290,7 +1309,7 @@ namespace UnityEditor.Recorder
                 }
                 else
                 {
-                    ShowMessageInStatusBar("Unable to start recording. Please check Console logs for details.", MessageType.Error);
+                    ShowMessageInStatusBar("Unable to start recording. Please check the Console logs and Recorder Window for details.", MessageType.Error);
                 }
 
                 return;

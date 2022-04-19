@@ -60,10 +60,6 @@ namespace UnityEditor.Recorder
                 m_Encoder.Dispose();
                 m_Encoder = null;
             }
-
-            // When adding a file to Unity's assets directory, trigger a refresh so it is detected.
-            if (Settings.fileNameGenerator.Root == OutputPath.Root.AssetsFolder || Settings.fileNameGenerator.Root == OutputPath.Root.StreamingAssets)
-                AssetDatabase.Refresh();
         }
     }
 

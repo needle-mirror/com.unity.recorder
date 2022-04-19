@@ -9,13 +9,13 @@ This page covers all properties specific to the Animation Clip Recorder type.
 ![](Images/RecorderAnimation.png)
 
 The Animation Clip Recorder properties fall into three main categories:
-* [Capture](#capture)
-* [Format](#format)
+* [Input](#input)
+* [Output Format](#output-format)
 * [Output File](#output-file)
 
-## Capture
+## Input
 
-Use this section to define the source and the content of your recording.
+Use this section to define the source of your recording.
 
 |Property||Function|
 |:---|:---|:---|
@@ -31,7 +31,7 @@ Use this section to define the source and the content of your recording.
 >[!NOTE]
 >The Animation Clip Recorder can only record a GameObject in the current Scene. It cannot record GameObjects in other Scenes.
 
-## Format
+## Output Format
 
 The Animation Clip Recorder always generates an animation clip in the .anim file format.
 

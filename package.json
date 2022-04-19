@@ -1,7 +1,7 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Recorder",
-  "version": "4.0.0-pre.3",
+  "version": "4.0.0-pre.4",
   "unity": "2022.1",
   "unityRelease": "1f1",
   "dependencies": {
@@ -22,16 +22,19 @@
     "pass",
     "layer"
   ],
+  "upm": {
+    "changelog": "### Added\n- GIF Encoder for the Movie Recorder.\n- Accumulation based shadow map filtering for Spot Lights, improving the quality of rendered shadows.\n- New option to apply Subpixel Jitter Antialiasing when recording with Accumulation (in HDRP).\n- PIZ compression for EXR image sequences.\n\n### Changed\n- Remove support for CentOS.\n- Allow audio recording while using the Movie Recorder's accumulation feature.\n- Improvements to the Accumulation UI parameters:\n  - Specify the shutter interval as a normalized interval or an angle.\n  - Specify the number of accumulation samples without a maximum limit, directly through a value field.\n  - Get the actual count of accumulated frames resulting from the shutter profile convolution.\n- Prevent users from recording in odd resolutions with ProRes packed pixel format codecs (e.g. 422HQ).\n- Movie Recorder no longer uses the Sync GPU readback code path.\n\n### Fixed\n- Improved performance for ProRes encoding.\n- Fix an issue that prevented the alpha component from being correctly recorded.\n- Make sure to generate high bitrate audio tracks when using custom quality encoding in the Unity Media Encoder.\n- Make sure the duration of recordings is accurate when capturing accumulation with time intervals in seconds.\n- Make sure the CapFPS setting remains reliable when the recording session includes multiple active Recorders.\n- Refresh the asset database after recording an image sequence to the Assets folder.\n- Prevent users from recording if the Recorder Window combines active recorders with and without accumulation.\n- Prevent the Recorder Window from throwing errors when selecting an invalid Encoder."
+  },
   "relatedPackages": {
-    "com.unity.recorder.tests": "4.0.0-pre.3"
+    "com.unity.recorder.tests": "4.0.0-pre.4"
   },
   "upmCi": {
-    "footprint": "8cf5d7158d7aa3357167f933c65ef0a7473a06dc"
+    "footprint": "b5366f379e5c7f3ab75548aa6f46669671a62c84"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.recorder.git",
     "type": "git",
-    "revision": "aaaa6232a08d48cf94b5ddfa8f5195c0ceb16700"
+    "revision": "f845373f2194be00d8c860812a821df0b07290f1"
   },
   "samples": [
     {

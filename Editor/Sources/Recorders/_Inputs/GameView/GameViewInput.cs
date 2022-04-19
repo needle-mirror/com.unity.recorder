@@ -6,7 +6,6 @@ namespace UnityEditor.Recorder.Input
 {
     class GameViewInput : BaseRenderTextureInput
     {
-        bool m_ModifiedResolution;
         RenderTexture m_CaptureTexture;
         RenderTexture m_TempCaptureTextureOpaque; // A temp RenderTexture for alpha conversion
         Material m_ToOpaqueMaterial = null;
@@ -73,23 +72,10 @@ namespace UnityEditor.Recorder.Input
             if (OutputWidth <= 0 || OutputHeight <= 0)
                 return; // error will be handled by ImageInputSettings.CheckForErrors. Otherwise we get a failure at RenderTexture.GetTemporary()
 
-            int w, h;
-            GameViewSize.GetGameRenderSize(out w, out h);
+            GameViewSize.GetGameRenderSize(out var w, out var h);
             if (w != OutputWidth || h != OutputHeight)
             {
-                var size = GameViewSize.SetCustomSize(OutputWidth, OutputHeight) ?? GameViewSize.AddSize(OutputWidth, OutputHeight);
-                if (GameViewSize.modifiedResolutionCount == 0)
-                    GameViewSize.BackupCurrentSize();
-                else
-                {
-                    if (size != GameViewSize.currentSize)
-                    {
-                        Debug.LogError("Requesting a resolution change while a recorder's input has already requested one! Undefined behaviour.");
-                    }
-                }
-                GameViewSize.modifiedResolutionCount++;
-                m_ModifiedResolution = true;
-                GameViewSize.SelectSize(size);
+                GameViewSize.SetCustomSize(OutputWidth, OutputHeight);
             }
 
             // Initialize the temporary texture for forcing opacity
@@ -123,22 +109,6 @@ namespace UnityEditor.Recorder.Input
         {
             UnityHelpers.Destroy(ReadbackTexture);
             ReadbackTexture = null;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (m_ModifiedResolution)
-                {
-                    if (GameViewSize.modifiedResolutionCount > 0)
-                        GameViewSize.modifiedResolutionCount--; // don't allow negative if called twice
-                    if (GameViewSize.modifiedResolutionCount == 0)
-                        GameViewSize.RestoreSize();
-                }
-            }
-
-            base.Dispose(disposing);
         }
     }
 }

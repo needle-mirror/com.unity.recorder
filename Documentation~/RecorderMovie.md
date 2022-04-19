@@ -9,13 +9,13 @@ This page covers all properties specific to the Movie Recorder type.
 ![](Images/RecorderMovie.png)
 
 The Movie Recorder properties fall into three main categories:
-* [Capture](#capture)
-* [Format](#format)
+* [Input](#input)
+* [Output Format](#output-format)
 * [Output File](#output-file)
 
-## Capture
+## Input
 
-Use this section to define the source and the content of your recording.
+Use this section to define the source of your recording.
 
 |Property||Function|
 |:---|:---|:---|
@@ -26,7 +26,6 @@ Use this section to define the source and the content of your recording.
 || Render Texture Asset |Records frames rendered in a Render Texture.<br/><br/>Selecting this option displays the [Render Texture Asset source properties](#render-texture-asset-source-properties).|
 || Texture Sampling |Supersamples the source camera during the capture to generate anti-aliased images in the recording.<br/><br/>Selecting this option displays the [Texture Sampling source properties](#texture-sampling-source-properties).|
 | **Flip Vertical** ||When you enable this option, the Recorder flips the output image vertically.<br />This is useful to correct for systems that output video upside down.<br /><br />This option is not available when you record the Game View.|
-| **Include Audio** ||Enable this option to include audio in the recording.<br /><br />Note that the Recorder automatically ignores audio recording if you enable the **Accumulation** feature.|
 | **Accumulation** || Enable this feature to render multiple sub-frames for accumulation purposes. See the [Accumulation properties](#accumulation-properties) for more details on this feature availability, use cases, and setup.<br /><br />**Note:** Enabling the **Accumulation** feature might considerably slow down your recording process as it involves a higher amount of rendering steps.|
 
 ### Game View source properties
@@ -47,17 +46,41 @@ Use this section to define the source and the content of your recording.
 ### Accumulation properties
 [!include[](InclCaptureOptionsAccumulation.md)]
 
-## Format
+## Output Format
 
 Use this section to set up the media format you need to save the recorded images in.
 
 |Property|Function|
 |:---|:---|
-| **Media File Format** | The encoding format of the Recorder's output. Choose **H.264 MP4**, **VP8 WebM** or **ProRes QuickTime**.<br /><br />**Note:** H.264 MP4 and ProRes QuickTime encoding are not supported on Linux. |
-| **Include Alpha** | Enable this property to include the alpha channel in the recording. Disable it to only record the RGB channels.<br/><br/>This property is not available when the selected **Media File Format** or **Codec Format** doesn't support transparency, or when **Capture** is set to **Game View**. |
-| **Quality** | The quality of the output movie: **Low**, **Medium**, or **High**. The lower the quality, the smaller the file size.<br/><br/>This property is only available when you set the **Media File Format** to **H.264 MP4** or **VP8 WebM**. |
-| **Codec Format** | The video codec to use to encode the output file. Choose among a variety of [**Apple ProRes**](https://en.wikipedia.org/wiki/Apple_ProRes) codecs: **ProRes 4444 XQ**, **ProRes 4444**, **ProRes 422 HQ**, **ProRes 422**, **ProRes 422 LT** or **ProRes 422 Proxy**.<br/><br/>This property is only available when you set the **Media File Format** to **ProRes QuickTime**. |
-| **Color Definition** | The video color space to use for the recording. Currently, the only available option is **HD Rec. 709**, which refers to HDTV standard.<br/><br/>This property is only available when you set the **Media File Format** to **ProRes QuickTime**. |
+| **Encoder** | The encoder to use for the recording. Each encoder has a specific set of properties:<br />• Select [Unity Media Encoder](#unity-media-encoder-properties) to generate an H.264 MP4 or VP8 WebM video.<br />• Select [GIF Encoder](#gif-encoder-properties) to generate an animated GIF.<br />• Select [ProRes Encoder](#prores-encoder-properties) to generate a video file encoded with an Apple ProRes codec. |
+| **Include Audio** | Enable this option to include audio in the recording, when the **Encoder** supports it. |
+| **Include Alpha** | Enable this property to include the alpha channel in the recording. Disable it to only record the RGB channels.<br/><br/>This property is not available when the selected **Codec** doesn't support transparency, or when the **Source** is set to **Game View**. |
+
+### Unity Media Encoder properties
+
+| Property | Function |
+|:---|:---|
+| **Codec** | The video codec to use to encode the output file.<br /><br />The **Unity Media Encoder** includes **H.264 MP4** and **VP8 WebM** codecs.<br /><br />**Note:** Encoding with H.264 MP4 codec is not supported on Linux. |
+| **Encoding quality** | The quality of the output movie: **Low**, **Medium**, or **High**.<br />The lower the quality, the smaller the file size.<br /><br />Select **Custom** to set up specific quality properties. |
+| **Target Bitrate** | Custom value for the bitrate the encoder tries to average throughout the video, in Mbps. |
+| **GOP Size** or<br />**Keyframe Distance** | Custom value for the interval between two full images ([I-frames](https://en.wikipedia.org/wiki/Video_compression_picture_types)). |
+| **Encoding Profile**<br />(H.264 MP4 only) | Custom encoding profile: choose **H.264 Baseline**, **H.264 Main**, or **H.264 High**. Each [encoding profile](https://en.wikipedia.org/wiki/Advanced_Video_Coding#Profiles) defines a different set of capabilities and constraints on which decoders rely. |
+| **B-Frames**<br />(H.264 MP4 only) | Custom value for the number of bidirectional predicted frames ([B-frames](https://en.wikipedia.org/wiki/Video_compression_picture_types)). |
+
+>**Tip:** See Youtube's [Recommended upload encoding settings](https://support.google.com/youtube/answer/1722171?hl=en#zippy=%2Ccontainer-mp%2Cvideo-codec-h%2Cframe-rate%2Cbitrate) for H.264 MP4.
+
+### GIF Encoder properties
+
+| Property | Function |
+|:---|:---|
+| **Quality** | The encoding quality of the GIF file. A higher quality results in a larger file size. |
+| **Loop** | Makes the generated file loop the frame sequence indefinitely. |
+
+### ProRes Encoder properties
+
+| Property | Function |
+|:---|:---|
+| **Codec** | The video codec to use to encode the output file.<br /><br />The **ProRes Encoder** includes a variety of [Apple ProRes](https://en.wikipedia.org/wiki/Apple_ProRes) codecs: **ProRes 4444 XQ**, **ProRes 4444**, **ProRes 422 HQ**, **ProRes 422**, **ProRes 422 LT** or **ProRes 422 Proxy**.<br /><br />**Note:** Encoding with ProRes codecs is not supported on Linux. |
 
 ## Output File
 

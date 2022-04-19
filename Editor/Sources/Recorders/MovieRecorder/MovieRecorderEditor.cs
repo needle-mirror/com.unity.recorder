@@ -52,8 +52,19 @@ namespace UnityEditor.Recorder
         {
             var mrs = target as MovieRecorderSettings;
             var encoderTypes = EncoderTypeUtilities.GetEncoderSettings();
-            var selectedIdx = encoderTypes.FindIndex(x => x == mrs.EncoderSettings.GetType());
-            var strings = encoderTypes.Select(GetEncoderDisplayName).ToArray();
+            int selectedIdx = 0;
+            string[] strings = new string[1];
+
+            if (mrs.EncoderSettings != null)
+            {
+                selectedIdx = encoderTypes.FindIndex(x => x == mrs.EncoderSettings.GetType());
+                strings = encoderTypes.Select(GetEncoderDisplayName).ToArray();
+            }
+            else
+            {
+                strings = encoderTypes.Select(GetEncoderDisplayName).Union(new[] {"Invalid Encoder"}).ToArray();
+                selectedIdx = strings.Length - 1;
+            }
 
             // Drawing code
             using (new EditorGUILayout.HorizontalScope())
@@ -99,12 +110,17 @@ namespace UnityEditor.Recorder
                 }
             }
 
+            if (mrs.EncoderSettings == null)
+            {
+                return;
+            }
+
             // Display selected encoder's fields, greyed out if not supported
             using (new EditorGUI.DisabledScope(!mrs.EncoderSettings.SupportsCurrentPlatform()))
                 EditorGUILayout.PropertyField(m_EncoderSettings, true);
 
             // Expose CaptureAudio and CaptureAlpha from the MovieRecorderSettings but look at input and encoder capabilities
-            if (mrs.EncoderSettings.CanCaptureAudio && !UnityHelpers.CaptureAccumulation(mrs)) // no audio if accumulation is active
+            if (mrs.EncoderSettings.CanCaptureAudio)
                 mrs.CaptureAudio = EditorGUILayout.Toggle(Styles.AudioLabel, mrs.CaptureAudio);
             if (mrs.ImageInputSettings.SupportsTransparent && mrs.EncoderSettings.CanCaptureAlpha)
                 mrs.CaptureAlpha = EditorGUILayout.Toggle(Styles.AlphaLabel, mrs.CaptureAlpha);

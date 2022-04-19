@@ -43,7 +43,7 @@ Select the type of Recorder you want the Recorder Clip to use.
 ### ![](Images/Label-C.png) Recorder properties
 
 Use this section to [set up the properties of the selected Recorder](RecorderProperties.md).
-<br />Recorder properties include Capture, Format and Output File properties.
+<br />Recorder properties include **Input**, **Output Format** and **Output File** properties.
 
 ## Starting and stopping the recording
 

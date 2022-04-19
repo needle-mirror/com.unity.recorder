@@ -27,7 +27,7 @@ internal struct ProResWrapper
     [DllImport(ProResWrapperInfo.LibraryPath)]
     public static extern IntPtr Create(string sMetadata, string sFileName, int width, int height, float fps, bool hasAudio, float fAudioSamplingRate, int codecType, bool hasTransparency, int colorDesc);
     [DllImport(ProResWrapperInfo.LibraryPath)]
-    public static extern bool AddVideoFrame(IntPtr pEncoder, byte[] pixels, long tickCount, int rateNumerator, int rateDenominator);
+    public static extern unsafe bool AddVideoFrame(IntPtr pEncoder, void* data, long tickCount, int rateNumerator, int rateDenominator);
     [DllImport(ProResWrapperInfo.LibraryPath)]
     public static extern bool AddAudioSamples(IntPtr pEncoder, float[] samples, int numSamples);
     [DllImport(ProResWrapperInfo.LibraryPath)]

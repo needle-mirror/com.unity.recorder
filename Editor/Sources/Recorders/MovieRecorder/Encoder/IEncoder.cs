@@ -10,6 +10,26 @@ namespace UnityEditor.Recorder.Encoder
     public interface IEncoder
     {
         /// <summary>
+        /// Defined the kind of image buffer, the Encoder can encoder
+        /// </summary>
+        enum VideoInputPath
+        {
+            /// <summary>
+            /// Use the GPU Buffer path
+            /// </summary>
+            GPUBuffer,
+            /// <summary>
+            /// Use the CPU Buffer path.
+            /// </summary>
+            CPUBuffer
+        }
+
+        /// <summary>
+        /// Returns the input video path for the encoder. Based on the returned value, the appropriate addVideoFrame function will be invoked.
+        /// </summary>
+        VideoInputPath GetVideoInputPath => VideoInputPath.CPUBuffer;
+
+        /// <summary>
         /// Opens the stream to add the audio and video frames to.
         /// </summary>
         /// <param name="settings">The settings of this encoder.</param>
@@ -22,13 +42,12 @@ namespace UnityEditor.Recorder.Encoder
         void CloseStream();
 
         /// <summary>
-        /// Encodes a Texture2D and adds it to the video stream.
+        /// Encodes a Texture and adds it to the video stream.
         /// </summary>
         /// <param name="frame">The texture to encode.</param>
         /// <param name="time">The timestamp of the current frame.</param>
-        void AddVideoFrame(Texture2D frame, MediaTime time)
+        void AddVideoFrame(RenderTexture frame, MediaTime time)
         {
-            AddVideoFrame(frame.GetPixelData<byte>(0), time);
         }
 
         /// <summary>
@@ -40,7 +59,9 @@ namespace UnityEditor.Recorder.Encoder
         /// <param name="bytes">The array of bytes to encode.</param>
         /// <param name="time">The timestamp of the current frame.</param>
         /// <seealso cref="UnityEditor.Recorder.Encoder.IEncoder.OpenStream"/>
-        void AddVideoFrame(NativeArray<byte> bytes, MediaTime time);
+        void AddVideoFrame(NativeArray<byte> bytes, MediaTime time)
+        {
+        }
 
         /// <summary>
         /// Encodes an array of audio values and adds it to the audio stream.
@@ -51,6 +72,8 @@ namespace UnityEditor.Recorder.Encoder
         /// <param name="bytes">The array of bytes to encode.</param>
         /// <seealso cref="UnityEditor.Recorder.Input.AudioInput"/>
         /// <seealso cref="UnityEngine.AudioSettings.speakerMode"/>
-        void AddAudioFrame(NativeArray<float> bytes);
+        void AddAudioFrame(NativeArray<float> bytes)
+        {
+        }
     }
 }

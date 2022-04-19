@@ -49,7 +49,11 @@ namespace UnityEditor.Recorder
             /// <summary>
             /// Zip compression.
             /// </summary>
-            Zip
+            Zip,
+            /// <summary>
+            /// Wavelet compression.
+            /// </summary>
+            PIZ,
         }
 
         static internal Texture2D.EXRFlags ToNativeType(EXRCompressionType type)
@@ -62,6 +66,9 @@ namespace UnityEditor.Recorder
                     break;
                 case ImageRecorderSettings.EXRCompressionType.Zip:
                     nativeType = Texture2D.EXRFlags.CompressZIP;
+                    break;
+                case ImageRecorderSettings.EXRCompressionType.PIZ:
+                    nativeType = Texture2D.EXRFlags.CompressPIZ;
                     break;
                 case ImageRecorderSettings.EXRCompressionType.None:
                     nativeType = Texture2D.EXRFlags.None;
@@ -108,7 +115,11 @@ namespace UnityEditor.Recorder
         public bool CaptureAlpha
         {
             get { return captureAlpha; }
-            set { captureAlpha = value; }
+            set
+            {
+                captureAlpha = value;
+                imageInputSettings.RecordTransparency = CaptureAlpha;
+            }
         }
 
         [SerializeField] private bool captureAlpha;
@@ -269,6 +280,23 @@ namespace UnityEditor.Recorder
                 }
             }
             return false;
+        }
+
+        internal override void  OnValidate()
+        {
+            base.OnValidate();
+            imageInputSettings.RecordTransparency = CaptureAlpha; // We need to sync the input data, when the UI changes the recorder one
+        }
+
+        protected internal override void GetWarnings(List<string> warnings)
+        {
+            base.GetWarnings(warnings);
+            if (CanCaptureAlpha() && captureAlpha)
+            {
+#if HDRP_AVAILABLE
+                HdrpHelper.CheckRenderPipelineAssetAlphaSupport(warnings);
+#endif
+            }
         }
     }
 }

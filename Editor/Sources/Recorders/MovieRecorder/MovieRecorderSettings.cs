@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
-using Unity.Media;
-using UnityEditor.Media;
 using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
@@ -40,7 +37,11 @@ namespace UnityEditor.Recorder
         public bool CaptureAlpha
         {
             get { return captureAlpha; }
-            set { captureAlpha = value; }
+            set
+            {
+                captureAlpha = value;
+                ImageInputSettings.RecordTransparency = value;
+            }
         }
         [SerializeField] private bool captureAlpha;
 
@@ -112,7 +113,7 @@ namespace UnityEditor.Recorder
                 iis.maxSupportedSize = ImageHeight.x2160p_4K;
 
             // Force even resolution in GameView and Target Cam if required
-            if (EncoderSettings.RequiresEvenResolution())
+            if (EncoderSettings != null && EncoderSettings.RequiresEvenResolution())
                 m_ImageInputSelector.ForceEvenResolution(true);
         }
 
@@ -141,15 +142,35 @@ namespace UnityEditor.Recorder
         }
 
         /// <inheritdoc/>
-        protected internal override string Extension => EncoderSettings.Extension;
+        protected internal override string Extension
+        {
+            get
+            {
+                if (EncoderSettings == null) return "";
+                return EncoderSettings.Extension;
+            }
+        }
 
         /// <inheritdoc/>
-        internal override bool NeedToFlipVerticallyForOutputFormat =>
-            EncoderSettings.CoordinateConvention != EncoderCoordinateConvention.OriginIsBottomLeft;
+        internal override bool NeedToFlipVerticallyForOutputFormat
+        {
+            get
+            {
+                if (EncoderSettings == null) return false;
+                return EncoderSettings.CoordinateConvention != EncoderCoordinateConvention.OriginIsBottomLeft;
+            }
+        }
 
         internal void ValidateRecording(RecordingContext ctx, List<string> errors, List<string> warnings)
         {
-            encoderSettings.ValidateRecording(ctx, errors, warnings);
+            if (encoderSettings != null)
+            {
+                encoderSettings.ValidateRecording(ctx, errors, warnings);
+            }
+            else
+            {
+                errors.Add("Invalid Encoder selected");
+            }
         }
 
         /// <summary>
@@ -163,9 +184,13 @@ namespace UnityEditor.Recorder
         internal RecordingContext GetRecordingContext()
         {
             RecordingContext ctx = default;
+            if (EncoderSettings == null)
+            {
+                return ctx;
+            }
             ctx.frameRateMode = FrameRatePlayback;
             ctx.doCaptureAlpha = ImageInputSettings.SupportsTransparent && EncoderSettings.CanCaptureAlpha && CaptureAlpha;
-            ctx.doCaptureAudio = EncoderSettings.CanCaptureAudio && CaptureAudio && !UnityHelpers.CaptureAccumulation(this);
+            ctx.doCaptureAudio = EncoderSettings.CanCaptureAudio && CaptureAudio;
             ctx.fps = MovieRecorder.RationalFromDouble(FrameRate);
             var inputSettings = InputsSettings.First();
             if (inputSettings is GameViewInputSettings gvs)
@@ -213,11 +238,23 @@ namespace UnityEditor.Recorder
         protected internal override void GetWarnings(List<string> warnings)
         {
             base.GetWarnings(warnings);
+            if (ImageInputSettings.SupportsTransparent && EncoderSettings.CanCaptureAlpha && captureAlpha)
+            {
+#if HDRP_AVAILABLE
+                HdrpHelper.CheckRenderPipelineAssetAlphaSupport(warnings);
+#endif
+            }
         }
 
         protected internal override void GetErrors(List<string> errors)
         {
             base.GetErrors(errors);
+        }
+
+        internal override void  OnValidate()
+        {
+            base.OnValidate();
+            ImageInputSettings.RecordTransparency = CaptureAlpha; // We need to sync the input data, when the UI changes the recorder one
         }
 
         // Obsolete and asset upgrade stuff. Should be moved to a new file (Trunk bug prevents it for now)

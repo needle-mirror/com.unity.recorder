@@ -147,15 +147,20 @@ namespace UnityEditor.Recorder
                     include_audio = r.Settings.CaptureAudio,
                 };
 
-                if (r.Settings.EncoderSettings.GetType() == typeof(ProResEncoderSettings))
+                if (r.Settings.EncoderSettings != null)
                 {
-                    ret.codec_format = ((ProResEncoderSettings)(r.Settings.EncoderSettings)).Format.ConvertToString();
-                    ret.media_format = "MOV";
-                }
-                else if (r.Settings.EncoderSettings.GetType() == typeof(CoreEncoderSettings))
-                {
-                    ret.media_format = ((CoreEncoderSettings)(r.Settings.EncoderSettings)).Codec.ConvertToString();
-                    ret.quality = ((CoreEncoderSettings)(r.Settings.EncoderSettings)).EncodingQuality.ConvertToString();
+                    if (r.Settings.EncoderSettings.GetType() == typeof(ProResEncoderSettings))
+                    {
+                        ret.codec_format =
+                            ((ProResEncoderSettings)(r.Settings.EncoderSettings)).Format.ConvertToString();
+                        ret.media_format = "MOV";
+                    }
+                    else if (r.Settings.EncoderSettings.GetType() == typeof(CoreEncoderSettings))
+                    {
+                        ret.media_format = ((CoreEncoderSettings)(r.Settings.EncoderSettings)).Codec.ConvertToString();
+                        ret.quality = ((CoreEncoderSettings)(r.Settings.EncoderSettings)).EncodingQuality
+                            .ConvertToString();
+                    }
                 }
 
                 return ret;

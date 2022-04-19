@@ -41,6 +41,8 @@ namespace UnityEditor.Recorder
         /// <remarks>
         /// Sets up the internal data for the recording session and pauses the simulation to ensure a proper synchronization between the Recorder and the Unity Editor.
         /// </remarks>
+        /// <exception cref="NullReferenceException">When the settings are null.</exception>
+        /// <exception cref="InvalidOperationException">When there are multiple recorders and accumulation is enabled for one of them.</exception>
         public void PrepareRecording()
         {
             if (!Application.isPlaying)
@@ -58,6 +60,11 @@ namespace UnityEditor.Recorder
             int numberOfSubframeRecorder = 0;
             int numberOfRecorderEnabled = 0;
             ValidateRecorderNames();
+
+            if (m_Settings.InvalidContextBecauseOfAccumulation())
+            {
+                throw new InvalidOperationException("You can only use one active Recorder at a time when you capture accumulation.");
+            }
 
             foreach (var recorderSetting in m_Settings.RecorderSettings)
             {

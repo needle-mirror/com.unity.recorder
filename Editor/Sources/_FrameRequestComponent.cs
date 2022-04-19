@@ -91,10 +91,15 @@ namespace UnityEditor.Recorder
                 yield return new WaitForEndOfFrame();
             }
 
-            FrameReady();
-
             if (currentState == State.WaitingForFirstFrame)
+            {
                 EnterRunningState();
+            }
+
+            if (currentState == State.Running)
+            {
+                FrameReady();
+            }
 
             frameProducedCount++;
         }
@@ -105,7 +110,7 @@ namespace UnityEditor.Recorder
             Time.timeScale = 0f;
         }
 
-        void RestoreProjectTimeScale()
+        protected void RestoreProjectTimeScale()
         {
             if (Time.timeScale == 0)
                 Time.timeScale = projectTimeScale;
@@ -117,7 +122,7 @@ namespace UnityEditor.Recorder
             SaveProjectTimeScale();
         }
 
-        void EnterRunningState()
+        protected virtual void EnterRunningState()
         {
             currentState = State.Running;
             RestoreProjectTimeScale();

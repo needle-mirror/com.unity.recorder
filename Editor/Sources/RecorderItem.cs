@@ -69,6 +69,7 @@ namespace UnityEditor.Recorder
         {
             try
             {
+                // This detects errors and warnings from the settings, not from the context of the Recorder Window itself (e.g. accumulation problems)
                 if (settings == null || settings.HasErrors())
                 {
                     state = State.HasErrors;

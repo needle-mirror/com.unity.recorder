@@ -4,11 +4,39 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0-pre.4] - 2022-04-19
+### Added
+- GIF Encoder for the Movie Recorder.
+- Accumulation based shadow map filtering for Spot Lights, improving the quality of rendered shadows.
+- New option to apply Subpixel Jitter Antialiasing when recording with Accumulation (in HDRP).
+- PIZ compression for EXR image sequences.
+
+### Changed
+- Remove support for CentOS.
+- Allow audio recording while using the Movie Recorder's accumulation feature.
+- Improvements to the Accumulation UI parameters:
+  - Specify the shutter interval as a normalized interval or an angle.
+  - Specify the number of accumulation samples without a maximum limit, directly through a value field.
+  - Get the actual count of accumulated frames resulting from the shutter profile convolution.
+- Prevent users from recording in odd resolutions with ProRes packed pixel format codecs (e.g. 422HQ).
+- Movie Recorder no longer uses the Sync GPU readback code path.
+
+### Fixed
+- Improved performance for ProRes encoding.
+- Fix an issue that prevented the alpha component from being correctly recorded.
+- Make sure to generate high bitrate audio tracks when using custom quality encoding in the Unity Media Encoder.
+- Make sure the duration of recordings is accurate when capturing accumulation with time intervals in seconds.
+- Make sure the CapFPS setting remains reliable when the recording session includes multiple active Recorders.
+- Refresh the asset database after recording an image sequence to the Assets folder.
+- Prevent users from recording if the Recorder Window combines active recorders with and without accumulation.
+- Prevent the Recorder Window from throwing errors when selecting an invalid Encoder.
+
 ## [4.0.0-pre.3] - 2021-11-01
 ### Added
 - Added a new "Encoder" drop down with the Unity Media Encoder and ProRes Encoder.
 - Added a new public Encoder API to allow users to create their own Encoders for seamless integration into the Movie Recorder.
 - Added a new "Custom" quality for the Unity Media Encoder, with different options for H.264 MP4 and VP8 WebM.
+- Support accumulation feature in Timeline Recorder Clips.
 
 ### Changed
 - Updated minimum required Unity Editor version to 2022.1.

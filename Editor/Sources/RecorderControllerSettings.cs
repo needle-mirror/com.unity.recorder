@@ -293,5 +293,23 @@ namespace UnityEditor.Recorder
             ApplyGlobalSetting(recorder);
             m_RecorderSettings.Add(recorder);
         }
+
+        /// <summary>
+        /// Gets the number of currently active recorders that capture accumulation.
+        /// </summary>
+        /// <returns>The number of recorders that are currently capturing accumulation.</returns>
+        int GetNumberOfActiveSubFrameRecorders()
+        {
+            return RecorderSettings.Count(r => r.Enabled && UnityHelpers.CaptureAccumulation(r));
+        }
+
+        /// <summary>
+        /// Whether the current context should prevent recording due to invalid accumulation settings or not.
+        /// </summary>
+        /// <returns></returns>
+        internal bool InvalidContextBecauseOfAccumulation()
+        {
+            return GetNumberOfActiveSubFrameRecorders() >= 1 && RecorderSettings.Count(r => r.Enabled) > 1;
+        }
     }
 }

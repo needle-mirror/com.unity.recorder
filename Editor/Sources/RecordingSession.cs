@@ -1,4 +1,5 @@
 using System;
+using Unity.Profiling;
 using UnityEditor.Media;
 using UnityEngine;
 using UnityEngine.LowLevel;
@@ -18,6 +19,8 @@ namespace UnityEditor.Recorder
 
         internal GameObject recorderGameObject;
         internal _FrameRequestComponent recorderComponent;
+        static bool frameRateCapped; // Used to have only 1 Recorder cap framerate when multiple are trying to do.
+        Unity.Profiling.ProfilerMarker capFPSMarker = new ProfilerMarker("Unity.Recorder.CapFPS");
 
         int m_SubFrameIndex = 0;
         int m_FrameIndex = 0;
@@ -192,6 +195,7 @@ namespace UnityEditor.Recorder
                 if (!recorder.SkipFrame(this))
                 {
                     recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameReady, this);
+                    recorder.RecordSubFrame(this);
                     if (!recorder.SkipSubFrame(this))
                     {
 #if DEBUG_RECORDER_TIMING
@@ -214,52 +218,59 @@ namespace UnityEditor.Recorder
                 Debug.LogException(ex);
             }
 
-            // Note: This is not great when multiple recorders are simultaneously active...
-            if (settings.FrameRatePlayback == FrameRatePlayback.Variable ||
-                settings.FrameRatePlayback == FrameRatePlayback.Constant && recorder.settings.CapFrameRate)
+            using (capFPSMarker.Auto())
             {
-                var frameCount = Time.renderedFrameCount - m_InitialFrame;
-                var frameLen = 1.0f / recorder.settings.FrameRate; // seconds
-                var elapsed = Time.unscaledTime - m_FPSTimeStart;
-                var target = frameLen * (frameCount + 1);
-                var sleepSec = Math.Min(target - elapsed, 1F);
-
-                if (sleepSec > 0.002F)
+                // Note: This is not great when multiple recorders are simultaneously active...
+                if (settings.FrameRatePlayback == FrameRatePlayback.Variable ||
+                    settings.FrameRatePlayback == FrameRatePlayback.Constant && recorder.settings.CapFrameRate)
                 {
-                    var curRealTime = Time.realtimeSinceStartup;
-                    var endWaitTime = curRealTime + sleepSec;
+                    var frameCount = Time.renderedFrameCount - m_InitialFrame;
+                    var frameLen = 1.0f / recorder.settings.FrameRate; // seconds
+                    var elapsed = Time.unscaledTime - m_FPSTimeStart;
+                    var target = frameLen * (frameCount + 1);
+                    var sleepSec = Math.Min(target - elapsed, 1F);
 
-                    if (RecorderOptions.VerboseMode)
-                        Debug.Log(string.Format("Recording session info => dT: {0:F1}s, Target dT: {1:F1}s, Retarding: {2}s, fps: {3:F1}", elapsed, target, sleepSec, frameCount / elapsed));
+                    if (sleepSec > 0.002F && !frameRateCapped)
+                    {
+                        frameRateCapped = true;
+                        var curRealTime = Time.realtimeSinceStartup;
+                        var endWaitTime = curRealTime + sleepSec;
 
-                    // We have a delta between the expected and actual current time. We'll sleep part of this delta, and
-                    // use a busy loop for the rest. The idea is that typically, OS-level sleep calls are imprecise and
-                    // may return "some time after the wanted duration".
-                    var sleepMS = (int)(sleepSec * 1000) - 3;
-                    if (sleepMS > 0)
-                        System.Threading.Thread.Sleep(sleepMS);
+                        if (RecorderOptions.VerboseMode)
+                            Debug.Log(string.Format(
+                                "Recording session info => dT: {0:F1}s, Target dT: {1:F1}s, Retarding: {2}s, fps: {3:F1}",
+                                elapsed, target, sleepSec, frameCount / elapsed));
 
-                    // Do the rest of the wait using a busy loop to maximize chances of keeping the main thread running
-                    // on the CPU.
-                    while (Time.realtimeSinceStartup < endWaitTime) ;
-                }
-                else if (sleepSec < -frameLen)
-                {
-                    m_InitialFrame--;
-                }
-                else if (RecorderOptions.VerboseMode)
-                    Debug.Log(string.Format("Recording session info => fps: {0:F1}", frameCount / elapsed));
+                        // We have a delta between the expected and actual current time. We'll sleep part of this delta, and
+                        // use a busy loop for the rest. The idea is that typically, OS-level sleep calls are imprecise and
+                        // may return "some time after the wanted duration".
+                        var sleepMS = (int)(sleepSec * 1000) - 3;
+                        if (sleepMS > 0)
+                            System.Threading.Thread.Sleep(sleepMS);
 
-                // reset every 30 frames
-                if (frameCount % 50 == 49)
-                {
-                    m_FPSNextTimeStart = Time.unscaledTime;
-                    m_FPSNextFrameCount = Time.renderedFrameCount;
-                }
-                if (frameCount % 100 == 99)
-                {
-                    m_FPSTimeStart = m_FPSNextTimeStart;
-                    m_InitialFrame = m_FPSNextFrameCount;
+                        // Do the rest of the wait using a busy loop to maximize chances of keeping the main thread running
+                        // on the CPU.
+                        while (Time.realtimeSinceStartup < endWaitTime) ;
+                    }
+                    else if (sleepSec < -frameLen)
+                    {
+                        m_InitialFrame--;
+                    }
+                    else if (RecorderOptions.VerboseMode)
+                        Debug.Log(string.Format("Recording session info => fps: {0:F1}", frameCount / elapsed));
+
+                    // reset every 30 frames
+                    if (frameCount % 50 == 49)
+                    {
+                        m_FPSNextTimeStart = Time.unscaledTime;
+                        m_FPSNextFrameCount = Time.renderedFrameCount;
+                    }
+
+                    if (frameCount % 100 == 99)
+                    {
+                        m_FPSTimeStart = m_FPSNextTimeStart;
+                        m_InitialFrame = m_FPSNextFrameCount;
+                    }
                 }
             }
 
@@ -277,6 +288,7 @@ namespace UnityEditor.Recorder
         {
             try
             {
+                frameRateCapped = false;
                 AllowInBackgroundMode();
                 currentFrameStartTS =
                     (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale)) -

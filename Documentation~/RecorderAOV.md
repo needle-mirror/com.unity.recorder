@@ -13,14 +13,14 @@ This page covers all properties specific to the AOV Image Sequence Recorder type
 ![](Images/AOVRecorderWindow.png)
 
 The AOV Recorder properties fall into three main categories:
-* [Capture](#capture)
-* [Format](#format)
+* [Input](#input)
+* [Output Format](#output-format)
 * [Output File](#output-file)
 
 
-## Capture
+## Input
 
-Use this section to define the source and the content of your recording. It includes settings to select the [AOV to export](#aov-to-export), select the [source camera](#source-camera) to use for the recording, and adjust other properties of the [recorded view](#recorded-view).
+Use this section to define the source of your recording. It includes settings to select the [AOV to export](#aov-to-export), select the [source camera](#source-camera) to use for the recording, and adjust other properties of the [recorded view](#recorded-view).
 
 ### AOV to Export
 
@@ -79,7 +79,7 @@ Set the dimensions and other properties of the recorded view.
 |   | Custom   | Uses custom aspect ratio that you supply in the displayed fields (w:h). |
 
 
-## Format
+## Output Format
 
 Use this section to set up the media format you need to save the recorded images in.
 
@@ -94,6 +94,7 @@ Use this section to set up the media format you need to save the recorded images
 |  | None | Disables all compression. |
 |  | Zip | Applies deflate compression to blocks of 16 scanlines at a time.<br/>This is the default selection. |
 |  | RLE | Applies [Run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding) compression.  |
+|  | PIZ | Applies [wavelet](https://en.wikipedia.org/wiki/Wavelet_transform#Wavelet_compression) compression. |
 
 
 ## Output File

@@ -1,4 +1,4 @@
-using UnityEditor.Recorder.Input;
+using UnityEngine;
 using UnityEngine.Playables;
 
 namespace UnityEditor.Recorder.Timeline
@@ -7,13 +7,12 @@ namespace UnityEditor.Recorder.Timeline
     {
         PlayState m_PlayState = PlayState.Paused;
         public RecordingSession session { get; set; }
-
-        public bool requestFrame => m_RequestFrame;
-
-        WaitForEndOfFrameComponent endOfFrameComp;
+        public static bool recordingWithAccumulation { get; set; }
+        public static bool recordingWithoutAccumulation { get; set; }
+        RecorderComponent endOfFrameComp;
         bool m_FirstOneSkipped;
-        bool m_RequestFrame;
 
+        bool m_RequestFrame = true;
 
         public override void OnGraphStart(Playable playable)
         {
@@ -37,37 +36,27 @@ namespace UnityEditor.Recorder.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            if (session != null && session.isRecording)
-            {
-                if (endOfFrameComp == null)
-                {
-                    endOfFrameComp = session.recorderGameObject.AddComponent<WaitForEndOfFrameComponent>();
-                    endOfFrameComp.m_playable = this;
-                }
-            }
-
-            if (session != null && session.isRecording)
-            {
-                session.PrepareNewFrame();
-                m_RequestFrame = true;
-            }
+            m_RequestFrame = true;
         }
 
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
             if (session == null)
                 return;
-
-            // Assumption: OnPlayStateChanged( PlayState.Playing ) ONLY EVER CALLED ONCE for this type of playable.
             m_PlayState = PlayState.Playing;
-            var res = session.BeginRecording();
-#if UNITY_EDITOR
-            RecorderAnalytics.SendStartEvent(session);
-            if (!res)
+
+            if (session != null)
             {
-                RecorderAnalytics.SendStopEvent(session, true, false);
+                if (endOfFrameComp == null)
+                {
+                    endOfFrameComp = session.recorderGameObject.AddComponent<RecorderComponent>();
+                    endOfFrameComp.session = session;
+                    endOfFrameComp.deferredStartRecording = true;
+                    endOfFrameComp.ShouldRequestFrameCb = () => m_RequestFrame;
+                    endOfFrameComp.FrameReadyCb = FrameEnded;
+                    session.recorderComponent = endOfFrameComp;
+                }
             }
-#endif
         }
 
         public override void OnBehaviourPause(Playable playable, FrameData info)
@@ -81,18 +70,21 @@ namespace UnityEditor.Recorder.Timeline
                 const double eps = 1e-5; // end is never evaluated
                 RecorderAnalytics.SendStopEvent(session, false, playable.GetTime() >= playable.GetDuration() - eps);
 #endif
+                recordingWithAccumulation = false;
+                recordingWithoutAccumulation = false;
                 session.Dispose();
                 session = null;
+                Object.DestroyImmediate(endOfFrameComp);
+                endOfFrameComp = null;
             }
 
             m_PlayState = PlayState.Paused;
         }
 
-        public void FrameEnded()
+        void FrameEnded()
         {
             if (session != null && session.isRecording)
             {
-                session.RecordFrame();
                 m_RequestFrame = false;
             }
         }

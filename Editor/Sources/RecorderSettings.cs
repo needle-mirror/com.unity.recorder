@@ -337,7 +337,7 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Validation of serialized value.
         /// </summary>
-        internal void OnValidate()
+        internal virtual void OnValidate()
         {
             captureEveryNthFrame = Mathf.Max(1, captureEveryNthFrame);
             take = Mathf.Max(0, take);
@@ -367,13 +367,17 @@ namespace UnityEditor.Recorder
 
         internal int Version => m_Version;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Unity calls this method before serializing the object.
+        /// </summary>
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
             OnBeforeSerialize();
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Unity calls this method after de-serializing the object.
+        /// </summary>
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
             if (m_Version < k_LatestVersion)

@@ -9,13 +9,13 @@ This page covers all properties specific to the Image Sequence Recorder type.
 ![](Images/RecorderImage.png)
 
 The Image Sequence Recorder properties fall into three main categories:
-* [Capture](#capture)
-* [Format](#format)
+* [Input](#input)
+* [Output Format](#output-format)
 * [Output File](#output-file)
 
-## Capture
+## Input
 
-Use this section to define the source and the content of your recording.
+Use this section to define the source of your recording.
 
 |Property||Function|
 |:---|:---|:---|
@@ -46,22 +46,23 @@ Use this section to define the source and the content of your recording.
 ### Accumulation properties
 [!include[](InclCaptureOptionsAccumulation.md)]
 
-## Format
+## Output Format
 
 Use this section to set up the media format you need to save the recorded images in.
 
 |Property||Function|
 |:---|:---|:---|
 | **Media File Format** || The file encoding format.<br/><br/>Choose **PNG**, **JPEG**, or **EXR** ([OpenEXR](https://en.wikipedia.org/wiki/OpenEXR)). The Recorder encodes EXR in 16 bits. |
-| **Include Alpha** || Enable this property to include the alpha channel in the recording. Disable it to only record the RGB channels.<br/><br/>This property is not available when the selected **Media File Format** doesn't support transparency, or when **Capture** is set to **Game View**. |
+| **Include Alpha** || Enable this property to include the alpha channel in the recording. Disable it to only record the RGB channels.<br/><br/>This property is not available when the selected **Media File Format** doesn't support transparency, or when the **Source** is set to **Game View**. |
 | **Color Space** | | The color space (gamma curve and gamut) to use in the output images. |
 |  | sRGB, sRGB | Uses sRGB curve and sRGB primaries. |
-|  | Linear, sRGB (unclamped) | Uses linear curve and sRGB primaries.<br/>This option is only available when you set the **Format** to **EXR**.<br/><br/>**Important:** To get the expected unclamped values in the output images, you must:<br/><br/>• Disable any Tonemapping post-processing effects in your Scene (menu: **Edit > Project Settings > HDRP Default Settings** and deselect **Tonemapping**) and in any Volume that includes a Tonemapping override (select the Volume, navigate in the Inspector and deselect **Tonemapping** if present).<br/><br/>• Disable **Dithering** on the Camera selected for the capture (in the Inspector, navigate to **General** and deselect **Dithering**). |
+|  | Linear, sRGB (unclamped) | Uses linear curve and sRGB primaries.<br/>This option is only available when you set the **Media File Format** to **EXR**.<br/><br/>**Important:** To get the expected unclamped values in the output images, you must:<br/><br/>• Disable any Tonemapping post-processing effects in your Scene (menu: **Edit > Project Settings > HDRP Default Settings** and deselect **Tonemapping**) and in any Volume that includes a Tonemapping override (select the Volume, navigate in the Inspector and deselect **Tonemapping** if present).<br/><br/>• Disable **Dithering** on the Camera selected for the capture (in the Inspector, navigate to **General** and deselect **Dithering**). |
 | **Quality** | | The JPEG encoding quality level. <br/>This property is only available when you set the **Media File Format** to **JPEG**. |
 | **Compression** | | The EXR compression method to apply when saving the data. <br/>This property is only available when you set the **Media File Format** to **EXR**. |
 |  | None | Disables all compression. |
 |  | Zip | Applies deflate compression to blocks of 16 scanlines at a time.<br/>This is the default selection. |
 |  | RLE | Applies [Run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding) compression.  |
+|  | PIZ | Applies [wavelet](https://en.wikipedia.org/wiki/Wavelet_transform#Wavelet_compression) compression. |
 
 ## Output File
 

@@ -10,6 +10,7 @@ public class AccumulationSettings
     public float ShutterInterval { get; set; }
     public UnityEngine.AnimationCurve ShutterProfileCurve { get; set; }
     public AccumulationSettings.ShutterProfileType ShutterType { get; set; }
+    public bool UseSubPixelJitter { get; set; }
     public AccumulationSettings() {}
     public enum ShutterProfileType
     {
@@ -147,6 +148,7 @@ namespace UnityEditor.Recorder
         public UnityEditor.Recorder.ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat { get; set; }
         public ImageRecorderSettings() {}
         public virtual AccumulationSettings GetAccumulationSettings();
+        protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
         public virtual bool IsAccumulationSupported();
         public enum ColorSpaceType
         {
@@ -157,6 +159,7 @@ namespace UnityEditor.Recorder
         public enum EXRCompressionType
         {
             public const UnityEditor.Recorder.ImageRecorderSettings.EXRCompressionType None = 0;
+            public const UnityEditor.Recorder.ImageRecorderSettings.EXRCompressionType PIZ = 3;
             public const UnityEditor.Recorder.ImageRecorderSettings.EXRCompressionType RLE = 1;
             public int value__;
             public const UnityEditor.Recorder.ImageRecorderSettings.EXRCompressionType Zip = 2;
@@ -512,13 +515,29 @@ namespace UnityEditor.Recorder.Encoder
         public EncoderSettingsAttribute(System.Type encoderType) {}
     }
 
+    [System.ComponentModel.DisplayName(@"GIF Encoder")] [UnityEditor.Recorder.Encoder.EncoderSettings(typeof(UnityEditor.Recorder.Encoder.GifEncoder))] public sealed class GifEncoderSettings : System.IEquatable<UnityEditor.Recorder.Encoder.GifEncoderSettings>, UnityEditor.Recorder.Encoder.IEncoderSettings
+    {
+        public bool Loop { get; set; }
+        public System.UInt32 Quality { get; set; }
+        public GifEncoderSettings() {}
+        public virtual bool Equals(object obj);
+        public virtual int GetHashCode();
+    }
+
     public interface IEncoder
     {
-        public abstract void AddAudioFrame(Unity.Collections.NativeArray<float> bytes);
-        public abstract void AddVideoFrame(Unity.Collections.NativeArray<byte> bytes, UnityEditor.Media.MediaTime time);
-        public virtual void AddVideoFrame(UnityEngine.Texture2D frame, UnityEditor.Media.MediaTime time);
+        public virtual UnityEditor.Recorder.Encoder.IEncoder.VideoInputPath GetVideoInputPath { get; }
+        public virtual void AddAudioFrame(Unity.Collections.NativeArray<float> bytes);
+        public virtual void AddVideoFrame(Unity.Collections.NativeArray<byte> bytes, UnityEditor.Media.MediaTime time);
+        public virtual void AddVideoFrame(UnityEngine.RenderTexture frame, UnityEditor.Media.MediaTime time);
         public abstract void CloseStream();
         public abstract void OpenStream(UnityEditor.Recorder.Encoder.IEncoderSettings settings, UnityEditor.Recorder.Encoder.RecordingContext ctx);
+        public enum VideoInputPath
+        {
+            public const UnityEditor.Recorder.Encoder.IEncoder.VideoInputPath CPUBuffer = 1;
+            public const UnityEditor.Recorder.Encoder.IEncoder.VideoInputPath GPUBuffer = 0;
+            public int value__;
+        }
     }
 
     public interface IEncoderSettings

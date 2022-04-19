@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEditor.Recorder;
 using UnityEditor.Recorder.Input;
 using UnityEditor.Media;
-using Unity.Media;
 using UnityEditor.Recorder.Encoder;
-using static UnityEditor.Recorder.MovieRecorderSettings;
+using UnityEngine.Experimental.Rendering;
 
 namespace UnityEditor.Recorder
 {
@@ -29,6 +25,7 @@ namespace UnityEditor.Recorder
         // Whether or not the recording has already been ended. To avoid messing with the count of concurrent recorders.
         private bool m_RecordingAlreadyEnded = false;
 
+        private PooledBufferAsyncGPUReadback asyncReadback;
         protected override TextureFormat ReadbackTextureFormat => Settings.EncoderSettings.GetTextureFormat(Settings.CaptureAlpha && Settings.EncoderSettings.CanCaptureAlpha && Settings.ImageInputSettings.SupportsTransparent);
 
         protected internal override bool BeginRecording(RecordingSession session)
@@ -84,6 +81,7 @@ namespace UnityEditor.Recorder
                 return false;
             }
 
+            asyncReadback = new PooledBufferAsyncGPUReadback();
             // Show warnings
             foreach (var w in lsWarnings)
             {
@@ -132,13 +130,19 @@ namespace UnityEditor.Recorder
                 return; // error will have been triggered in BeginRecording()
 
             base.RecordFrame(session);
-            var audioInput = (AudioInput)m_Inputs[1];
-            if (Settings.CaptureAudio && Settings.EncoderSettings.CanCaptureAudio && audioInput.AudioSettings.PreserveAudio && !UnityHelpers.CaptureAccumulation(settings))
-                m_Encoder.AddAudioFrame(audioInput.MainBuffer);
         }
 
         protected internal override void EndRecording(RecordingSession session)
         {
+            if (asyncReadback != null)
+            {
+                asyncReadback.Dispose();
+                asyncReadback = null;
+            }
+
+            if (m_Encoder != null)
+                m_Encoder.CloseStream();
+
             base.EndRecording(session);
 
             if (m_RecordingStartedProperly && !m_RecordingAlreadyEnded)
@@ -152,9 +156,44 @@ namespace UnityEditor.Recorder
             }
         }
 
-        /// <summary>
-        /// Detect the ocurrence of concurrent recorders.
-        /// </summary>
+        internal override bool WriteGPUTextureFrame(RenderTexture tex)
+        {
+            if (m_Encoder.GetVideoInputPath == IEncoder.VideoInputPath.GPUBuffer)
+            {
+                var recorderTime = DequeueTimeStamp();
+                m_Encoder.AddVideoFrame(tex, ComputeMediaTime(recorderTime));
+            }
+            else
+            {
+                asyncReadback.RequestGPUReadBack(tex, GraphicsFormatUtility.GetGraphicsFormat(ReadbackTextureFormat, false), WriteCPUFrame);
+            }
+
+            WarnOfConcurrentRecorders();
+            return true;
+        }
+
+        void WriteCPUFrame(AsyncGPUReadbackRequest r)
+        {
+            if (r.hasError)
+            {
+                ConsoleLogMessage("The rendered image has errors. Skipping this frame.", LogType.Error);
+                return;
+            }
+            var recorderTime = DequeueTimeStamp();
+            m_Encoder.AddVideoFrame(r.GetData<byte>(), ComputeMediaTime(recorderTime));
+        }
+
+        internal override void RecordSubFrame(RecordingSession ctx)
+        {
+            base.RecordSubFrame(ctx);
+            var audioInput = (AudioInput)m_Inputs[1];
+            if (Settings.CaptureAudio && Settings.EncoderSettings.CanCaptureAudio &&
+                audioInput.AudioSettings.PreserveAudio)
+            {
+                m_Encoder.AddAudioFrame(audioInput.MainBuffer);
+            }
+        }
+
         private void WarnOfConcurrentRecorders()
         {
             if (s_ConcurrentCount > 1 && !s_WarnedUserOfConcurrentCount)
@@ -162,36 +201,6 @@ namespace UnityEditor.Recorder
                 ConsoleLogMessage($"There are two or more concurrent Movie Recorders in your project. You should keep only one of them active per recording to avoid experiencing slowdowns or other issues.", LogType.Warning);
                 s_WarnedUserOfConcurrentCount = true;
             }
-        }
-
-        protected override void WriteFrame(Texture2D t)
-        {
-            var recorderTime = DequeueTimeStamp();
-            m_Encoder.AddVideoFrame(t, ComputeMediaTime(recorderTime));
-            WarnOfConcurrentRecorders();
-        }
-
-        protected override void WriteFrame(AsyncGPUReadbackRequest r)
-        {
-            var recorderTime = DequeueTimeStamp();
-            if (r.hasError)
-            {
-                ConsoleLogMessage("The rendered image has errors. Skipping this frame.", LogType.Error);
-                return;
-            }
-            m_Encoder.AddVideoFrame(r.GetData<byte>(), ComputeMediaTime(recorderTime));
-            WarnOfConcurrentRecorders();
-        }
-
-        protected override void DisposeEncoder()
-        {
-            if (m_Encoder != null)
-                m_Encoder.CloseStream();
-            base.DisposeEncoder();
-
-            // When adding a file to Unity's assets directory, trigger a refresh so it is detected.
-            if (Settings.fileNameGenerator.Root == OutputPath.Root.AssetsFolder || Settings.fileNameGenerator.Root == OutputPath.Root.StreamingAssets)
-                AssetDatabase.Refresh();
         }
 
         private MediaTime ComputeMediaTime(float recorderTime)

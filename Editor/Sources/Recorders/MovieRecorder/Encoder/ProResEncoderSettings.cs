@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 
 namespace UnityEditor.Recorder.Encoder
@@ -100,7 +101,8 @@ namespace UnityEditor.Recorder.Encoder
         {
             var codecFormatSupportsTransparency = CodecFormatSupportsAlphaChannel(Format);
             var willIncludeAlpha = inputContainsAlpha && codecFormatSupportsTransparency;
-            return willIncludeAlpha ? TextureFormat.ARGB32 : TextureFormat.RGB24;
+            var formatIs4444Or4444XQ = Format == OutputFormat.ProRes4444 || Format == OutputFormat.ProRes4444XQ;
+            return willIncludeAlpha || formatIs4444Or4444XQ ? TextureFormat.RGBA64 : TextureFormat.RGB24;
         }
 
         /// <inheritdoc/>
@@ -115,6 +117,13 @@ namespace UnityEditor.Recorder.Encoder
 
             if (ctx.frameRateMode == FrameRatePlayback.Variable)
                 errors.Add($"This encoder does not support Variable frame rate playback. Please consider using Constant frame rate instead.");
+
+            // For packed pixel formats (2yuv), refuse odd resolutions
+            if (Format is OutputFormat.ProRes422 or OutputFormat.ProRes422Proxy or OutputFormat.ProRes422LT or OutputFormat.ProRes422HQ)
+            {
+                if (ctx.height % 2 != 0 || ctx.width % 2 != 0)
+                    errors.Add($"The {Format} format does not support odd values in resolution: {ctx.height}x{ctx.width}");
+            }
         }
 
         /// <inheritdoc/>
@@ -157,13 +166,20 @@ namespace UnityEditor.Recorder.Encoder
             return outputFormat == other.outputFormat;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Compares the current object with another one.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current one.</param>
+        /// <returns>True if the two objects are equal, false otherwise.</returns>
         public override bool Equals(object obj)
         {
             return ReferenceEquals(this, obj) || obj is ProResEncoderSettings other && ((IEquatable<ProResEncoderSettings>) this).Equals(other);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Returns a hash code of all serialized fields.
+        /// </summary>
+        /// <returns>The hash code.</returns>
         public override int GetHashCode()
         {
             return HashCode.Combine((int)outputFormat);

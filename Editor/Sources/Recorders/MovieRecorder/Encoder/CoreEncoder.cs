@@ -53,7 +53,8 @@ namespace UnityEditor.Recorder.Encoder
                             width = (uint)ctx.width,
                             height = (uint)ctx.height,
                             includeAlpha = ctx.doCaptureAlpha,
-                            targetBitRate = coreSettings.TargetBitRateBitsPerSecond  // H.264 expects bps
+                            bitRateMode = VideoBitrateMode.High, // so that audio encoder uses high bitrate
+                            targetBitRate = coreSettings.TargetBitRateBitsPerSecond  // H.264 expects bps,
                         };
                         break;
                     case CoreEncoderSettings.OutputCodec.WEBM:
@@ -69,6 +70,7 @@ namespace UnityEditor.Recorder.Encoder
                             width = (uint)ctx.width,
                             height = (uint)ctx.height,
                             includeAlpha = ctx.doCaptureAlpha,
+                            bitRateMode = VideoBitrateMode.High, // so that audio encoder uses high bitrate
                             targetBitRate = coreSettings.TargetBitRateKiloBitsPerSecond // VP8 expects kbps
                         };
                         break;
@@ -139,6 +141,12 @@ namespace UnityEditor.Recorder.Encoder
                 Debug.LogError($"The encoder has already been disposed, ignoring this data.");
                 return;
             }
+
+            if (bytes.Length == 0)
+            {
+                return;
+            }
+
             var success = encoderHandle.AddSamples(bytes);
             if (!success)
                 Debug.LogError("Failed to add audio samples to Unity Media Encoder");

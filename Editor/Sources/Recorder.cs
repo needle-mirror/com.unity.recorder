@@ -209,6 +209,10 @@ namespace UnityEditor.Recorder
 
             RestoreAsynchronousShaderCompilation();
             ++settings.Take;
+
+            // When adding a file to Unity's assets directory, trigger a refresh so it is detected.
+            if (settings.fileNameGenerator.Root == OutputPath.Root.AssetsFolder || settings.fileNameGenerator.Root == OutputPath.Root.StreamingAssets)
+                AssetDatabase.Refresh();
         }
 
         /// <summary>
@@ -223,6 +227,10 @@ namespace UnityEditor.Recorder
         /// </summary>
         /// <param name="ctx">The current recording session.</param>
         protected internal virtual void PrepareNewFrame(RecordingSession ctx)
+        {
+        }
+
+        internal virtual void RecordSubFrame(RecordingSession ctx)
         {
         }
 
