@@ -16,6 +16,7 @@ namespace UnityEngine.Recorder
             get { return m_Dictionary; }
         }
 
+
         public void OnBeforeSerialize()
         {
             m_Keys.Clear();

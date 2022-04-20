@@ -19,7 +19,7 @@ Shader "Hidden/Recorder/ProResPixelOptimizer" {
             uniform float4 _MainTex_ST;
             float4 _MainTex_TexelSize;
             #pragma multi_compile ___ RGB24_TO_2VUY8BITS // pack RGB24 into 2VUY format
-            #pragma multi_compile ___ RGBA64_TO_ARGB64 // swap bytes to get from RGBA64 to ARGB64
+            #pragma multi_compile ___ RGBA64_TO_AYCBCR
             #pragma multi_compile ___ INPUT_IS_SRGB
             struct appdata_t {
                 float4 vertex : POSITION;
@@ -48,12 +48,10 @@ Shader "Hidden/Recorder/ProResPixelOptimizer" {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
                 float2 t = i.texcoord;
                 half4 result;
-                #if RGBA64_TO_ARGB64
+                #if RGBA64_TO_AYCBCR
                     half4 c = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, t);
-                    #if INPUT_IS_SRGB
-                         c.rgb = LinearToGammaSpace(c.rgb);
-                    #endif
-                    result = c.argb; // We need to go from RGBA64 to ARGB64
+                    result.x = c.a; // We need to go from RGBA64 to ARGB64
+                    result.yzw = RGB2YUV_8BITS(c.rgb);
                 #elif RGB24_TO_2VUY8BITS
                     const float3 ts = float3(_MainTex_TexelSize.xy, 0);
                     float2 uv = i.texcoord;

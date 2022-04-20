@@ -123,8 +123,10 @@ namespace UnityEditor.Recorder.Input
             var sizeObj = FindRecorderSizeObj();
             if (sizeObj != null)
             {
-                sizeObj.GetType().GetField("m_Width", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(sizeObj, width);
-                sizeObj.GetType().GetField("m_Height", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(sizeObj, height);
+                var setWidth = sizeObj.GetType().GetProperty("width");
+                var setHeight = sizeObj.GetType().GetProperty("height");
+                setWidth.SetValue(sizeObj, width);
+                setHeight.SetValue(sizeObj, height);
             }
             else
             {

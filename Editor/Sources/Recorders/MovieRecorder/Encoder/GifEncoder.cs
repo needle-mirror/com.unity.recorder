@@ -35,6 +35,7 @@ namespace UnityEditor.Recorder.Encoder
             bool success = GIFWrapper.Close(encoderPtr);
             if (!success)
                 Debug.LogError("Failed to close GIF encoder");
+            encoderPtr = new IntPtr(); // This protects against a double free.
         }
 
         public unsafe void AddVideoFrame(NativeArray<byte> bytes, MediaTime time)

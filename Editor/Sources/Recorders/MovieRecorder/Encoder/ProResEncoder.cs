@@ -61,11 +61,10 @@ namespace UnityEditor.Recorder.Encoder
             (this as IDisposable).Dispose();
             if (encoderPtr == IntPtr.Zero)
                 return; // Error will have been triggered earlier
-            bool success = false;
-            success = ProResWrapper.Close(encoderPtr);
-            encoderPtr = new IntPtr(); // This protects against a double free.
+            bool success = ProResWrapper.Close(encoderPtr);
             if (!success)
                 Debug.LogError("Failed to close ProRes encoder");
+            encoderPtr = new IntPtr(); // This protects against a double free.
         }
 
         private void GetARGBBytes(RenderTexture tex, Action<AsyncGPUReadbackRequest> cb)
@@ -106,7 +105,7 @@ namespace UnityEditor.Recorder.Encoder
                 switch (textureFormat)
                 {
                     case TextureFormat.RGBA64:
-                        mat.EnableKeyword("RGBA64_TO_ARGB64");
+                        mat.EnableKeyword("RGBA64_TO_AYCBCR");
                         break;
                     case TextureFormat.RGB24:
                         mat.EnableKeyword("RGB24_TO_2VUY8BITS");

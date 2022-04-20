@@ -89,7 +89,7 @@ namespace UnityEditor.Recorder.AOV
     /// A class that represents the settings of an AOV Sequence Recorder.
     /// </summary>
     [RecorderSettings(typeof(AOVRecorder), "AOV Image Sequence", "aovimagesequence_16")]
-    public class AOVRecorderSettings : RecorderSettings
+    public class AOVRecorderSettings : RecorderSettings, RecorderSettings.IResolutionUser
     {
         [SerializeField] internal ImageRecorderSettings.ImageRecorderOutputFormat m_OutputFormat = ImageRecorderSettings.ImageRecorderOutputFormat.EXR;
         [SerializeField] internal AOVType m_AOVSelection = AOVType.Beauty;
@@ -238,5 +238,17 @@ namespace UnityEditor.Recorder.AOV
         {
             get { yield return m_AOVImageInputSelector.Selected; }
         }
+
+        bool IResolutionUser.IsOutputResolutionContradictory
+        {
+            get;
+            set;
+        }
+
+        int IResolutionUser.OutputWidth => imageInputSettings.OutputWidth;
+
+        int IResolutionUser.OutputHeight => imageInputSettings.OutputHeight;
+
+        Type IResolutionUser.ImageInputType => imageInputSettings.GetType();
     }
 }

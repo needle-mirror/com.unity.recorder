@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Media;
-using UnityEditor.Recorder.Encoder;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace UnityEditor.Recorder
 {
@@ -266,6 +263,11 @@ namespace UnityEditor.Recorder
             {
                 errors.Add("Current platform is not supported");
             }
+
+            if (this is IResolutionUser { IsOutputResolutionContradictory : true })
+            {
+                errors.Add("Conflicting resolution detected. All active Recorders must have the same output resolution.");
+            }
         }
 
         /// <summary>
@@ -409,5 +411,19 @@ namespace UnityEditor.Recorder
         protected virtual void OnAfterDeserialize() {} // Do not clean up since users can only override this
 
         internal virtual void OnUpgradeFromVersion(Versions oldVersion) {}
+
+        internal interface IResolutionUser
+        {
+            internal bool IsOutputResolutionContradictory
+            {
+                get;
+                set;
+            }
+
+            internal int OutputWidth { get; }
+            internal int OutputHeight { get; }
+
+            internal Type ImageInputType { get; }
+        }
     }
 }

@@ -4,6 +4,22 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0-pre.5] - 2022-04-20
+### Added
+- Movie Recorder Encoder sample showing how to integrate a custom command line encoder such as FFmpeg.
+
+### Changed
+- Only accumulate subframes within the specified recording time/frame range, and not on skipped frames.
+
+### Fixed
+- Make sure the Game View UI displays the actual resolution when the Recorder needs to change it.
+- Prevent the Recorder from capturing audio when the output format doesn't support it.
+- Support ProRes 4444 export on Apple M1 Max CPUs.
+- Make sure to get the proper recording duration when capturing accumulation and specifying a recording time range in seconds.
+- Fix accumulation frame artifacts when specifying a recording time range in seconds that doesn't start from zero.
+- Prevent the Unity Editor from crashing when multiple recorders use different output resolutions.
+- Prevent Unity from logging an error in the console when exiting timeline clips with the GIF encoder.
+
 ## [4.0.0-pre.4] - 2022-04-19
 ### Added
 - GIF Encoder for the Movie Recorder.

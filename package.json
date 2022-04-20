@@ -1,7 +1,7 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Recorder",
-  "version": "4.0.0-pre.4",
+  "version": "4.0.0-pre.5",
   "unity": "2022.1",
   "unityRelease": "1f1",
   "dependencies": {
@@ -22,25 +22,30 @@
     "pass",
     "layer"
   ],
-  "upm": {
-    "changelog": "### Added\n- GIF Encoder for the Movie Recorder.\n- Accumulation based shadow map filtering for Spot Lights, improving the quality of rendered shadows.\n- New option to apply Subpixel Jitter Antialiasing when recording with Accumulation (in HDRP).\n- PIZ compression for EXR image sequences.\n\n### Changed\n- Remove support for CentOS.\n- Allow audio recording while using the Movie Recorder's accumulation feature.\n- Improvements to the Accumulation UI parameters:\n  - Specify the shutter interval as a normalized interval or an angle.\n  - Specify the number of accumulation samples without a maximum limit, directly through a value field.\n  - Get the actual count of accumulated frames resulting from the shutter profile convolution.\n- Prevent users from recording in odd resolutions with ProRes packed pixel format codecs (e.g. 422HQ).\n- Movie Recorder no longer uses the Sync GPU readback code path.\n\n### Fixed\n- Improved performance for ProRes encoding.\n- Fix an issue that prevented the alpha component from being correctly recorded.\n- Make sure to generate high bitrate audio tracks when using custom quality encoding in the Unity Media Encoder.\n- Make sure the duration of recordings is accurate when capturing accumulation with time intervals in seconds.\n- Make sure the CapFPS setting remains reliable when the recording session includes multiple active Recorders.\n- Refresh the asset database after recording an image sequence to the Assets folder.\n- Prevent users from recording if the Recorder Window combines active recorders with and without accumulation.\n- Prevent the Recorder Window from throwing errors when selecting an invalid Encoder."
+  "_upm": {
+    "changelog": "### Added\n- Movie Recorder Encoder sample showing how to integrate a custom command line encoder such as FFmpeg.\n\n### Changed\n- Only accumulate subframes within the specified recording time/frame range, and not on skipped frames.\n\n### Fixed\n- Make sure the Game View UI displays the actual resolution when the Recorder needs to change it.\n- Prevent the Recorder from capturing audio when the output format doesn't support it.\n- Support ProRes 4444 export on Apple M1 Max CPUs.\n- Make sure to get the proper recording duration when capturing accumulation and specifying a recording time range in seconds.\n- Fix accumulation frame artifacts when specifying a recording time range in seconds that doesn't start from zero.\n- Prevent the Unity Editor from crashing when multiple recorders use different output resolutions.\n- Prevent Unity from logging an error in the console when exiting timeline clips with the GIF encoder."
   },
   "relatedPackages": {
-    "com.unity.recorder.tests": "4.0.0-pre.4"
+    "com.unity.recorder.tests": "4.0.0-pre.5"
   },
   "upmCi": {
-    "footprint": "b5366f379e5c7f3ab75548aa6f46669671a62c84"
+    "footprint": "667f2a9859b82dc6131c78162c1afacc84f80dca"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.recorder.git",
     "type": "git",
-    "revision": "f845373f2194be00d8c860812a821df0b07290f1"
+    "revision": "4bbecfc3cc7a5eb52efa8b35a4de4582559cd72e"
   },
   "samples": [
     {
       "displayName": "Screenshot Capture Sample",
       "description": "This example shows how to set up a recording session via script.",
       "path": "Samples~/CaptureScreenShot"
+    },
+    {
+      "displayName": "Custom Encoder: FFmpeg",
+      "description": "Example for integrating a custom command line encoder such as FFmpeg in the Movie Recorder. \n Requires your own FFmpeg executable. Tested with FFmpeg 5.0.1.",
+      "path": "Samples~/FFmpegCommandLineEncoder"
     },
     {
       "displayName": "Movie Recorder Sample",

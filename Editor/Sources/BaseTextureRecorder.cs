@@ -22,6 +22,11 @@ namespace UnityEditor.Recorder
         /// </summary>
         protected bool UseAsyncGPUReadback;
 
+        /// <summary>
+        /// Whether or not accumulation is requested and has been enabled.
+        /// </summary>
+        internal bool accumulationInitialized;
+
         private PooledBufferAsyncGPUReadback asyncReadback;
 #if HDRP_AVAILABLE
         bool m_AccumulationIsActive;
@@ -112,8 +117,16 @@ namespace UnityEditor.Recorder
         {
             if (!base.BeginRecording(session))
                 return false;
+            UseAsyncGPUReadback = SystemInfo.supportsAsyncGPUReadback;
+            m_AsyncReadbackTimeStamps.Clear();
+            asyncReadback = new PooledBufferAsyncGPUReadback();
+            return true;
+        }
+
+        void SetupAccumulation()
+        {
 #if HDRP_AVAILABLE
-            if (RenderPipelineManager.currentPipeline is HDRenderPipeline hdRenderPipeline)
+            if (!accumulationInitialized && RenderPipelineManager.currentPipeline is HDRenderPipeline hdRenderPipeline)
             {
                 if (settings.IsAccumulationSupported() && settings is IAccumulation accumulation)
                 {
@@ -179,14 +192,11 @@ namespace UnityEditor.Recorder
                                 aSettings.ShutterProfileCurve
                             );
                         }
+                        accumulationInitialized = true;
                     }
                 }
             }
 #endif
-            UseAsyncGPUReadback = SystemInfo.supportsAsyncGPUReadback;
-            m_AsyncReadbackTimeStamps.Clear();
-            asyncReadback = new PooledBufferAsyncGPUReadback();
-            return true;
         }
 
         /// <inheritdoc/>
@@ -255,6 +265,7 @@ namespace UnityEditor.Recorder
         {
             base.PrepareNewFrame(ctx);
 #if HDRP_AVAILABLE
+            SetupAccumulation();
             if (m_AccumulationIsActive && RenderPipelineManager.currentPipeline is HDRenderPipeline hdRenderPipeline)
             {
                 m_SubFrameIndex = ++m_SubFrameIndex % m_NumSubFrames;

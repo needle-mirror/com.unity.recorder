@@ -16,7 +16,7 @@ namespace UnityEditor.Recorder
     /// A class that represents the settings of a Movie Recorder.
     /// </summary>
     [RecorderSettings(typeof(MovieRecorder), "Movie", "movie_16")]
-    public class MovieRecorderSettings : RecorderSettings, IAccumulation
+    public class MovieRecorderSettings : RecorderSettings, IAccumulation, RecorderSettings.IResolutionUser
     {
         /// <summary>
         /// Use this property to define the encoder used by the Recorder.
@@ -531,5 +531,16 @@ namespace UnityEditor.Recorder
         }
 
 #pragma warning restore 618
+        bool IResolutionUser.IsOutputResolutionContradictory
+        {
+            get;
+            set;
+        }
+
+        int IResolutionUser.OutputWidth => ImageInputSettings.OutputWidth;
+
+        int IResolutionUser.OutputHeight => ImageInputSettings.OutputHeight;
+
+        Type IResolutionUser.ImageInputType => ImageInputSettings.GetType();
     }
 }

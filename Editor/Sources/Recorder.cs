@@ -244,11 +244,19 @@ namespace UnityEditor.Recorder
         /// <returns>True if the frame should be skipped, False otherwise.</returns>
         protected internal virtual bool SkipFrame(RecordingSession ctx)
         {
-            return !Recording
-                || ctx.frameIndex % settings.captureEveryNthFrame != 0 && ctx.settings.FrameRatePlayback == FrameRatePlayback.Variable
-                || settings.RecordMode == RecordMode.TimeInterval && ctx.currentFrameStartTS < settings.StartTime
-                || settings.RecordMode == RecordMode.FrameInterval && ctx.frameIndex < settings.StartFrame
-                || settings.RecordMode == RecordMode.SingleFrame && ctx.frameIndex < settings.StartFrame;
+            // Compute the starting frame of the recording
+            int startFrame = settings.RecordMode == RecordMode.TimeInterval ? (int)(settings.StartTime * settings.FrameRate) : settings.StartFrame;
+            var skip_vfr = ctx.frameIndex % settings.captureEveryNthFrame != 0 &&
+                ctx.settings.FrameRatePlayback == FrameRatePlayback.Variable;
+            var skip_time = settings.RecordMode == RecordMode.TimeInterval && ctx.frameIndex < startFrame;
+            var skip_frame = settings.RecordMode == RecordMode.FrameInterval && ctx.frameIndex < startFrame;
+            var skip_single = settings.RecordMode == RecordMode.SingleFrame && ctx.frameIndex < startFrame;
+            var result = !Recording
+                || skip_vfr
+                || skip_time
+                || skip_frame
+                || skip_single;
+            return result;
         }
 
         /// <summary>

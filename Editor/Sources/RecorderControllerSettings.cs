@@ -114,8 +114,8 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Sets the Recorders to Time Interval mode and defines the Start and End times of the interval to record.
         /// </summary>
-        /// <param name="startTime">Start time.</param>
-        /// <param name="endTime">End time.</param>
+        /// <param name="startTime">The start time, in seconds.</param>
+        /// <param name="endTime">The end time, in seconds.</param>
         public void SetRecordModeToTimeInterval(float startTime, float endTime)
         {
             m_RecordMode = RecordMode.TimeInterval;

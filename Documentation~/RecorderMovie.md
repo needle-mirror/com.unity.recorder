@@ -52,7 +52,7 @@ Use this section to set up the media format you need to save the recorded images
 
 |Property|Function|
 |:---|:---|
-| **Encoder** | The encoder to use for the recording. Each encoder has a specific set of properties:<br />• Select [Unity Media Encoder](#unity-media-encoder-properties) to generate an H.264 MP4 or VP8 WebM video.<br />• Select [GIF Encoder](#gif-encoder-properties) to generate an animated GIF.<br />• Select [ProRes Encoder](#prores-encoder-properties) to generate a video file encoded with an Apple ProRes codec. |
+| **Encoder** | The encoder to use for the recording. Each encoder has a specific set of properties:<br />• Select [Unity Media Encoder](#unity-media-encoder-properties) to generate an H.264 MP4 or VP8 WebM video.<br />• Select [GIF Encoder](#gif-encoder-properties) to generate an animated GIF.<br />• Select [ProRes Encoder](#prores-encoder-properties) to generate a video file encoded with an Apple ProRes codec.<br /><br />**Note:** To integrate a custom command line encoder such as FFmpeg and make it available from this list, use the [**Custom Encoder: FFmpeg**](samples-custom-encoder.md) sample provided along with the Recorder package. |
 | **Include Audio** | Enable this option to include audio in the recording, when the **Encoder** supports it. |
 | **Include Alpha** | Enable this property to include the alpha channel in the recording. Disable it to only record the RGB channels.<br/><br/>This property is not available when the selected **Codec** doesn't support transparency, or when the **Source** is set to **Game View**. |
 

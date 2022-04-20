@@ -134,7 +134,7 @@ namespace UnityEditor.Recorder
         public ImageInputSelector() {}
     }
 
-    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.ImageRecorder), @"Image Sequence", @"imagesequence_16")] public class ImageRecorderSettings : UnityEditor.Recorder.RecorderSettings, IAccumulation
+    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.ImageRecorder), @"Image Sequence", @"imagesequence_16")] public class ImageRecorderSettings : UnityEditor.Recorder.RecorderSettings, IAccumulation, UnityEditor.Recorder.RecorderSettings.IResolutionUser
     {
         public AccumulationSettings AccumulationSettings { get; set; }
         public bool CaptureAlpha { get; set; }
@@ -187,7 +187,7 @@ namespace UnityEditor.Recorder
         protected InputSettingsSelector() {}
     }
 
-    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.MovieRecorder), @"Movie", @"movie_16")] public class MovieRecorderSettings : UnityEditor.Recorder.RecorderSettings, IAccumulation
+    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.MovieRecorder), @"Movie", @"movie_16")] public class MovieRecorderSettings : UnityEditor.Recorder.RecorderSettings, IAccumulation, UnityEditor.Recorder.RecorderSettings.IResolutionUser
     {
         public AccumulationSettings AccumulationSettings { get; set; }
         public UnityEditor.Recorder.Input.AudioInputSettings AudioInputSettings { get; }
@@ -416,7 +416,7 @@ namespace UnityEditor.Recorder
 
 namespace UnityEditor.Recorder.AOV
 {
-    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.AOVRecorder), @"AOV Image Sequence", @"aovimagesequence_16")] public class AOVRecorderSettings : UnityEditor.Recorder.RecorderSettings
+    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.AOVRecorder), @"AOV Image Sequence", @"aovimagesequence_16")] public class AOVRecorderSettings : UnityEditor.Recorder.RecorderSettings, UnityEditor.Recorder.RecorderSettings.IResolutionUser
     {
         public UnityEditor.Recorder.AOV.AOVType AOVSelection { get; set; }
         public bool CaptureHDR { get; }

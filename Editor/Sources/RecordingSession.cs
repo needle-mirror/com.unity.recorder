@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using Unity.Profiling;
 using UnityEditor.Media;
 using UnityEngine;
@@ -274,14 +275,42 @@ namespace UnityEditor.Recorder
                 }
             }
 
-            if (recorder.SkipSubFrame(this))
+            if (!recorder.SkipSubFrame(this))
             {
-                // do not increment the frame index
-            }
-            else
-            {
+                // This is a 'full' frame: increment the current full frame counter
                 m_FrameIndex++;
             }
+        }
+
+        // Don't start incrementing the subframe count until accumulation has been activated.
+        void IncrementSubFrameCount()
+        {
+#if HDRP_AVAILABLE
+            if (settings.IsAccumulationSupported() && settings is IAccumulation accumulation && accumulation.GetAccumulationSettings().CaptureAccumulation)
+            {
+                switch (settings.RecordMode)
+                {
+                    case RecordMode.FrameInterval:
+                    case RecordMode.SingleFrame:
+                        if (m_FrameIndex >= settings.StartFrame)
+                        {
+                            m_SubFrameIndex++;
+                        }
+                        break;
+                    case RecordMode.TimeInterval:
+                        if (currentFrameStartTS >= settings.StartTime)
+                        {
+                            m_SubFrameIndex++;
+                        }
+                        break;
+                    case RecordMode.Manual:
+                        m_SubFrameIndex++;
+                        break;
+                    default:
+                        throw new InvalidEnumArgumentException($"Unexpected record mode {settings.RecordMode}");
+                }
+            }
+#endif
         }
 
         internal void PrepareNewFrame()
@@ -293,7 +322,7 @@ namespace UnityEditor.Recorder
                 currentFrameStartTS =
                     (Time.time / (Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale)) -
                     recordingStartTS;
-                m_SubFrameIndex++;
+                IncrementSubFrameCount();
                 if (!recorder.SkipFrame(this))
                 {
                     recorder.SignalInputsOfStage(ERecordingSessionStage.NewFrameStarting, this);

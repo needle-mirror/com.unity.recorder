@@ -43,6 +43,13 @@ You can also benefit from additional Recorder types if you install specific pack
 * The [FBX Exporter](https://docs.unity3d.com/Packages/com.unity.formats.fbx@latest) package includes an **FBX Recorder**, which allows you to record and export animations directly to FBX files.
 
 
+## Samples
+
+Various [samples](samples.md) are available with the Recorder package to help you experiment with some specific features and use cases.
+
+One of them allows you to [integrate FFmpeg as a custom command line encoder](samples-custom-encoder.md) in the Movie Recorder.
+
+
 ## Package technical details
 
 ### Installation

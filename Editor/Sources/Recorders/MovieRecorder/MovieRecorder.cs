@@ -28,6 +28,13 @@ namespace UnityEditor.Recorder
         private PooledBufferAsyncGPUReadback asyncReadback;
         protected override TextureFormat ReadbackTextureFormat => Settings.EncoderSettings.GetTextureFormat(Settings.CaptureAlpha && Settings.EncoderSettings.CanCaptureAlpha && Settings.ImageInputSettings.SupportsTransparent);
 
+        protected internal override void SessionCreated(RecordingSession session)
+        {
+            base.SessionCreated(session);
+            var audioInput = m_Inputs[1] as AudioInput;
+            audioInput.NeedToCaptureAudio = () => Settings.EncoderSettings != null && Settings.EncoderSettings.CanCaptureAudio;
+        }
+
         protected internal override bool BeginRecording(RecordingSession session)
         {
             m_RecordingStartedProperly = false;
@@ -141,7 +148,10 @@ namespace UnityEditor.Recorder
             }
 
             if (m_Encoder != null)
+            {
                 m_Encoder.CloseStream();
+                m_Encoder = null;
+            }
 
             base.EndRecording(session);
 
@@ -187,8 +197,10 @@ namespace UnityEditor.Recorder
         {
             base.RecordSubFrame(ctx);
             var audioInput = (AudioInput)m_Inputs[1];
+            var okCaptureAccum = Settings.AccumulationSettings.CaptureAccumulation && accumulationInitialized;
             if (Settings.CaptureAudio && Settings.EncoderSettings.CanCaptureAudio &&
-                audioInput.AudioSettings.PreserveAudio)
+                audioInput.AudioSettings.PreserveAudio &&
+                (okCaptureAccum || !Settings.AccumulationSettings.CaptureAccumulation))
             {
                 m_Encoder.AddAudioFrame(audioInput.MainBuffer);
             }

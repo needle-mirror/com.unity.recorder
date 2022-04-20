@@ -74,6 +74,8 @@ namespace UnityEditor.Recorder.Input
             }
         }
 
+        internal Func<bool> NeedToCaptureAudio;
+
         ushort m_ChannelCount;
 
         /// <summary>
@@ -153,13 +155,13 @@ namespace UnityEditor.Recorder.Input
             if (RecorderOptions.VerboseMode)
                 Debug.Log(string.Format("AudioInput.BeginRecording for capture frame rate {0}", Time.captureFramerate));
 
-            if (AudioSettings.PreserveAudio)
+            if (ShouldCaptureAudio())
                 AudioRendererWrapper.Start();
         }
 
         protected internal override void NewFrameReady(RecordingSession session)
         {
-            if (!AudioSettings.PreserveAudio)
+            if (!ShouldCaptureAudio())
                 return;
 
             if (s_Handler == null)
@@ -206,8 +208,20 @@ namespace UnityEditor.Recorder.Input
 
             s_Handler = null;
 
-            if (AudioSettings.PreserveAudio)
+            if (ShouldCaptureAudio())
                 AudioRendererWrapper.Stop();
+        }
+
+        // This is a workaround for the fact that the input wants to capture the audio, but the (movie)recorder does not support it.
+        // This is a non-persistant way to disable the audio capture.
+        bool ShouldCaptureAudio()
+        {
+            if (NeedToCaptureAudio != null)
+            {
+                return AudioSettings.PreserveAudio && NeedToCaptureAudio();
+            }
+
+            return AudioSettings.PreserveAudio;
         }
     }
 }

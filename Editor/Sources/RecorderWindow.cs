@@ -783,29 +783,11 @@ namespace UnityEditor.Recorder
             var activeRecorders = m_ControllerSettings.RecorderSettings.Where(r => r.Enabled).ToArray();
 
             if (HasDuplicateOutputNames(activeRecorders)) return;
+            HasDifferentResolutions(activeRecorders);
 
             // Refresh the state of all items in the window
             foreach (var recorderItem in m_RecordingListItem.items)
                 recorderItem.UpdateState();
-
-            var gameViewRecorders = new Dictionary<ImageHeight, RecorderSettings>();
-
-            foreach (var recorder in activeRecorders)
-            {
-                var gameView = recorder.InputsSettings.FirstOrDefault(i => i is GameViewInputSettings) as GameViewInputSettings;
-                if (gameView != null)
-                {
-                    if (gameViewRecorders.Any() && !gameViewRecorders.ContainsKey(gameView.outputImageHeight))
-                    {
-                        var msg =  "Recorders '" + gameViewRecorders.Values.First().name + "' and '" +
-                            recorder.name +
-                            "' are recording the Game View using different resolutions. This can lead to unexpected behaviour.";
-                        ShowMessageInStatusBar(msg, MessageType.Warning);
-                    }
-
-                    gameViewRecorders[gameView.outputImageHeight] = recorder;
-                }
-            }
 
             if (m_ControllerSettings.InvalidContextBecauseOfAccumulation())
             {
@@ -851,6 +833,20 @@ namespace UnityEditor.Recorder
             }
 
             return duplicateNames > 0;
+        }
+
+        void HasDifferentResolutions(RecorderSettings[] activeRecorders)
+        {
+            m_RecorderController.ValidateRecorderResolutions();
+
+            var duplicateRes = activeRecorders.OfType<RecorderSettings.IResolutionUser>()
+                .Count(x => x.IsOutputResolutionContradictory);
+
+            if (duplicateRes > 0)
+            {
+                var msg = $"There are {duplicateRes} Recorders that use different resolutions.";
+                ShowMessageInStatusBar(msg, MessageType.Error);
+            }
         }
 
         bool ShouldDisableRecordSettings()
@@ -1353,19 +1349,28 @@ namespace UnityEditor.Recorder
                 case RecordMode.SingleFrame:
                 case RecordMode.FrameInterval:
                 {
-                    var label = session.frameIndex < settings.StartFrame
-                        ? string.Format("Skipping first {0} frame(s)...", settings.StartFrame - 1)
-                        : string.Format("{0} Frame(s) processed", session.frameIndex - settings.StartFrame + 1);
-                    EditorGUI.ProgressBar(progressBarRect, (session.frameIndex + 1) / (float)(settings.EndFrame + 1), label);
+                    var expectedFrames = settings.EndFrame - settings.StartFrame;
+                    var waitingText = settings.StartFrame == 0
+                        ? "Waiting for the first frame..." // not skipping frames, just waiting for the first frame to be recorded
+                        : $"Skipping first {settings.StartFrame} frame(s)..."; // if we start at frame 30, we are skipping frames [0;29] so total 30 frames skipped
+                    var label = session.recorder.RecordedFramesCount == 0
+                        ? waitingText
+                        : $"{session.recorder.RecordedFramesCount} frame(s) processed";
+                    var progress = (float)session.recorder.RecordedFramesCount / expectedFrames;
+                    EditorGUI.ProgressBar(progressBarRect, progress, label);
                     break;
                 }
                 case RecordMode.TimeInterval:
                 {
-                    var label = session.currentFrameStartTS < settings.StartTime
-                        ? string.Format("Skipping first {0} second(s)...", settings.StartTime)
-                        : string.Format("{0} Frame(s) processed", session.frameIndex - settings.StartFrame + 1);
-                    EditorGUI.ProgressBar(progressBarRect, (float)session.currentFrameStartTS / (settings.EndTime.Equals(0.0f) ? 0.0001f : settings.EndTime), label);
-
+                    var expectedFrames = (settings.EndTime - settings.StartTime) * settings.FrameRate;
+                    var waitingText = settings.StartTime == 0
+                        ? "Waiting for the first frame..." // not skipping frames, just waiting for the first frame to be recorded
+                        : $"Skipping first {settings.StartTime} second(s)..."; // really skipping some time
+                    var label = session.recorder.RecordedFramesCount == 0
+                        ? waitingText
+                        : $"{session.recorder.RecordedFramesCount} frame(s) processed";
+                    var progress = (float)session.recorder.RecordedFramesCount / expectedFrames;
+                    EditorGUI.ProgressBar(progressBarRect, progress, label);
                     break;
                 }
             }

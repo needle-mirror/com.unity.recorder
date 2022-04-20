@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Recorder.AOV.Input;
+using UnityEditor.Recorder.Input;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -11,6 +13,9 @@ namespace UnityEditor.Recorder
     /// </summary>
     public class RecorderController
     {
+        static HashSet<Type> resolutionUserType = new HashSet<Type>
+        { typeof(GameViewInputSettings), typeof(CameraInputSettings), typeof(RenderTextureSamplerSettings), typeof(AOVCameraInputSettings) };
+
         readonly SceneHook m_SceneHook;
 
         internal List<RecordingSession> m_RecordingSessions;
@@ -60,6 +65,7 @@ namespace UnityEditor.Recorder
             int numberOfSubframeRecorder = 0;
             int numberOfRecorderEnabled = 0;
             ValidateRecorderNames();
+            ValidateRecorderResolutions();
 
             if (m_Settings.InvalidContextBecauseOfAccumulation())
             {
@@ -216,6 +222,40 @@ namespace UnityEditor.Recorder
                     if (!recSettings.Enabled) continue;
                     recSettings.IsOutputNameDuplicate = false;
                     outputPaths.Add(path, recSettings);
+                }
+            }
+        }
+
+        internal void ValidateRecorderResolutions()
+        {
+            var resSet = new ValueTuple<int, int>?();
+            var contradictory = false;
+            foreach (var recSettings in m_Settings.RecorderSettings.Where(x => x.Enabled).OfType<RecorderSettings.IResolutionUser>().Where(x => resolutionUserType.Contains(x.ImageInputType)))
+            {
+                var val = new ValueTuple<int, int>(recSettings.OutputHeight, recSettings.OutputWidth);
+                if (resSet.HasValue && resSet.Value != val)
+                {
+                    contradictory = true;
+                    break;
+                }
+
+                resSet = val;
+            }
+
+            foreach (var recSettings in m_Settings.RecorderSettings.Where(x => x.Enabled).OfType<RecorderSettings.IResolutionUser>().Where(x => resolutionUserType.Contains(x.ImageInputType)))
+            {
+                recSettings.IsOutputResolutionContradictory = contradictory;
+            }
+
+            // Disabled recorders never report errors
+            foreach (var recSettings in m_Settings.RecorderSettings)
+            {
+                if (recSettings is RecorderSettings.IResolutionUser res)
+                {
+                    if (!resolutionUserType.Contains(res.ImageInputType) || recSettings.Enabled == false)
+                    {
+                        res.IsOutputResolutionContradictory = false;
+                    }
                 }
             }
         }

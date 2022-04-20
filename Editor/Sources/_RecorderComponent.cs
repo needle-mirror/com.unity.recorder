@@ -130,29 +130,44 @@ namespace UnityEditor.Recorder
                     break;
                 case RecordMode.SingleFrame:
                 {
+                    // We are done recording once the frame has been recorded.
                     if (session.recorder.RecordedFramesCount == 1)
                         Destroy(this);
                     break;
                 }
                 case RecordMode.FrameInterval:
                 {
-                    if (session.frameIndex > session.settings.EndFrame)
+                    // We are done recording once the expected number of frames has been recorded.
+                    var expectedFrames = (session.settings.EndFrame - session.settings.StartFrame);
+                    if (session.settings.FrameRatePlayback == FrameRatePlayback.Variable)
+                    {
+                        expectedFrames /= session.settings.captureEveryNthFrame;
+                    }
+                    if (session.recorder.RecordedFramesCount > expectedFrames)
+                    {
                         Destroy(this);
+                    }
                     break;
                 }
                 case RecordMode.TimeInterval:
                 {
+                    var expectedFrames = (session.settings.EndTime - session.settings.StartTime) *
+                                         session.settings.FrameRate;
                     if (session.settings.FrameRatePlayback == FrameRatePlayback.Variable)
                     {
-                        if (session.currentFrameStartTS >= session.settings.EndTime)
+                        expectedFrames /= session.settings.captureEveryNthFrame;
+                        if (session.recorder.RecordedFramesCount > expectedFrames)
+                        {
                             Destroy(this);
+                        }
                     }
                     else
                     {
-                        var expectedFrames = (session.settings.EndTime - session.settings.StartTime) *
-                                             session.settings.FrameRate;
+                        // We are done recording once the expected number of frames has been recorded.
                         if (session.recorder.RecordedFramesCount > expectedFrames)
+                        {
                             Destroy(this);
+                        }
                     }
 
                     break;

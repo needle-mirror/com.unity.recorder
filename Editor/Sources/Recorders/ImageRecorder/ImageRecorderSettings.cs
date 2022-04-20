@@ -12,7 +12,7 @@ namespace UnityEditor.Recorder
     /// A class that represents the settings of an Image Recorder.
     /// </summary>
     [RecorderSettings(typeof(ImageRecorder), "Image Sequence", "imagesequence_16")]
-    public class ImageRecorderSettings : RecorderSettings, IAccumulation
+    public class ImageRecorderSettings : RecorderSettings, IAccumulation, RecorderSettings.IResolutionUser
     {
         /// <summary>
         /// Available options for the output image format used by Image Sequence Recorder.
@@ -298,5 +298,17 @@ namespace UnityEditor.Recorder
 #endif
             }
         }
+
+        bool IResolutionUser.IsOutputResolutionContradictory
+        {
+            get;
+            set;
+        }
+
+        int IResolutionUser.OutputWidth => imageInputSettings.OutputWidth;
+
+        int IResolutionUser.OutputHeight => imageInputSettings.OutputHeight;
+
+        Type IResolutionUser.ImageInputType => imageInputSettings.GetType();
     }
 }
