@@ -122,7 +122,8 @@ namespace UnityEditor.Recorder
             // Expose CaptureAudio and CaptureAlpha from the MovieRecorderSettings but look at input and encoder capabilities
             if (mrs.EncoderSettings.CanCaptureAudio)
                 mrs.CaptureAudio = EditorGUILayout.Toggle(Styles.AudioLabel, mrs.CaptureAudio);
-            if (mrs.ImageInputSettings.SupportsTransparent && mrs.EncoderSettings.CanCaptureAlpha)
+
+            if (!UnityHelpers.UsingURP() && mrs.ImageInputSettings.SupportsTransparent && mrs.EncoderSettings.CanCaptureAlpha)
                 mrs.CaptureAlpha = EditorGUILayout.Toggle(Styles.AlphaLabel, mrs.CaptureAlpha);
         }
 
@@ -139,27 +140,6 @@ namespace UnityEditor.Recorder
                     EditorGUILayout.PropertyField(p, Styles.SourceLabel);
                 }
             }
-        }
-
-        protected override void OnValidateSettingsGUI()
-        {
-            base.OnValidateSettingsGUI();
-
-            var warnings = new List<string>();
-            var errors = new List<string>();
-
-            var s = target as MovieRecorderSettings;
-            var data = s.GetRecordingContext();
-            s.ValidateRecording(data, errors, warnings);
-
-            foreach (var w in warnings)
-                EditorGUILayout.HelpBox(w, MessageType.Warning);
-
-            foreach (var e in errors)
-                EditorGUILayout.HelpBox(e, MessageType.Error);
-
-            if (warnings.Count > 0 || errors.Count > 0)
-                InvokeRecorderValidated();
         }
     }
 }

@@ -44,6 +44,11 @@ namespace UnityEditor.Recorder.Input
         {
             AudioRenderer.Render(buffer);
         }
+
+        public static bool IsInstanceActive()
+        {
+            return instance.s_StartCount != 0;
+        }
     }
 
     /// <summary>
@@ -197,19 +202,16 @@ namespace UnityEditor.Recorder.Input
 
         protected internal override void EndRecording(RecordingSession session)
         {
+            if (ShouldCaptureAudio() && AudioRendererWrapper.IsInstanceActive())
+                AudioRendererWrapper.Stop();
+
             if (s_BufferManager != null)
             {
                 s_BufferManager.Dispose();
                 s_BufferManager = null;
             }
 
-            if (s_Handler == null)
-                return;
-
             s_Handler = null;
-
-            if (ShouldCaptureAudio())
-                AudioRendererWrapper.Stop();
         }
 
         // This is a workaround for the fact that the input wants to capture the audio, but the (movie)recorder does not support it.

@@ -38,12 +38,8 @@ RecorderItem.disabled.selected {
     background-color: #F4F4F4;
 }
 
-RecorderItem.hasErrors {
+RecorderItem.isInvalid {
     background-color: #F08080;
-}
-
-RecorderItem.hasErrors.selected {
-    background-color: #F02020;
 }
 
 RecorderItem > EditableLabel > * {

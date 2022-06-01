@@ -1,7 +1,7 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Recorder",
-  "version": "4.0.0-pre.5",
+  "version": "4.0.0",
   "unity": "2022.1",
   "unityRelease": "1f1",
   "dependencies": {
@@ -22,19 +22,19 @@
     "pass",
     "layer"
   ],
-  "_upm": {
-    "changelog": "### Added\n- Movie Recorder Encoder sample showing how to integrate a custom command line encoder such as FFmpeg.\n\n### Changed\n- Only accumulate subframes within the specified recording time/frame range, and not on skipped frames.\n\n### Fixed\n- Make sure the Game View UI displays the actual resolution when the Recorder needs to change it.\n- Prevent the Recorder from capturing audio when the output format doesn't support it.\n- Support ProRes 4444 export on Apple M1 Max CPUs.\n- Make sure to get the proper recording duration when capturing accumulation and specifying a recording time range in seconds.\n- Fix accumulation frame artifacts when specifying a recording time range in seconds that doesn't start from zero.\n- Prevent the Unity Editor from crashing when multiple recorders use different output resolutions.\n- Prevent Unity from logging an error in the console when exiting timeline clips with the GIF encoder."
-  },
   "relatedPackages": {
-    "com.unity.recorder.tests": "4.0.0-pre.5"
+    "com.unity.recorder.tests": "4.0.0"
+  },
+  "_upm": {
+    "changelog": "### Added\n### Changed\n### Fixed\n- Better handle error messages when using a Tagged Camera while the tag is missing from the project or not assigned to the camera.\n- Make sure to stop the AudioRenderer when all recordings are over.\n- Hide the Include Alpha checkbox for Movie Recorders in URP projects.\n- Make sure the Recorder Window uses error icons for errors that prevent the recording from starting.\n- When accumulation is activated, make sure all recorders check for errors."
   },
   "upmCi": {
-    "footprint": "667f2a9859b82dc6131c78162c1afacc84f80dca"
+    "footprint": "fa2235bcec48f1879679d2f5af4bb0ced0db0675"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.recorder.git",
     "type": "git",
-    "revision": "4bbecfc3cc7a5eb52efa8b35a4de4582559cd72e"
+    "revision": "efd575cd6c9198bba834abbbe32d6195afa94b6e"
   },
   "samples": [
     {

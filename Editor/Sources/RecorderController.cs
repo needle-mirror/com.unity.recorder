@@ -84,7 +84,7 @@ namespace UnityEditor.Recorder
 
                 m_Settings.ApplyGlobalSetting(recorderSetting);
 
-                if (recorderSetting.HasErrors())
+                if (recorderSetting.IsInvalid())
                 {
                     if (RecorderOptions.VerboseMode)
                         Debug.Log("Ignoring invalid recorder '" + recorderSetting.name + "'");

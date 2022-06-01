@@ -282,15 +282,45 @@ namespace UnityEditor.Recorder
             return false;
         }
 
-        internal override void  OnValidate()
+        internal override void OnValidate()
         {
             base.OnValidate();
             imageInputSettings.RecordTransparency = CaptureAlpha; // We need to sync the input data, when the UI changes the recorder one
         }
 
+        internal override bool HasWarnings()
+        {
+            var errors = new List<string>();
+            var warnings = new List<string>();
+            ValidateRecording(errors, warnings);
+            return base.HasWarnings() || warnings.Count > 0;
+        }
+
+        private void ValidateRecording(List<string> errors, List<string> warnings)
+        {
+            // No error detection here yet for image recorders
+        }
+
+        protected internal override bool HasErrors()
+        {
+            var errors = new List<string>();
+            var warnings = new List<string>();
+            ValidateRecording(errors, warnings);
+            return base.HasErrors() || errors.Count > 0;
+        }
+
+        protected internal override void GetErrors(List<string> errors)
+        {
+            base.GetErrors(errors);
+            var warnings = new List<string>();
+            ValidateRecording(errors, warnings);
+        }
+
         protected internal override void GetWarnings(List<string> warnings)
         {
             base.GetWarnings(warnings);
+            var errors = new List<string>();
+            ValidateRecording(errors, warnings);
             if (CanCaptureAlpha() && captureAlpha)
             {
 #if HDRP_AVAILABLE

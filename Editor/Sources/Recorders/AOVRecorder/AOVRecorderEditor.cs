@@ -98,7 +98,7 @@ namespace UnityEditor.Recorder
 
             DrawSeparator();
 #else
-            // Draw nothing, user will see errors (see AOVRecorderSettings.HasErrors) and an empty AOV GUI
+            // Draw nothing, user will see errors (see AOVRecorderSettings.IsInvalid) and an empty AOV GUI
 #endif
         }
     }

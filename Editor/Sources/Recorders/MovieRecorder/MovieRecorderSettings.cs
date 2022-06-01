@@ -232,12 +232,23 @@ namespace UnityEditor.Recorder
             var errors = new List<string>();
             var warnings = new List<string>();
             ValidateRecording(data, errors, warnings);
-            return base.HasWarnings() || warnings.Count > 0 || errors.Count > 0;
+            return base.HasWarnings() || warnings.Count > 0;
+        }
+
+        protected internal override void GetErrors(List<string> errors)
+        {
+            base.GetErrors(errors);
+            var warnings = new List<string>();
+            var data = GetRecordingContext();
+            ValidateRecording(data, errors, warnings);
         }
 
         protected internal override void GetWarnings(List<string> warnings)
         {
             base.GetWarnings(warnings);
+            var errors = new List<string>();
+            var data = GetRecordingContext();
+            ValidateRecording(data, errors, warnings);
             if (ImageInputSettings.SupportsTransparent && EncoderSettings.CanCaptureAlpha && captureAlpha)
             {
 #if HDRP_AVAILABLE
@@ -246,12 +257,16 @@ namespace UnityEditor.Recorder
             }
         }
 
-        protected internal override void GetErrors(List<string> errors)
+        protected internal override bool HasErrors()
         {
-            base.GetErrors(errors);
+            var data = GetRecordingContext();
+            var errors = new List<string>();
+            var warnings = new List<string>();
+            ValidateRecording(data, errors, warnings);
+            return base.HasErrors() || errors.Count > 0;
         }
 
-        internal override void  OnValidate()
+        internal override void OnValidate()
         {
             base.OnValidate();
             ImageInputSettings.RecordTransparency = CaptureAlpha; // We need to sync the input data, when the UI changes the recorder one

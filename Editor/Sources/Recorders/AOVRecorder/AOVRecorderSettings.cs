@@ -218,7 +218,7 @@ namespace UnityEditor.Recorder.AOV
 
 #endif
 
-        protected internal override bool HasErrors()
+        internal override bool IsInvalid()
         {
 #if HDRP_AVAILABLE
             // Is the selection supported?

@@ -763,27 +763,27 @@ namespace UnityEditor.Recorder
         {
             var info = RecordersInventory.GetRecorderInfo(recorderSettings.GetType());
 
-            var hasError = info == null;
+            var isInvalid = info == null;
 
-            var recorderItem = new RecorderItem(m_ControllerSettings, recorderSettings, hasError ? null : info.iconName);
+            var recorderItem = new RecorderItem(m_ControllerSettings, recorderSettings, isInvalid ? null : info.iconName);
             recorderItem.OnEnableStateChanged += enabled =>
             {
                 if (enabled)
                     m_RecordingListItem.selection = recorderItem;
             };
 
-            if (hasError)
-                recorderItem.state = RecorderItem.State.HasErrors;
+            if (isInvalid)
+                recorderItem.state = RecorderItem.State.Invalid;
 
             return recorderItem;
         }
 
         void CheckRecordersIncompatibility()
         {
-            var activeRecorders = m_ControllerSettings.RecorderSettings.Where(r => r.Enabled).ToArray();
+            var activeRecordersThatCanRun = m_ControllerSettings.RecorderSettings.Where(r => r.Enabled && !r.HasErrors()).ToArray();
 
-            if (HasDuplicateOutputNames(activeRecorders)) return;
-            HasDifferentResolutions(activeRecorders);
+            if (HasDuplicateOutputNames(activeRecordersThatCanRun)) return;
+            HasDifferentResolutions(activeRecordersThatCanRun);
 
             // Refresh the state of all items in the window
             foreach (var recorderItem in m_RecordingListItem.items)
@@ -796,9 +796,9 @@ namespace UnityEditor.Recorder
                 // Flag all the recorders that support accumulation with a warning (important to perform this after calling UpdateState on all items)
                 foreach (var recorderItem in m_RecordingListItem.items)
                 {
-                    if (recorderItem.settings.Enabled && recorderItem.settings is IAccumulation)
+                    if (recorderItem.settings.Enabled)
                     {
-                        recorderItem.state = RecorderItem.State.HasWarnings;
+                        recorderItem.state = RecorderItem.State.HasErrors;
                     }
                 }
                 return;
@@ -809,7 +809,7 @@ namespace UnityEditor.Recorder
                 m_State = State.Idle;
             }
 
-            if (activeRecorders.Length > 0)
+            if (activeRecordersThatCanRun.Length > 0)
             {
                 ShowMessageInStatusBar("Ready to start recording", MessageType.None);
             }
@@ -871,11 +871,11 @@ namespace UnityEditor.Recorder
             var enable = !ShouldDisableRecordSettings();
 
             m_AddNewRecordPanel.SetEnabled(enable);
-            m_ParametersControl.SetEnabled(enable && m_SelectedRecorderItem != null && m_SelectedRecorderItem.state != RecorderItem.State.HasErrors);
+            m_ParametersControl.SetEnabled(enable && m_SelectedRecorderItem != null && m_SelectedRecorderItem.state != RecorderItem.State.Invalid);
             m_RecordModeOptionsPanel.SetEnabled(enable);
             m_FrameRateOptionsPanel.SetEnabled(enable);
 
-            if (HaveActiveRecordings())
+            if (HaveActiveRecordingsThatCanRun())
             {
                 if (IsRecording())
                 {
@@ -1006,7 +1006,7 @@ namespace UnityEditor.Recorder
 
             if (m_SelectedRecorderItem != null)
             {
-                if (m_SelectedRecorderItem.state == RecorderItem.State.HasErrors)
+                if (m_SelectedRecorderItem.state == RecorderItem.State.Invalid)
                 {
                     EditorGUILayout.LabelField("This Recorder has errors and cannot record any data.");
                 }
@@ -1263,9 +1263,9 @@ namespace UnityEditor.Recorder
                 m_ControllerSettings.Save();
         }
 
-        bool HaveActiveRecordings()
+        bool HaveActiveRecordingsThatCanRun()
         {
-            return m_ControllerSettings.RecorderSettings.Any(r => r.Enabled);
+            return m_ControllerSettings.RecorderSettings.Any(r => r.Enabled && !r.HasErrors());
         }
 
         static void ShowMessageInStatusBar(string msg, MessageType messageType)
@@ -1299,13 +1299,19 @@ namespace UnityEditor.Recorder
 
             if (m_State == State.Error)
             {
-                if (!HaveActiveRecordings())
+                if (!HaveActiveRecordingsThatCanRun())
                 {
-                    ShowMessageInStatusBar("Unable to start recording because no recorder has been set.", MessageType.Warning);
+                    ShowMessageInStatusBar("Unable to start recording because no recorders are active and have no errors.", MessageType.Warning);
                 }
                 else
                 {
-                    ShowMessageInStatusBar("Unable to start recording. Please check the Console logs and Recorder Window for details.", MessageType.Error);
+                    var activeRecorders = m_ControllerSettings.RecorderSettings.Where(r => r.Enabled).ToArray();
+                    var thereAreWarnings = activeRecorders.Any(r => r.HasWarnings());
+                    var thereAreErrors = activeRecorders.Any(r => r.HasErrors());
+                    if (thereAreWarnings || thereAreErrors)
+                    {
+                        ShowMessageInStatusBar("Please check the recorders for warnings and errors.", MessageType.Warning);
+                    }
                 }
 
                 return;
@@ -1313,9 +1319,9 @@ namespace UnityEditor.Recorder
 
             if (m_State == State.Idle)
             {
-                if (!HaveActiveRecordings())
+                if (!HaveActiveRecordingsThatCanRun())
                 {
-                    ShowMessageInStatusBar("No active recorder", MessageType.Info);
+                    ShowMessageInStatusBar("No active recorder with no errors.", MessageType.Info);
                 }
                 return;
             }

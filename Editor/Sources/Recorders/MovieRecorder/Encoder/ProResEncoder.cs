@@ -179,10 +179,15 @@ namespace UnityEditor.Recorder.Encoder
             if (encoderPtr == IntPtr.Zero)
                 return; // Error will have been triggered earlier
 
-            // Recorder clips may send empty buffers, in which case success will still be true.
-            bool success = ProResWrapper.AddAudioSamples(encoderPtr, bytes.ToArray(), bytes.Count());
-            if (!success)
-                Debug.LogError("Failed to add audio samples to ProRes encoder");
+            unsafe
+            {
+                // Recorder clips may send empty buffers, in which case success will still be true.
+                var success =
+                    ProResWrapper.AddAudioSamples(encoderPtr, (float*)bytes.GetUnsafeReadOnlyPtr(), bytes.Count());
+
+                if (!success)
+                    Debug.LogError("Failed to add audio samples to ProRes encoder");
+            }
         }
 
         void IDisposable.Dispose()

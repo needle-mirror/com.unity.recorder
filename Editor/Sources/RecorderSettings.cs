@@ -317,23 +317,28 @@ namespace UnityEditor.Recorder
         {
         }
 
-        // Errors mean that the inspector will be blank so don't use them yet for problems that can be fixed in the inspector
-        protected internal virtual bool HasErrors()
+        internal virtual bool IsInvalid()
         {
             return false;
         }
 
-        // For now both errors and warnings make the recording invalid
-        internal virtual bool HasWarnings()
+        protected internal virtual bool HasErrors()
         {
             var errors = new List<string>();
-            var warnings = new List<string>();
-#pragma warning disable 618
-            ValidityCheck(warnings);
-#pragma warning restore 618
             GetErrors(errors);
+            return errors.Count > 0;
+        }
+
+        internal virtual bool HasWarnings()
+        {
+            var warnings = new List<string>();
+            var oldErrors = new List<string>();
+#pragma warning disable 618
+            // In the old API, errors were meant to be handled as non-blocking warnings
+            ValidityCheck(oldErrors);
+#pragma warning restore 618
             GetWarnings(warnings);
-            return errors.Count > 0 || warnings.Count > 0;
+            return oldErrors.Count > 0 || warnings.Count > 0;
         }
 
         /// <summary>

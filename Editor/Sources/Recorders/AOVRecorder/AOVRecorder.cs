@@ -26,14 +26,14 @@ namespace UnityEditor.Recorder
         {
 #if !HDRP_AVAILABLE
             // This can happen with an AOV Recorder Clip in a project after removing HDRP
-            return settings.HasErrors();
+            return settings.IsInvalid();
 #else
             if (!base.BeginRecording(session))
             {
                 return false;
             }
 
-            if (settings.HasErrors())
+            if (settings.IsInvalid())
             {
                 Debug.LogError($"The '{settings.name}' AOV Recorder has errors and cannot record any data.");
                 return false;
@@ -58,7 +58,7 @@ namespace UnityEditor.Recorder
 
         protected internal override void RecordFrame(RecordingSession session)
         {
-            if (settings.HasErrors())
+            if (settings.IsInvalid())
                 return;
 
             if (m_Inputs.Count != 1)

@@ -4,6 +4,16 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2022-06-01
+### Added
+### Changed
+### Fixed
+- Better handle error messages when using a Tagged Camera while the tag is missing from the project or not assigned to the camera.
+- Make sure to stop the AudioRenderer when all recordings are over.
+- Hide the Include Alpha checkbox for Movie Recorders in URP projects.
+- Make sure the Recorder Window uses error icons for errors that prevent the recording from starting.
+- When accumulation is activated, make sure all recorders check for errors.
+
 ## [4.0.0-pre.5] - 2022-04-20
 ### Added
 - Movie Recorder Encoder sample showing how to integrate a custom command line encoder such as FFmpeg.
@@ -36,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Get the actual count of accumulated frames resulting from the shutter profile convolution.
 - Prevent users from recording in odd resolutions with ProRes packed pixel format codecs (e.g. 422HQ).
 - Movie Recorder no longer uses the Sync GPU readback code path.
+- Use error icons in the Recorder Window for errors that prevent the recording from starting.
 
 ### Fixed
 - Improved performance for ProRes encoding.

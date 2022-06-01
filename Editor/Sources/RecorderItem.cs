@@ -60,17 +60,25 @@ namespace UnityEditor.Recorder
             None,
             Normal,
             HasWarnings,
-            HasErrors
+            HasErrors,
+            Invalid
         }
 
         State m_State = State.None;
 
-        public void UpdateState(bool checkForWarnings = true)
+        public void UpdateState(bool checkForWarnings = true, bool checkForErrors = true)
         {
             try
             {
                 // This detects errors and warnings from the settings, not from the context of the Recorder Window itself (e.g. accumulation problems)
-                if (settings == null || settings.HasErrors())
+                if (settings == null || settings.IsInvalid())
+                {
+                    state = State.Invalid;
+                    return;
+                }
+
+                // If there are both errors and warnings, errors take precedence
+                if (checkForErrors && settings.HasErrors())
                 {
                     state = State.HasErrors;
                     return;
@@ -110,6 +118,10 @@ namespace UnityEditor.Recorder
                     case State.HasErrors:
                         RemoveFromClassList("hasErrors");
                         break;
+
+                    case State.Invalid:
+                        RemoveFromClassList("isInvalid");
+                        break;
                 }
 
                 switch (value)
@@ -121,6 +133,11 @@ namespace UnityEditor.Recorder
 
                     case State.HasErrors:
                         AddToClassList("hasErrors");
+                        m_Icon = StatusBarHelper.errorIcon;
+                        break;
+
+                    case State.Invalid:
+                        AddToClassList("isInvalid");
                         m_Icon = StatusBarHelper.errorIcon;
                         break;
 
@@ -182,7 +199,7 @@ namespace UnityEditor.Recorder
             if (m_RecorderIcon == null)
                 m_RecorderIcon = LoadIcon("customrecorder_16");
 
-            UpdateState(false);
+            UpdateState(false, false);
 
             var iconContainer = new IMGUIContainer(() => // UIElement Image doesn't support tint yet. Use IMGUI instead.
             {

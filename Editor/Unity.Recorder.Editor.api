@@ -148,7 +148,9 @@ namespace UnityEditor.Recorder
         public UnityEditor.Recorder.ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat { get; set; }
         public ImageRecorderSettings() {}
         public virtual AccumulationSettings GetAccumulationSettings();
+        protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
         protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
+        protected virtual bool HasErrors();
         public virtual bool IsAccumulationSupported();
         public enum ColorSpaceType
         {
@@ -204,6 +206,7 @@ namespace UnityEditor.Recorder
         public virtual AccumulationSettings GetAccumulationSettings();
         protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
         protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
+        protected virtual bool HasErrors();
         public virtual bool IsAccumulationSupported();
         [System.Obsolete(@"Please use the EncoderSettings API to access the encoding quality of each Encoder.")] public enum VideoEncodingQuality
         {
@@ -429,7 +432,6 @@ namespace UnityEditor.Recorder.AOV
         public UnityEditor.Recorder.ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat { get; set; }
         public AOVRecorderSettings() {}
         protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
-        protected virtual bool HasErrors();
     }
 
     public enum AOVType

@@ -282,22 +282,13 @@ namespace UnityEditor.Recorder.Input
                 case ImageSource.TaggedCamera:
                 {
                     var tag = ((CameraInputSettings)settings).CameraTag;
+                    var objs = GameObject.FindGameObjectsWithTag(tag);
 
-                    try
-                    {
-                        var objs = GameObject.FindGameObjectsWithTag(tag);
+                    var cams = objs.Select(obj => obj.GetComponent<Camera>()).Where(c => c != null);
+                    if (cams.Count() > 1)
+                        Debug.LogWarning("More than one camera has the requested target tag '" + tag + "'");
 
-                        var cams = objs.Select(obj => obj.GetComponent<Camera>()).Where(c => c != null);
-                        if (cams.Count() > 1)
-                            Debug.LogWarning("More than one camera has the requested target tag '" + tag + "'");
-
-                        TargetCamera = cams.FirstOrDefault();
-                    }
-                    catch (UnityException)
-                    {
-                        Debug.LogWarning("No camera has the requested target tag '" + tag + "'");
-                        TargetCamera = null;
-                    }
+                    TargetCamera = cams.FirstOrDefault();
 
                     break;
                 }

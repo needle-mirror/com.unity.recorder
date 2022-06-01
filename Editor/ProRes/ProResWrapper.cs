@@ -29,7 +29,7 @@ internal struct ProResWrapper
     [DllImport(ProResWrapperInfo.LibraryPath)]
     public static extern unsafe bool AddVideoFrame(IntPtr pEncoder, void* data, long tickCount, int rateNumerator, int rateDenominator);
     [DllImport(ProResWrapperInfo.LibraryPath)]
-    public static extern bool AddAudioSamples(IntPtr pEncoder, float[] samples, int numSamples);
+    public static extern unsafe bool AddAudioSamples(IntPtr pEncoder, float* samples, int numSamples);
     [DllImport(ProResWrapperInfo.LibraryPath)]
     public static extern bool Close(IntPtr pEncoder);
 }

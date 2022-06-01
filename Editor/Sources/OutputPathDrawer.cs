@@ -55,46 +55,16 @@ namespace UnityEditor.Recorder
             var fullPath = OutputPath.GetFullPath((OutputPath.Root)m_RootProperty.intValue, m_LeafProperty.stringValue,
                 m_AbsolutePathProperty.stringValue);
 
-            if (!target.forceAssetsFolder)
+            var tooltip = "Select the output location through your file browser";
+            var folder = fullPath;
+
+            if (target.forceAssetsFolder)
             {
-                if (GUI.Button(btnRect, new GUIContent("...", "Select the output location through your file browser")))
-                {
-                    var newPath = EditorUtility.OpenFolderPanel("Select output location", fullPath, "");
-                    if (!string.IsNullOrEmpty(newPath))
-                    {
-                        var newValue = OutputPath.FromPath(newPath);
-                        m_RootProperty.intValue = (int)newValue.root;
-                        if (newValue.root == OutputPath.Root.Absolute)
-                            m_AbsolutePathProperty.stringValue = newValue.leaf;
-                        else
-                            m_LeafProperty.stringValue = newValue.leaf;
-                    }
-                }
+                tooltip = "Select the output location in Unity Assets through your file browser";
+                folder = Application.dataPath;
             }
-            else
-            {
-                if (GUI.Button(btnRect, new GUIContent("...", "Select the output location in Unity Assets through your file browser")))
-                {
-                    var newPath = EditorUtility.OpenFolderPanel("Select output location",
-                        Application.dataPath, "");
-                    if (!string.IsNullOrEmpty(newPath))
-                    {
-                        if (!newPath.Contains(Application.dataPath))
-                            EditorUtility.DisplayDialog("Invalid Path",
-                                "Selected path " + newPath + " must be in the Unity Assets directory",
-                                "Ok");
-                        else
-                        {
-                            var newValue = OutputPath.FromPath(newPath);
-                            m_RootProperty.intValue = (int)newValue.root;
-                            if (newValue.root == OutputPath.Root.Absolute)
-                                m_AbsolutePathProperty.stringValue = newValue.leaf;
-                            else
-                                m_LeafProperty.stringValue = newValue.leaf;
-                        }
-                    }
-                }
-            }
+
+            var folderPanelBtnClicked = GUI.Button(btnRect, new GUIContent("...", tooltip));
 
             if (pathType == OutputPath.Root.Absolute && m_AbsolutePathProperty.stringValue == "")
             {
@@ -104,6 +74,33 @@ namespace UnityEditor.Recorder
 
             EditorGUI.indentLevel = indent;
             EditorGUI.EndProperty();
+
+            if (folderPanelBtnClicked)
+            {
+                var newPath = EditorUtility.OpenFolderPanel("Select output location", folder, "");
+                if (!string.IsNullOrEmpty(newPath))
+                {
+                    if (target.forceAssetsFolder && !newPath.Contains(Application.dataPath))
+                        EditorUtility.DisplayDialog("Invalid Path",
+                            "Selected path " + newPath + " must be in the Unity Assets directory",
+                            "Ok");
+                    else
+                    {
+                        var newValue = OutputPath.FromPath(newPath);
+                        m_RootProperty.intValue = (int)newValue.root;
+                        if (newValue.root == OutputPath.Root.Absolute)
+                            m_AbsolutePathProperty.stringValue = newValue.leaf;
+                        else
+                            m_LeafProperty.stringValue = newValue.leaf;
+                    }
+                }
+
+                m_RootProperty.serializedObject.ApplyModifiedProperties();
+                m_AbsolutePathProperty.serializedObject.ApplyModifiedProperties();
+                m_LeafProperty.serializedObject.ApplyModifiedProperties();
+
+                GUIUtility.ExitGUI();
+            }
         }
     }
 }
