@@ -74,6 +74,7 @@ namespace UnityEditor.Recorder
     public abstract class RecorderSettings : ScriptableObject, ISerializationCallbackReceiver
     {
         private static string s_OutputFileErrorMessage = "Recorder output file cannot be empty";
+
         /// <summary>
         /// Stores the path this Recorder will use to generate the output file.
         /// It can be either an absolute or a relative path.
@@ -236,10 +237,10 @@ namespace UnityEditor.Recorder
         {
             if (InputsSettings != null)
             {
-                foreach (var i in InputsSettings)
+                foreach (var inputSetting in InputsSettings)
                 {
                     var inputErrors = new List<string>();
-                    i.CheckForErrors(inputErrors);
+                    inputSetting.CheckForErrors(inputErrors);
                     errors.AddRange(inputErrors);
                 }
             }
@@ -278,11 +279,28 @@ namespace UnityEditor.Recorder
         {
             if (InputsSettings != null)
             {
-                foreach (var i in InputsSettings)
+                foreach (var inputSetting in InputsSettings)
                 {
                     var inputWarnings = new List<string>();
-                    i.CheckForWarnings(inputWarnings);
+                    inputSetting.CheckForWarnings(inputWarnings);
                     warnings.AddRange(inputWarnings);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the Recorder has any info messages.
+        /// </summary>
+        /// <param name="info">List of info encountered.</param>
+        protected internal virtual void GetInfoMessages(List<string> info)
+        {
+            if (InputsSettings != null)
+            {
+                foreach (var inputSetting in InputsSettings)
+                {
+                    var infoMessages = new List<string>();
+                    inputSetting.CheckForInfoMessages(infoMessages);
+                    info.AddRange(infoMessages);
                 }
             }
         }

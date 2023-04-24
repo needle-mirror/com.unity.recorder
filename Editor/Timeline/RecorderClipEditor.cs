@@ -70,10 +70,7 @@ namespace UnityEditor.Recorder.Timeline
 
                             if (settings != null)
                             {
-                                var presetReceiver = CreateInstance<PresetHelper.PresetReceiver>();
-                                presetReceiver.Init(settings, Repaint);
-
-                                PresetSelector.ShowSelector(settings, null, true, presetReceiver);
+                                PresetHelper.ShowPresetSelectorWrapper(settings, null, Repaint);
                             }
                         }
                     }

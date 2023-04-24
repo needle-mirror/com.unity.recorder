@@ -2,6 +2,8 @@
 
 This page lists some known issues and limitations that you might experience with the Recorder. It also gives basic instructions to help you work around them.
 
+>**Note:** The AOV Image Sequence recorder included in this version of the Recorder package is marked for deprecation and will be removed in Recorder 5.0.0. 
+
 #### Recording slowdown with concurrent Movie Recorders
 
 **Limitation:** The Unity Editor playback process might substantially slow down if you perform concurrent recordings with multiple Movie Recorders, particularly with large image resolutions (full HD or higher).
@@ -19,6 +21,10 @@ This page lists some known issues and limitations that you might experience with
 **Limitation:** The Recorder currently supports only the recording of samples from the Unity built-in audio engine. As such, it cannot record audio from third-party audio engines such as FMOD Studio or Wwise.
 
 **Workaround:** For a movie, you can record the third-party audio output in WAV format through another application, reimport this recorded file into the Unity Timeline, and then use the Recorder to create the final movie with audio. Alternatively, you can use any video editing software to recompose audio and video.
+
+**Limitation:** Only Mono or Stereo audio recording is supported. If the project uses more than two audio channels, Recorder Clips that include audio are skipped during Play mode, and, in the Recorder window, Recorders that include audio cannot be started.
+
+**Workaround:** In **Project Settings** > **Audio** > **Default Speaker Mode**, select **Mono** or **Stereo** depending on what the encoder specified for the recording supports.
 
 #### MP4 and ProRes encoding not supported on Linux
 
@@ -63,6 +69,35 @@ The Recorder doesn't fully support 360 View recording. Here is a list of known i
 
 * If you record a 360 View in projects that use the High Definition Render Pipeline (HDRP), the rendered cube map might have artefacts that make its boundaries visible. One way to work around this issue would be to disable post-process effects such as Shadows, Bloom, or Volumetric Fogs.
 
-* If you record a 360 View through a Physical Camera, the rendered image is not equirectangular, which makes the output media unusable. To work around the issue, use a regular Camera for the recording.
-
 * The Recorder doesn't support stereoscopic recording in projects that use any Scriptable Render Pipelines (SRPs). The **Stereo Separation** property has no effect on the recorded views, which makes the rendering identical for both eyes.
+
+#### Overexposed frames when accumulating path tracing
+
+**Known issue:** If a scene contains an Exposure post-process in an automatic mode, during accumulation the exposure is re-evaluated on every sub-frame. If Adaptation is set to Progressive, and path tracing is enabled, the added time to change the exposure can result in images that are incorrect (too bright/overexposed) because the first sub-frames are noisy.
+
+**Workaround:**
+1. Depending on where Exposure is set, go to the [HDRP Global Settings window](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Default-Settings-Window.html) or the Volume component override in you scene.
+2. Under Volume Profiles (or Volume), expand **Exposure**.
+3. Under Adaptation, set **Mode** to **Fixed**.
+
+#### Path-tracing limitations in HDRP apply to Recorder Accumulation
+
+Limitations to path tracing in HDRP also apply to path tracing in Accumulation. See Path tracing [limitations](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Ray-Tracing-Path-Tracing.html%23limitations).
+
+#### Poor image quality if motion blur is applied in HDRP and Recorder Accumulation
+
+**Limitation:** The HDRP motion-blur post-process is applied on the final image, so it is applied on top of accumulated motion blur. This creates undesirable results.
+
+**Workaround:** Disable motion blur in HDRP before recording motion blur using Accumulation.
+
+#### Path-tracing quality problems when capturing motion blur
+
+**Limitation:** Motion-blur accumulation settings can negatively affect path-tracing accumulation. For example, a short Shutter Interval reduces the number of path-tracing samples accumulated.
+
+**Workaround:** Disable [path-tracing overrides on volumes](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@@latest/index.html?subfolder=/manual/Ray-Tracing-Path-Tracing.html%23adding-path-tracing-to-a-scene) in your scene.
+
+#### Poor image quality if anti-aliasing applied in HDRP and Recorder Accumulation
+
+**Limitation:** Recording accumulation while anti-aliasing is enabled in HDRP may have unintended effects on image quality.
+
+**Workaround:** Disable anti-aliasing in HDRP before recording with Accumulation. Enable **Anti-aliasing** in Accumulation instead.

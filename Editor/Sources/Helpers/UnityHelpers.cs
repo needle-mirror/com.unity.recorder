@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEditor.Recorder.Encoder;
@@ -57,7 +59,7 @@ namespace UnityEditor.Recorder
                 SetGameObjectVisibility(rc.gameObject, value);
             }
 
-            var rcs = Object.FindObjectsOfType<RecorderComponent>();
+            var rcs = FindObjectsHelper.FindObjectsByTypeWrapper<RecorderComponent>();
             foreach (var rc in rcs)
             {
                 SetGameObjectVisibility(rc.gameObject, value);
@@ -282,6 +284,113 @@ namespace UnityEditor.Recorder
 
             // We flip if the user's intention is different from the result, and take into account the Y axis convention of the encoder
             return willBeFlipped != wantFlippedTexture;
+        }
+
+        /// <summary>
+        /// Whether the current number of audio channels is supported by the recorder.
+        /// </summary>
+        /// <returns>bool</returns>
+        internal static bool IsNumAudioChannelsSupported()
+        {
+            return AudioSettings.speakerMode is AudioSpeakerMode.Mono or AudioSpeakerMode.Stereo;
+        }
+
+        /// <summary>
+        /// Returns the number of audio channels of the project.
+        /// </summary>
+        /// <returns>The number of audio channels of the project.</returns>
+        /// <exception cref="InvalidEnumArgumentException">Thrown if the speaker mode is not supported.</exception>
+        internal static uint GetNumAudioChannels()
+        {
+            return GetNumAudioChannels(AudioSettings.speakerMode);
+        }
+
+        /// <summary>
+        /// Returns the number of audio channels for a given speaker mode.
+        /// </summary>
+        /// <returns>The number of audio channels of the project.</returns>
+        /// <exception cref="InvalidEnumArgumentException">Thrown if the speaker mode is not supported</exception>
+        internal static uint GetNumAudioChannels(AudioSpeakerMode mode)
+        {
+            switch (mode)
+            {
+                case AudioSpeakerMode.Mono:
+                    return 1;
+                case AudioSpeakerMode.Prologic: // not supported, but recognized.
+                case AudioSpeakerMode.Stereo:
+                    return 2;
+                case AudioSpeakerMode.Quad:
+                    return 4;
+                case AudioSpeakerMode.Surround:
+                    return 5;
+                case AudioSpeakerMode.Mode5point1:
+                    return 6;
+                case AudioSpeakerMode.Mode7point1:
+                    return 8;
+                default:
+                    throw new InvalidEnumArgumentException($"Unsupported speaker mode '{AudioSettings.speakerMode}'");
+            }
+        }
+
+        /// <summary>
+        /// Returns the name of a given speaker mode. If no speaker mode is provided, the project's speaker mode
+        /// is probed.
+        /// </summary>
+        /// <returns>The number of audio channels of the project.</returns>
+        /// <exception cref="InvalidEnumArgumentException">Thrown if the speaker mode is not supported</exception>
+        internal static string GetSpeakerModeName(AudioSpeakerMode mode)
+        {
+            switch (mode)
+            {
+                case AudioSpeakerMode.Mono:
+                    return "Mono";
+                case AudioSpeakerMode.Prologic:
+                    return "Prologic DTS";
+                case AudioSpeakerMode.Stereo:
+                    return "Stereo";
+                case AudioSpeakerMode.Quad:
+                    return "Quad";
+                case AudioSpeakerMode.Surround:
+                    return "Surround";
+                case AudioSpeakerMode.Mode5point1:
+                    return "Surround 5.1";
+                case AudioSpeakerMode.Mode7point1:
+                    return "Surround 7.1";
+                default:
+                    throw new InvalidEnumArgumentException($"Unsupported speaker mode '{AudioSettings.speakerMode}'");
+            }
+        }
+
+        /// <summary>
+        /// Returns error message that is raised when the current default speaker mode is not supported depending on
+        /// current encoder and current speaker mode.
+        /// </summary>
+        ///<param name="encoderName">Current encoder.</param>
+        /// ///<param name="supportedSpeakerModes">Speaker modes supported by the encoder.</param>
+        /// <returns>Error message.</returns>
+        internal static string GetUnsupportedSpeakerModeErrorMessage(string encoderName, AudioSpeakerMode[] supportedSpeakerModes)
+        {
+            var defaultSpeakerModeName = GetSpeakerModeName(AudioSettings.speakerMode);
+            var speakerModesMsg = AudioSpeakerModesToString(supportedSpeakerModes);
+            return
+                $"The {encoderName} only supports {speakerModesMsg} audio recording. The Default Speaker Mode is {defaultSpeakerModeName}.";
+        }
+
+        /// <summary>
+        /// Returns an array of AudioSpeakerModes in a human readable string (ex: "speakerMode1, speakerMode2 and speakerMode3")
+        /// </summary>
+        /// ///<param name="speakerModes">An array of speaker modes</param>
+        /// <returns>SpeakerModes separated by commas and 'and' for the last one.</returns>
+        internal static string AudioSpeakerModesToString(AudioSpeakerMode[] speakerModes)
+        {
+            return string.Join(" ", speakerModes.Select((v, i) =>
+            {
+                if (i < speakerModes.Length - 2)
+                    return $"{GetSpeakerModeName(v)},";
+                if (i < speakerModes.Length - 1)
+                    return $"{GetSpeakerModeName(v)} and";
+                return GetSpeakerModeName(v);
+            }));
         }
     }
 }

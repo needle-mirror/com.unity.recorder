@@ -6,7 +6,9 @@ using UnityEngine;
 
 namespace UnityEditor.Recorder
 {
+#pragma warning disable 618
     [CustomEditor(typeof(AOVRecorderSettings))]
+#pragma warning restore 618
     class AOVRecorderEditor : RecorderEditor
     {
         SerializedProperty m_OutputFormat;
@@ -19,7 +21,7 @@ namespace UnityEditor.Recorder
         {
             internal static readonly GUIContent FormatLabel = new GUIContent("Format");
             internal static readonly GUIContent AOVLabel = new GUIContent("Aov to Export", "The AOV render pass to record.");
-            internal static readonly GUIContent AOVCLabel = new GUIContent("Compression", "The data compression method to apply when using the EXR format.");
+            internal static readonly GUIContent AOVCompressionLabel = new GUIContent("Compression", "The data compression method to apply when using the EXR format.");
             internal static readonly GUIContent ColorSpace = new GUIContent("Color Space", "The color space (gamma curve, gamut) to use in the output images.\n\nIf you select an option to get unclamped values, you must:\n- Use High Definition Render Pipeline (HDRP).\n- Disable any Tonemapping in your Scene.\n- Disable Dithering on the selected Camera.");
             internal static readonly GUIContent JpegQualityLabel = new GUIContent("Quality", "The JPEG encoding quality level.");
         }
@@ -41,7 +43,10 @@ namespace UnityEditor.Recorder
         protected override void FileTypeAndFormatGUI()
         {
             EditorGUILayout.PropertyField(m_OutputFormat, Styles.FormatLabel);
+#pragma warning disable 618
             var imageSettings = (AOVRecorderSettings)target;
+#pragma warning restore 618
+
             string[] list_of_colorspaces = new[] {"sRGB, sRGB", "Linear, sRGB (unclamped)"};
 
             if (imageSettings.CanCaptureHDRFrames())
@@ -60,7 +65,7 @@ namespace UnityEditor.Recorder
             if ((ImageRecorderSettings.ImageRecorderOutputFormat)m_OutputFormat.enumValueIndex ==
                 ImageRecorderSettings.ImageRecorderOutputFormat.EXR)
             {
-                EditorGUILayout.PropertyField(m_EXRCompression, Styles.AOVCLabel);
+                EditorGUILayout.PropertyField(m_EXRCompression, Styles.AOVCompressionLabel);
             }
             if ((ImageRecorderSettings.ImageRecorderOutputFormat)m_OutputFormat.enumValueIndex ==
                 ImageRecorderSettings.ImageRecorderOutputFormat.JPEG)
@@ -76,7 +81,10 @@ namespace UnityEditor.Recorder
 
             // This is the list of items in the GUI, but it does not necessarily include all elements of the AOVType enum.
             var aovTypesSubset = AOVCameraAOVRequestAPIInput.m_Aovs.Keys.Select(i => i.ToString()).ToArray();
+
+#pragma warning disable 618
             AOVType selectedAOV = (AOVType)m_AOVSelection.intValue; // we load enum values not GUI dropdown values
+#pragma warning restore 618
 
             // What is the index of selectedAOV in aovTypesSubset?
             var selectedAOVIndexInSubset = AOVCameraAOVRequestAPIInput.m_Aovs.Keys.ToList().FindIndex(k => k == selectedAOV);

@@ -188,8 +188,13 @@ namespace UnityEditor.Recorder
                     EditorGUILayout.HelpBox(e, MessageType.Warning);
             }
 
+            var infoMessages = new List<string>();
             var warnings = new List<string>();
             var errors = new List<string>();
+
+            targetSettings.GetInfoMessages(infoMessages);
+            foreach (var i in infoMessages)
+                EditorGUILayout.HelpBox(i, MessageType.Info);
 
             targetSettings.GetWarnings(warnings);
             foreach (var w in warnings)

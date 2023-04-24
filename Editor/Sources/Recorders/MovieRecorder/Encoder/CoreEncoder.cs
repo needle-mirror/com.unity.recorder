@@ -54,7 +54,7 @@ namespace UnityEditor.Recorder.Encoder
                             height = (uint)ctx.height,
                             includeAlpha = ctx.doCaptureAlpha,
                             bitRateMode = VideoBitrateMode.High, // so that audio encoder uses high bitrate
-                            targetBitRate = coreSettings.TargetBitRateBitsPerSecond  // H.264 expects bps,
+                            targetBitRate = coreSettings.TargetBitRateBitsPerSecond  // H.264 expects bps
                         };
                         break;
                     case CoreEncoderSettings.OutputCodec.WEBM:
@@ -71,7 +71,11 @@ namespace UnityEditor.Recorder.Encoder
                             height = (uint)ctx.height,
                             includeAlpha = ctx.doCaptureAlpha,
                             bitRateMode = VideoBitrateMode.High, // so that audio encoder uses high bitrate
+#if UNITY_2022_2_OR_NEWER
+                            targetBitRate = coreSettings.TargetBitRateBitsPerSecond // VP8 expects bps
+#else
                             targetBitRate = coreSettings.TargetBitRateKiloBitsPerSecond // VP8 expects kbps
+#endif
                         };
                         break;
                     default:
@@ -95,7 +99,7 @@ namespace UnityEditor.Recorder.Encoder
             {
                 audioAttributes = new AudioTrackAttributes()
                 {
-                    channelCount = (ushort)(AudioSettings.speakerMode == AudioSpeakerMode.Mono ? 1 : 2),
+                    channelCount = (ushort)UnityHelpers.GetNumAudioChannels(),
                     sampleRate = new MediaRational(AudioSettings.outputSampleRate),
                     language = ""
                 };

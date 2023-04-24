@@ -9,8 +9,11 @@ using UnityEngine.Profiling;
 
 namespace UnityEditor.Recorder
 {
+#pragma warning disable 618
     class AOVRecorder : BaseTextureRecorder<AOVRecorderSettings>
     {
+#pragma warning restore 618
+
         Queue<string> m_PathQueue = new Queue<string>();
         protected override TextureFormat ReadbackTextureFormat
         {
@@ -40,7 +43,9 @@ namespace UnityEditor.Recorder
             }
 
             // Did the user request a vertically flipped image? This is not supported.
+#pragma warning disable 618
             var input = settings.InputsSettings.First() as AOVCameraInputSettings;
+#pragma warning restore 618
             if (input != null && input.FlipFinalOutput)
             {
                 Debug.LogWarning($"The '{settings.name}' AOV Recorder can't vertically flip the image as requested. This option is not supported in AOV recording context.");

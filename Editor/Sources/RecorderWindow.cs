@@ -39,6 +39,7 @@ namespace UnityEditor.Recorder
         private static string s_PackageShortVersionNumber = "1.0";
         private static ListRequest s_Request;
         private static bool s_NeedToResetView = false;
+        private static bool s_ShouldMarkDirtyAndSaveAsset;
 
 
         private static bool HasFocus()
@@ -1042,12 +1043,13 @@ namespace UnityEditor.Recorder
 
                             if (settings != null)
                             {
-                                var presetReceiver = CreateInstance<PresetHelper.PresetReceiver>();
-                                presetReceiver.Init(settings, Repaint);
-
-                                PresetSelector.ShowSelector(settings, null, true, presetReceiver);
+                                PresetHelper.ShowPresetSelectorWrapper(settings, null, Repaint, () =>
+                                {
+                                    s_ShouldMarkDirtyAndSaveAsset = true;
+                                });
                             }
                         }
+
                         EditorGUILayout.EndHorizontal();
                         EditorGUILayout.Separator();
 
@@ -1059,8 +1061,9 @@ namespace UnityEditor.Recorder
                         editor.OnInspectorGUI();
                         RecorderEditor.FromRecorderWindow = prevValue;
 
-                        if (EditorGUI.EndChangeCheck())
+                        if (EditorGUI.EndChangeCheck() || s_ShouldMarkDirtyAndSaveAsset)
                         {
+                            s_ShouldMarkDirtyAndSaveAsset = false;
                             m_ControllerSettings.Save();
                             m_SelectedRecorderItem.UpdateState();
                             UIElementHelper.SetDirty(m_RecorderSettingPanel);
@@ -1128,17 +1131,6 @@ namespace UnityEditor.Recorder
             }
 
             menu.ShowAsContext();
-        }
-
-        void OnRecorderSettingPresetClicked()
-        {
-            if (m_SelectedRecorderItem != null && m_SelectedRecorderItem.settings != null)
-            {
-                var presetReceiver = CreateInstance<PresetHelper.PresetReceiver>();
-                presetReceiver.Init(m_SelectedRecorderItem.settings, Repaint, () => m_ControllerSettings.Save());
-
-                PresetSelector.ShowSelector(m_SelectedRecorderItem.settings, null, true, presetReceiver);
-            }
         }
 
         void OnDestroy()

@@ -1,5 +1,7 @@
 These properties appear when you set **Source** to **Targeted Camera**.
 
+>**Note:** If the Output Resolution and/or Aspect Ratio in the Recorder is different than the Game view resolution, the Recorder switches the Game view to the Recorder's resolution before starting the recording. After the recording ends, the Game view does not automatically revert to its previous resolution.
+
 ![](Images/CaptureOptionsTargetedCamera.png)
 
 |Property||Function|

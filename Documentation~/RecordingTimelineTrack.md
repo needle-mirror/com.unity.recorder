@@ -12,6 +12,10 @@ You can use multiple Recorder Clips in the same Recorder Track to record data at
 
 To record multiple types of data at the same time, you must use multiple Recorder Tracks.
 
+>**Notes:**
+>* Only Mono or Stereo audio recording is supported. If a non-supported speaker mode is selected in **Project Settings** > **Audio** > **Default Speaker Mode**, Recorder Clips that include audio are skipped in Play mode.  
+>* During Play mode, while the play head is over a Recorder Clip that records audio, the audio signal is sent to the Recorder, not to your system's audio output.
+
 ## Setting up a Recorder Clip
 
 To set up a recording session in a Timeline instance:

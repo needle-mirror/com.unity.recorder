@@ -90,7 +90,7 @@ namespace UnityEditor.Recorder
             var closewriter = _binwriter;
             _binwriter = null;
             int subformat = 3; // float
-            int numchannels = AudioSettings.speakerMode == AudioSpeakerMode.Mono ? 1 : 2;
+            uint numchannels = UnityHelpers.GetNumAudioChannels();
             int numbits = 32;
             int samplerate = AudioSettings.outputSampleRate;
 

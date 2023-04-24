@@ -216,8 +216,10 @@ namespace UnityEditor.Recorder
             public string color_space;
             public string aov;
 
+#pragma warning disable 618
             public static AOVImageRecorderInfo FromRecorder(AOVRecorderSettings r)
             {
+#pragma warning restore 618
                 var ret = new AOVImageRecorderInfo()
                 {
                     type = RecordersInventory.GetRecorderInfo(r.GetType()).recorderType.FullName,
@@ -478,8 +480,10 @@ namespace UnityEditor.Recorder
                     case MovieRecorderSettings r:
                         movie.Add(MovieRecorderInfo.FromRecorder(r));
                         break;
+#pragma warning disable 618
                     case AOVRecorderSettings r:
                         aov.Add(AOVImageRecorderInfo.FromRecorder(r));
+#pragma warning restore 618
                         break;
                     default:
                         var ri = new RecorderInfo();

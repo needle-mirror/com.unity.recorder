@@ -86,6 +86,8 @@ namespace UnityEditor.Recorder.Encoder
         /// <inheritdoc/>
         bool IEncoderSettings.CanCaptureAudio => true;
 
+        internal readonly AudioSpeakerMode[] kSupportedSpeakerModes = new AudioSpeakerMode[] { AudioSpeakerMode.Stereo};
+
         /// <summary>
         /// Indicates whether the requested ProRes codec format can encode an alpha channel or not.
         /// </summary>
@@ -124,6 +126,10 @@ namespace UnityEditor.Recorder.Encoder
                 if (ctx.height % 2 != 0 || ctx.width % 2 != 0)
                     errors.Add($"The {Format} format does not support odd values in resolution: {ctx.height}x{ctx.width}");
             }
+
+            // https://jira.unity3d.com/projects/REC/issues/REC-1128
+            if (ctx.doCaptureAudio && AudioSettings.speakerMode is not AudioSpeakerMode.Stereo)
+                errors.Add(UnityHelpers.GetUnsupportedSpeakerModeErrorMessage("ProRes Encoder", kSupportedSpeakerModes));
         }
 
         /// <inheritdoc/>

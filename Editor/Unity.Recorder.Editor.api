@@ -43,6 +43,7 @@ namespace UnityEditor.Recorder
         protected virtual string Extension { get; }
         public virtual System.Collections.Generic.IEnumerable<UnityEditor.Recorder.RecorderInputSettings> InputsSettings { get; }
         public AudioRecorderSettings() {}
+        protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
     }
 
     public abstract class BaseRenderTextureInput : UnityEditor.Recorder.RecorderInput
@@ -328,6 +329,7 @@ namespace UnityEditor.Recorder
         protected abstract System.Type InputType { get; }
         protected RecorderInputSettings() {}
         protected virtual void CheckForErrors(System.Collections.Generic.List<string> errors);
+        protected virtual void CheckForInfoMessages(System.Collections.Generic.List<string> infoMessages);
         protected virtual void CheckForWarnings(System.Collections.Generic.List<string> warnings);
         [System.Obsolete(@"Please use methods CheckForErrors() and CheckForWarnings()")] protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
     }
@@ -357,6 +359,7 @@ namespace UnityEditor.Recorder
         public int Take { get; set; }
         protected RecorderSettings() {}
         protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
+        protected virtual void GetInfoMessages(System.Collections.Generic.List<string> info);
         protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
         protected virtual bool HasErrors();
         public virtual bool IsAccumulationSupported();
@@ -419,7 +422,7 @@ namespace UnityEditor.Recorder
 
 namespace UnityEditor.Recorder.AOV
 {
-    [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.AOVRecorder), @"AOV Image Sequence", @"aovimagesequence_16")] public class AOVRecorderSettings : UnityEditor.Recorder.RecorderSettings, UnityEditor.Recorder.RecorderSettings.IResolutionUser
+    [System.Obsolete(@"The AOV Image Sequence recorder is marked for deprecation and will be removed in Recorder 5.0.0.")] [UnityEditor.Recorder.RecorderSettings(typeof(UnityEditor.Recorder.AOVRecorder), @"AOV Image Sequence (Deprecated)", @"aovimagesequence_16")] public class AOVRecorderSettings : UnityEditor.Recorder.RecorderSettings, UnityEditor.Recorder.RecorderSettings.IResolutionUser
     {
         public UnityEditor.Recorder.AOV.AOVType AOVSelection { get; set; }
         public bool CaptureHDR { get; }
@@ -432,9 +435,10 @@ namespace UnityEditor.Recorder.AOV
         public UnityEditor.Recorder.ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat { get; set; }
         public AOVRecorderSettings() {}
         protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
+        protected virtual void GetInfoMessages(System.Collections.Generic.List<string> info);
     }
 
-    public enum AOVType
+    [System.Obsolete(@"The AOV Image Sequence recorder is marked for deprecation and will be removed in Recorder 5.0.0.")] public enum AOVType
     {
         public const UnityEditor.Recorder.AOV.AOVType Albedo = 1;
         public const UnityEditor.Recorder.AOV.AOVType Alpha = 7;
@@ -460,7 +464,7 @@ namespace UnityEditor.Recorder.AOV
 
 namespace UnityEditor.Recorder.AOV.Input
 {
-    public class AOVCameraInputSettings : UnityEditor.Recorder.Input.CameraInputSettings
+    [System.Obsolete(@"The AOV Image Sequence recorder is marked for deprecation and will be removed in Recorder 5.0.0.")] public class AOVCameraInputSettings : UnityEditor.Recorder.Input.CameraInputSettings
     {
         protected virtual System.Type InputType { get; }
         public AOVCameraInputSettings() {}

@@ -4,9 +4,16 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.0] - 2022-06-01
-### Added
+## [4.0.1] - 2023-04-24
 ### Changed
+- The AOV Image Sequence recorder is marked for deprecation and will be removed in Recorder 5.0.0.
+
+### Fixed
+- Prevent the Recorder from capturing audio if there are more than two audio channels.
+- To fix a compression issue, the VP8 target bitrate is now converted to bits per second (bps) instead of kilobits per second (kbps).
+- The Physical Camera property now stays enabled when recording with accumulation anti-aliasing.
+
+## [4.0.0] - 2022-06-01
 ### Fixed
 - Better handle error messages when using a Tagged Camera while the tag is missing from the project or not assigned to the camera.
 - Make sure to stop the AudioRenderer when all recordings are over.

@@ -13,8 +13,10 @@ namespace UnityEditor.Recorder
     /// </summary>
     public class RecorderController
     {
+#pragma warning disable 618
         static HashSet<Type> resolutionUserType = new HashSet<Type>
         { typeof(GameViewInputSettings), typeof(CameraInputSettings), typeof(RenderTextureSamplerSettings), typeof(AOVCameraInputSettings) };
+#pragma warning restore 618
 
         readonly SceneHook m_SceneHook;
 

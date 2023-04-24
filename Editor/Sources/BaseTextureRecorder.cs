@@ -34,7 +34,13 @@ namespace UnityEditor.Recorder
         int m_NumSubFrames;
         Vector2[] m_JitterOffsets;
         Vector2 m_CurrentJitterOffset;
-        readonly Dictionary<Camera, Matrix4x4> m_NonJitteredProjections = new Dictionary<Camera, Matrix4x4>();
+
+        struct SavedCameraProperties
+        {
+            public bool usePhysicalProperties;
+        }
+
+        readonly Dictionary<Camera, SavedCameraProperties> m_NonJitteredProjections = new Dictionary<Camera, SavedCameraProperties>();
 #if HDRP_14_0_2_AVAILABLE
         // Wraps the callback overriding the spotlight view matrix computation.
         // We need to maintain a reference to the light data while evaluating the view,
@@ -159,7 +165,7 @@ namespace UnityEditor.Recorder
 
 #if HDRP_14_0_2_AVAILABLE
                         // Shadowmap rotation
-                        foreach (var lightData in FindObjectsOfType<HDAdditionalLightData>(false))
+                        foreach (var lightData in FindObjectsHelper.FindObjectsByTypeWrapper<HDAdditionalLightData>())
                         {
                             // Shadowmap rotation only supports spot-light at the moment.
                             if (lightData.type == HDLightType.Spot)
@@ -380,7 +386,10 @@ namespace UnityEditor.Recorder
                 if (camera.cameraType == CameraType.Game)
                 {
                     var originalProjection = camera.projectionMatrix;
-                    m_NonJitteredProjections.Add(camera, originalProjection);
+                    m_NonJitteredProjections.Add(camera, new SavedCameraProperties
+                    {
+                        usePhysicalProperties = camera.usePhysicalProperties
+                    });
                     camera.projectionMatrix = GetJitteredProjectionMatrix(camera, originalProjection, m_CurrentJitterOffset);
                 }
             }
@@ -393,9 +402,10 @@ namespace UnityEditor.Recorder
 
         void RestoreNonJitteredMatrices()
         {
-            foreach (var(camera, projection) in m_NonJitteredProjections)
+            foreach (var(camera, camProperties) in m_NonJitteredProjections)
             {
-                camera.projectionMatrix = projection;
+                camera.ResetProjectionMatrix();
+                camera.usePhysicalProperties = camProperties.usePhysicalProperties;
             }
 
             m_NonJitteredProjections.Clear();

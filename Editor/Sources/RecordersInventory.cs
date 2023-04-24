@@ -89,7 +89,9 @@ namespace UnityEditor.Recorder
                         s_Recorders[typeof(MovieRecorderSettings)],
                         s_Recorders[typeof(ImageRecorderSettings)],
 #if HDRP_AVAILABLE
+#pragma warning disable 618
                         s_Recorders[typeof(AOVRecorderSettings)],
+#pragma warning restore 618
 #endif
                         s_Recorders[typeof(AudioRecorderSettings)]
                     };

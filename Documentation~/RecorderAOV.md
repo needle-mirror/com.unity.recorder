@@ -1,10 +1,12 @@
 # AOV Image Sequence Recorder properties
 
+>**Important:** The AOV Image Sequence recorder included in this version of the Recorder package is currently supported, but marked for deprecation, and will be removed in Recorder 5.0.0.
+
 AOV recording is a process that extracts specific render pass data from the Scene that a specific Camera views. This mainly includes render passes related to the material, geometry, depth, motion, and lighting response of the GameObjects in the Scene.
 
 The AOV Recorder only works with projects that use Unity's [HDRP (High Definition Render Pipeline)](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest). It generates a sequence of image files in various formats including compressed EXR and supports the recording of [several different AOVs](#aov-to-export) for various [use cases](#use-case-examples).
 
->**Note:** This AOV Recorder replaces the one that was formerly available through a separate package. If you previously installed the separate AOV Recorder package, you should uninstall it to avoid any unexpected recording issues.
+>**Note:** This AOV Recorder replaces the one that was formerly available through a separate package. If you installed the separate AOV Recorder package, you should uninstall it to avoid any unexpected recording issues.
 
 This page covers all properties specific to the AOV Image Sequence Recorder type.
 
@@ -68,6 +70,8 @@ Select the camera to use for the recording.
 
 Set the dimensions and other properties of the recorded view.
 
+>**Note:** If the Output Resolution and/or Aspect Ratio in the Recorder is different than the Game view resolution, the Recorder switches the Game view to the Recorder's resolution before starting the recording. After the recording ends, the Game view does not automatically revert to its previous resolution.
+
 | Property || Function |
 |:---|:---|:---|
 | **Output Resolution** || Allows you to set the dimensions of the recorded view using different methods. |
@@ -77,6 +81,7 @@ Set the dimensions and other properties of the recorded view.
 | **Aspect Ratio** || Specifies the ratio of width to height (w:h) of the recorded view when you set the **Output Resolution** to a preset resolution. |
 |   | _[PRESET ASPECT RATIOS]_ | Choose from several standard aspect ratios such as 16:9 (1.7778) and 4:3 (1.3333). |
 |   | Custom   | Uses custom aspect ratio that you supply in the displayed fields (w:h). |
+| **Render Frame Step** || Available when you set **Playback** to **Variable**. Specifies the number of rendered frames to discard between recorded frames. Example: if the value is 2, every second frame is discarded. |
 
 
 ## Output Format

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace UnityEditor.Recorder
     public class AudioRecorderSettings : RecorderSettings
     {
         [SerializeField] AudioInputSettings m_AudioInputSettings = new AudioInputSettings();
+        internal readonly AudioSpeakerMode[] kSupportedSpeakerModes = new AudioSpeakerMode[] { AudioSpeakerMode.Mono , AudioSpeakerMode.Stereo};
 
         protected internal override string Extension
         {
@@ -26,6 +28,14 @@ namespace UnityEditor.Recorder
         public override IEnumerable<RecorderInputSettings> InputsSettings
         {
             get { yield return m_AudioInputSettings; }
+        }
+
+        /// <inheritdoc/>
+        protected internal override void GetErrors(List<string> errors)
+        {
+            base.GetErrors(errors);
+            if (!UnityHelpers.IsNumAudioChannelsSupported())
+                errors.Add(UnityHelpers.GetUnsupportedSpeakerModeErrorMessage("Audio Encoder", kSupportedSpeakerModes));
         }
 
         /// <summary>

@@ -304,7 +304,7 @@ namespace UnityEditor.Recorder.Input
             if (cbSettings.CaptureUI && UnityHelpers.UsingLegacyRP())
             {
                 // Find canvases
-                var canvases = UnityObject.FindObjectsOfType<Canvas>();
+                var canvases = FindObjectsHelper.FindObjectsByTypeWrapper<Canvas>();
                 if (m_CanvasBackups == null || m_CanvasBackups.Length != canvases.Length)
                     m_CanvasBackups = new CanvasBackup[canvases.Length];
 

@@ -22,6 +22,7 @@ namespace UnityEditor.Recorder.Input
             public AOVRequest m_AovRequest;
         }
 
+#pragma warning disable 618
         // The dictionary of supported AOV types
         static internal Dictionary<AOVType, AOVInfo> m_Aovs = new Dictionary<AOVType, AOVInfo>
         {
@@ -170,7 +171,7 @@ namespace UnityEditor.Recorder.Input
                 }
             }
         };
-
+#pragma warning restore 618
 
         protected RenderTexture CreateFrameBuffer(RenderTextureFormat format, int width, int height, int depth = 0, bool sRGB = false)
         {
@@ -179,7 +180,9 @@ namespace UnityEditor.Recorder.Input
 
         void EnableAOVCapture(RecordingSession session, Camera cam)
         {
+#pragma warning disable 618
             var aovRecorderSettings = session.settings as AOVRecorderSettings;
+#pragma warning restore 618
 
             if (aovRecorderSettings != null)
             {
@@ -250,7 +253,9 @@ namespace UnityEditor.Recorder.Input
 
         void ReadbackAOVCapture(RecordingSession session)
         {
+#pragma warning disable 618
             var aovRecorderSettings = session.settings as AOVRecorderSettings;
+#pragma warning restore 618
 
             if (aovRecorderSettings != null)
             {
@@ -267,7 +272,9 @@ namespace UnityEditor.Recorder.Input
 
         void DisableAOVCapture(RecordingSession session)
         {
+#pragma warning disable 618
             var aovRecorderSettings = session.settings as AOVRecorderSettings;
+#pragma warning restore 618
 
             if (aovRecorderSettings != null)
             {

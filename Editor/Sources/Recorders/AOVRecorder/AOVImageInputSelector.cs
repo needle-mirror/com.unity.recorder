@@ -8,7 +8,9 @@ namespace UnityEditor.Recorder.AOV
     [Serializable]
     class AOVImageInputSelector : InputSettingsSelector
     {
+#pragma warning disable 618
         [SerializeField] public CameraInputSettings cameraInputSettings = new AOVCameraInputSettings();
+#pragma warning restore 618
         public ImageInputSettings imageInputSettings
         {
             get { return (ImageInputSettings)Selected; }

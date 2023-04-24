@@ -5,7 +5,7 @@
 Use the Recorder package to capture and save data during [Play mode](https://docs.unity3d.com/Manual/GameView.html). For example, you can capture gameplay or a cinematic and save it as a video file.
 
 >[!NOTE]
->You can only use the Recorder in the Unity Editor. It does not work in standalone Unity Players or builds.
+>You can use the Recorder in the Unity Editor only. It does not work in standalone Unity Players or builds.
 
 ## Recording
 
@@ -30,9 +30,9 @@ The Recorder includes the following recorder types by default:
 * **Audio Recorder:** generates an audio clip in WAV format.
 
 * **AOV Recorder:** generates a sequence of image files in JPEG, PNG, or EXR (OpenEXR) format, to capture specific render pass data (for example, data related to materials, geometry, depth, motion, or lighting) in projects that use Unity's [HDRP (High Definition Render Pipeline)](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest).
+    >**Important:** The AOV Image Sequence recorder included in this version of the Recorder package is marked for deprecation and will be removed in Recorder 5.0.0.
 
->**Note:** The AOV Recorder included in this version of the Recorder package replaces the one that was formerly available through a separate package. If you previously installed the separate AOV Recorder package, you should uninstall it to avoid any unexpected recording issues.
-
+    >**Note:** The AOV Recorder included in this version of the Recorder package replaces the one that was formerly available through a separate package. If you previously installed the separate AOV Recorder package, you should uninstall it to avoid any unexpected recording issues.
 
 ### Additional recorders
 

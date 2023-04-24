@@ -9,6 +9,7 @@ namespace UnityEditor.Recorder.AOV
     /// <summary>
     /// Available options AOV Types.
     /// </summary>
+    [Obsolete("The AOV Image Sequence recorder is marked for deprecation and will be removed in Recorder 5.0.0.")]
     public enum AOVType
     {
         /// <summary>
@@ -88,7 +89,8 @@ namespace UnityEditor.Recorder.AOV
     /// <summary>
     /// A class that represents the settings of an AOV Sequence Recorder.
     /// </summary>
-    [RecorderSettings(typeof(AOVRecorder), "AOV Image Sequence", "aovimagesequence_16")]
+    [Obsolete("The AOV Image Sequence recorder is marked for deprecation and will be removed in Recorder 5.0.0.")]
+    [RecorderSettings(typeof(AOVRecorder), "AOV Image Sequence (Deprecated)", "aovimagesequence_16")]
     public class AOVRecorderSettings : RecorderSettings, RecorderSettings.IResolutionUser
     {
         [SerializeField] internal ImageRecorderSettings.ImageRecorderOutputFormat m_OutputFormat = ImageRecorderSettings.ImageRecorderOutputFormat.EXR;
@@ -229,6 +231,12 @@ namespace UnityEditor.Recorder.AOV
             Debug.LogError("AOV Recorder requires the HDRP package version " + hdrpMinVersion + " or greater to be installed");
             return true;
 #endif
+        }
+
+        protected internal override void GetInfoMessages(List<string> info)
+        {
+            base.GetInfoMessages(info);
+            info.Add("The AOV Image Sequence recorder is marked for deprecation and will be removed in Recorder 5.0.0.");
         }
 
         /// <summary>

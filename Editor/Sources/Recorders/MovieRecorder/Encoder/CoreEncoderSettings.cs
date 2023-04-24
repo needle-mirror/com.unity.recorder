@@ -19,6 +19,7 @@ namespace UnityEditor.Recorder.Encoder
         internal readonly int kMaxSupportedSize_H264 = (int)ImageHeight.x2160p_4K;
         internal readonly int kMaxSupportedSize_VP8 = (int)ImageHeight.x4320p_8K;
         internal readonly int kMaxSupportedBitrate = 4150; // Mbps
+        internal readonly AudioSpeakerMode[] kSupportedSpeakerModes = new AudioSpeakerMode[] { AudioSpeakerMode.Mono , AudioSpeakerMode.Stereo};
 
         /// <summary>
         /// The choice of encoder and container for the output file.
@@ -252,6 +253,9 @@ namespace UnityEditor.Recorder.Encoder
 
             if (ctx.doCaptureAlpha && !CodecSupportsTransparency(Codec))
                 errors.Add($"Codec '{Codec}' does not support transparency.");
+
+            if (ctx.doCaptureAudio && !UnityHelpers.IsNumAudioChannelsSupported())
+                errors.Add(UnityHelpers.GetUnsupportedSpeakerModeErrorMessage("Unity Media Encoder", kSupportedSpeakerModes));
         }
 
         internal bool CodecSupportsTransparency(OutputCodec outputCodec)

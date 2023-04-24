@@ -94,7 +94,7 @@ namespace UnityEditor.Recorder
 
         internal static RecorderBindings[] FindRecorderBindings()
         {
-            return Object.FindObjectsOfType<RecorderBindings>();
+            return FindObjectsHelper.FindObjectsByTypeWrapper<RecorderBindings>();
         }
 
         static Scene GetObjectScene(Object obj)

@@ -1,9 +1,26 @@
 using System;
 using UnityEditor.Presets;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace UnityEditor.Recorder
 {
+    static class FindObjectsHelper
+    {
+        internal static T[] FindObjectsByTypeWrapper<T>(
+#if UNITY_2023_1_OR_NEWER
+            FindObjectsSortMode sortMode = FindObjectsSortMode.None
+#endif
+        ) where T : Object
+        {
+#if UNITY_2023_1_OR_NEWER
+            return UnityEngine.Object.FindObjectsByType<T>(sortMode);
+#else
+            return UnityEngine.Object.FindObjectsOfType<T>();
+#endif
+        }
+    }
+
     static class PresetHelper
     {
         static Texture2D s_PresetIcon;
@@ -26,6 +43,31 @@ namespace UnityEditor.Recorder
             {
                 return s_PresetButtonStyle ?? (s_PresetButtonStyle = new GUIStyle("iconButton") { fixedWidth = 19.0f });
             }
+        }
+
+        internal static void ShowPresetSelectorWrapper(RecorderSettings settings, Preset currentSelection = null,
+            Action onSelectionChanged = null, Action onSelectionClosed = null)
+        {
+#if UNITY_2023_1_OR_NEWER
+
+            Action<Preset> OnSelectionChangedIgnoreParams = _ =>
+            {
+                if (onSelectionChanged != null) onSelectionChanged();
+            };
+
+            Action<Preset, bool> OnSelectionClosedIgnoreParams = (_, _) =>
+            {
+                if (onSelectionClosed != null) onSelectionClosed();
+            };
+
+            PresetSelector.ShowSelector(new UnityEngine.Object[] { settings }, currentSelection, true, OnSelectionChangedIgnoreParams, OnSelectionClosedIgnoreParams);
+        }
+
+#else
+            var presetReceiver = ScriptableObject.CreateInstance<PresetReceiver>();
+            presetReceiver.Init(settings, onSelectionChanged, onSelectionClosed);
+
+            PresetSelector.ShowSelector(settings, currentSelection, true, presetReceiver);
         }
 
         internal class PresetReceiver : PresetSelectorReceiver
@@ -72,5 +114,6 @@ namespace UnityEditor.Recorder
                 DestroyImmediate(this);
             }
         }
+#endif
     }
 }
