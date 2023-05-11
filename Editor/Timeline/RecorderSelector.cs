@@ -64,6 +64,10 @@ namespace UnityEditor.Recorder.Timeline
             if (m_SelectedRecorder == newSelection)
                 return;
 
+            var recorderAttribs = newSelection.GetCustomAttributes(typeof(ObsoleteAttribute), false);
+            if (recorderAttribs.Length > 0)
+                Debug.LogWarning("Recorder " + ((ObsoleteAttribute)recorderAttribs[0]).Message);
+
             m_SelectedRecorder = newSelection;
 
             if (OnSelectionChanged != null)

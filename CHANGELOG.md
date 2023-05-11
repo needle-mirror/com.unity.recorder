@@ -4,12 +4,16 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.1] - 2023-04-24
+## [5.0.0-pre.1] - 2023-05-11
 ### Changed
-- The AOV Image Sequence recorder is marked for deprecation and will be removed in Recorder 5.0.0.
+- Updated minimum required Unity Editor version to 2023.1.
+- Removed obsolete warnings about spot lights when recording accumulation in 2023.2. 
+- Removed AOV recorder.
 
 ### Fixed
-- Prevent the Recorder from capturing audio if there are more than two audio channels.
+- An exception no longer occurs when deleting all but one recorder when the deleted recorders' outputs were incompatible with, or names conflicted with, the remaining recorder.
+- An error message is now displayed and the Recorder is prevented from starting if MainCamera is selected while the main camera is missing from the project.
+- Prevent the Recorder from capturing audio if there are more than two audio channels because only mono or stereo recording is supported.
 - To fix a compression issue, the VP8 target bitrate is now converted to bits per second (bps) instead of kilobits per second (kbps).
 - The Physical Camera property now stays enabled when recording with accumulation anti-aliasing.
 

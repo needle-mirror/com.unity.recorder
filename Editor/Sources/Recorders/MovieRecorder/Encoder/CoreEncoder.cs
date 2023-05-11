@@ -71,11 +71,7 @@ namespace UnityEditor.Recorder.Encoder
                             height = (uint)ctx.height,
                             includeAlpha = ctx.doCaptureAlpha,
                             bitRateMode = VideoBitrateMode.High, // so that audio encoder uses high bitrate
-#if UNITY_2022_2_OR_NEWER
                             targetBitRate = coreSettings.TargetBitRateBitsPerSecond // VP8 expects bps
-#else
-                            targetBitRate = coreSettings.TargetBitRateKiloBitsPerSecond // VP8 expects kbps
-#endif
                         };
                         break;
                     default:

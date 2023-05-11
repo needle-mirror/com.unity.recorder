@@ -3,7 +3,7 @@
 The procedures listed below are provided as typical uses of the Recorder feature. The same general steps are used to configure and record other Recorder outputs.
 >**Note**: Recorders can be configured in the Recorder window or in the Timeline:
 * Recorders configured in the [Recorder window](RecordingRecorderWindow.md) are manually started. They can be configured to record what is currently playing, a set of frames specified with a Start frame and End frame, or a time interval.
-* [Recorder Clips](RecordingTimelineTrack.md), which are used to specify recorders in the Timeline, automatically start recording when the Timeline plays the specified frames.
+* [Recorder Clips](RecordingTimelineTrack.md), which are used to specify recorders in the Timeline, automatically start recording when the Timeline plays the specified frames.  
 
 | Procedure | Description |
 | --- | --- |
@@ -11,4 +11,4 @@ The procedures listed below are provided as typical uses of the Recorder feature
 | [Record an animated GIF](RecordingAnimatedGIF.md) | Configure and record an animated GIF. |
 | [Accumulate motion blur](RecordingAccumulationMotionBlur.md) | Configure motion-blur accumulation in a Movie recorder or Image Sequence recorder. |
 | [Accumulate path tracing](RecordingAccumulationPathTracing.md) | Configure path-tracing accumulation in a Movie recorder or Image Sequence recorder. You can configure path-tracing accumulation with or without motion blur.|
-| [Configure a recorder to use the linear sRGB (unclamped) color space](RecordingInLinearSrgbColorSpace.md) | Configure an AOV or Image Sequence recorder to use the linear sRGB (unclamped) color space. <br/>**Note:** The AOV Image Sequence recorder included in this version of the Recorder package is marked for deprecation and will be removed in Recorder 5.0.0. |
+| [Configure a recorder to use the linear sRGB (unclamped) color space](RecordingInLinearSrgbColorSpace.md) | Configure an Image Sequence recorder to use the linear sRGB (unclamped) color space. |

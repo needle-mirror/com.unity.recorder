@@ -29,11 +29,6 @@ The Recorder includes the following recorder types by default:
 
 * **Audio Recorder:** generates an audio clip in WAV format.
 
-* **AOV Recorder:** generates a sequence of image files in JPEG, PNG, or EXR (OpenEXR) format, to capture specific render pass data (for example, data related to materials, geometry, depth, motion, or lighting) in projects that use Unity's [HDRP (High Definition Render Pipeline)](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest).
-    >**Important:** The AOV Image Sequence recorder included in this version of the Recorder package is marked for deprecation and will be removed in Recorder 5.0.0.
-
-    >**Note:** The AOV Recorder included in this version of the Recorder package replaces the one that was formerly available through a separate package. If you previously installed the separate AOV Recorder package, you should uninstall it to avoid any unexpected recording issues.
-
 ### Additional recorders
 
 You can also benefit from additional Recorder types if you install specific packages along with the Recorder:
@@ -60,7 +55,7 @@ To install this package, follow the instructions in the [Package Manager documen
 
 This version of the Recorder is compatible with the following versions of the Unity Editor:
 
-* 2022.1 and later (recommended)
+* 2023.1 and later (recommended)
 
 ### Known issues and limitations
 

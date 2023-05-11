@@ -105,11 +105,6 @@ namespace UnityEditor.Recorder.Encoder
         internal uint TargetBitRateBitsPerSecond => (uint)(TargetBitRate * 1000 * 1000); // Mbps to bps
 
         /// <summary>
-        /// The target bitrate, in kbbps, for the VP8 codec.
-        /// </summary>
-        internal uint TargetBitRateKiloBitsPerSecond => (uint)(TargetBitRate * 1000); // Mbps to kbps
-
-        /// <summary>
         /// The interval in frames between two full images (I-frames), known as the Group of Pictures (GOP) size for the H.264 codec.
         /// </summary>
         public uint GopSize

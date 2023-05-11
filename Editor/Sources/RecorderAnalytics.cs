@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEditor.Recorder.AOV;
 using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
@@ -44,8 +43,6 @@ namespace UnityEditor.Recorder
             public List<AnimationRecorderInfo> animation_recorder_info;
             public List<ImageRecorderInfo> image_recorder_info;
             public List<MovieRecorderInfo> movie_recorder_info;
-            // need to keep as to not mess up the schema
-            public List<AOVImageRecorderInfo> aov_recorder_info;
         }
 
         [Serializable]
@@ -203,36 +200,6 @@ namespace UnityEditor.Recorder
                 ret.media_format = r.EncoderSettings.Extension;
 
                 RecorderInfo.FromRecorder(r, ret);
-                return ret;
-            }
-        }
-
-        [Serializable]
-        internal class AOVImageRecorderInfo : RecorderInfo
-        {
-            public int output_resolution_w;
-            public int output_resolution_h;
-            public string media_format;
-            public string color_space;
-            public string aov;
-
-#pragma warning disable 618
-            public static AOVImageRecorderInfo FromRecorder(AOVRecorderSettings r)
-            {
-#pragma warning restore 618
-                var ret = new AOVImageRecorderInfo()
-                {
-                    type = RecordersInventory.GetRecorderInfo(r.GetType()).recorderType.FullName,
-                    record_guid = r.GetInstanceID().ToString(),
-                    color_space = r.OutputFormat == ImageRecorderSettings.ImageRecorderOutputFormat.EXR ? r.OutputColorSpace.ConvertToString() : null,
-                    media_format = r.OutputFormat.ConvertToString(),
-                    output_resolution_h = r.imageInputSettings.OutputHeight,
-                    output_resolution_w = r.imageInputSettings.OutputWidth,
-                    aov = r.AOVSelection.ToString()
-                };
-
-                RecorderInfo.FromRecorder(r, ret);
-
                 return ret;
             }
         }
@@ -414,8 +381,7 @@ namespace UnityEditor.Recorder
                 out data.animation_recorder_info,
                 out data.image_recorder_info,
                 out data.movie_recorder_info,
-                out data.recorder_info,
-                out data.aov_recorder_info);
+                out data.recorder_info);
 #if DEBUG_ANALYTICS
             var json = JsonUtility.ToJson(data, prettyPrint: true);
             Debug.Log(json);
@@ -448,8 +414,7 @@ namespace UnityEditor.Recorder
                 out data.animation_recorder_info,
                 out data.image_recorder_info,
                 out data.movie_recorder_info,
-                out data.recorder_info,
-                out data.aov_recorder_info);
+                out data.recorder_info);
 
 #if DEBUG_ANALYTICS
             var json = JsonUtility.ToJson(data, prettyPrint: true);
@@ -459,13 +424,12 @@ namespace UnityEditor.Recorder
         }
 
         static void GetSpecificRecorderInfos(IEnumerable<RecorderSettings> recorders, out List<AnimationRecorderInfo> anim,
-            out List<ImageRecorderInfo> image, out List<MovieRecorderInfo> movie, out List<RecorderInfo> recorder, out List<AOVImageRecorderInfo> aov)
+            out List<ImageRecorderInfo> image, out List<MovieRecorderInfo> movie, out List<RecorderInfo> recorder)
         {
             anim = new List<AnimationRecorderInfo>();
             image = new List<ImageRecorderInfo>();
             movie = new List<MovieRecorderInfo>();
             recorder = new List<RecorderInfo>();
-            aov = new List<AOVImageRecorderInfo>();
 
             foreach (var reco in recorders)
             {
@@ -479,11 +443,6 @@ namespace UnityEditor.Recorder
                         break;
                     case MovieRecorderSettings r:
                         movie.Add(MovieRecorderInfo.FromRecorder(r));
-                        break;
-#pragma warning disable 618
-                    case AOVRecorderSettings r:
-                        aov.Add(AOVImageRecorderInfo.FromRecorder(r));
-#pragma warning restore 618
                         break;
                     default:
                         var ri = new RecorderInfo();
@@ -501,8 +460,6 @@ namespace UnityEditor.Recorder
                 movie = null;
             if (recorder.Count == 0)
                 recorder = null;
-            if (aov.Count == 0)
-                aov = null;
         }
 
         internal static string ConvertToString<T>(this T e) where T : Enum

@@ -17,7 +17,6 @@ namespace UnityEditor.Recorder
             return true;
         }
 
-        protected internal virtual void CheckForInfoMessages(List<string> infoMessages) {}
         protected internal virtual void CheckForWarnings(List<string> warnings) {}
         protected internal virtual void CheckForErrors(List<string> errors) {}
     }

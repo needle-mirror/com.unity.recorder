@@ -32,7 +32,6 @@ The **+Wildcards** menu helps you quickly append them to the file name string, b
 
 | Placeholder | Description | Resolved value example |
 |--|--|--|
-| `<AOV>` | The name of the [**AOV to Export** selected for recording](RecorderAOV.md#aov-to-export).<br/>**Note:** The AOV Image Sequence recorder included in this version of the Recorder package is marked for deprecation and will be removed in Recorder 5.0.0. | `Beauty` |
 | `<Date>` | The date the recording is generated. Uses the `yyyy-MM-dd` format. | `2020-11-03` |
 | `<Extension>` | The file extension of the output format (without the period). | `png` |
 | `<Frame>` | The current frame number. Uses the `0000` format.<br/><br/>This is useful for Image Sequence Recorders which output each frame as a separate file. | `0154` |

@@ -237,10 +237,10 @@ namespace UnityEditor.Recorder
         {
             if (InputsSettings != null)
             {
-                foreach (var inputSetting in InputsSettings)
+                foreach (var i in InputsSettings)
                 {
                     var inputErrors = new List<string>();
-                    inputSetting.CheckForErrors(inputErrors);
+                    i.CheckForErrors(inputErrors);
                     errors.AddRange(inputErrors);
                 }
             }
@@ -279,28 +279,11 @@ namespace UnityEditor.Recorder
         {
             if (InputsSettings != null)
             {
-                foreach (var inputSetting in InputsSettings)
+                foreach (var i in InputsSettings)
                 {
                     var inputWarnings = new List<string>();
-                    inputSetting.CheckForWarnings(inputWarnings);
+                    i.CheckForWarnings(inputWarnings);
                     warnings.AddRange(inputWarnings);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Checks if the Recorder has any info messages.
-        /// </summary>
-        /// <param name="info">List of info encountered.</param>
-        protected internal virtual void GetInfoMessages(List<string> info)
-        {
-            if (InputsSettings != null)
-            {
-                foreach (var inputSetting in InputsSettings)
-                {
-                    var infoMessages = new List<string>();
-                    inputSetting.CheckForInfoMessages(infoMessages);
-                    info.AddRange(infoMessages);
                 }
             }
         }

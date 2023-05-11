@@ -59,7 +59,7 @@ namespace UnityEditor.Recorder
                 SetGameObjectVisibility(rc.gameObject, value);
             }
 
-            var rcs = FindObjectsHelper.FindObjectsByTypeWrapper<RecorderComponent>();
+            var rcs = UnityObject.FindObjectsByType<RecorderComponent>(FindObjectsSortMode.None);
             foreach (var rc in rcs)
             {
                 SetGameObjectVisibility(rc.gameObject, value);

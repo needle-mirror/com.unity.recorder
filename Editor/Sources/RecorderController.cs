@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Recorder.AOV.Input;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
 
@@ -13,10 +12,8 @@ namespace UnityEditor.Recorder
     /// </summary>
     public class RecorderController
     {
-#pragma warning disable 618
         static HashSet<Type> resolutionUserType = new HashSet<Type>
-        { typeof(GameViewInputSettings), typeof(CameraInputSettings), typeof(RenderTextureSamplerSettings), typeof(AOVCameraInputSettings) };
-#pragma warning restore 618
+        { typeof(GameViewInputSettings), typeof(CameraInputSettings), typeof(RenderTextureSamplerSettings)};
 
         readonly SceneHook m_SceneHook;
 

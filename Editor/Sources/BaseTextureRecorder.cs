@@ -73,11 +73,7 @@ namespace UnityEditor.Recorder
 
             Matrix4x4 GetViewMatrix(Matrix4x4 localToWorldMatrix)
             {
-                // Only apply the rotation when using a cone shape.
-                var rotation = m_AdditionalLightData.spotLightShape == SpotLightShape.Cone ?
-                    m_ViewRotationMatrix : Matrix4x4.identity;
-                var invView = localToWorldMatrix * rotation;
-
+                var invView = localToWorldMatrix * m_ViewRotationMatrix;
                 var view = invView.inverse;
 
                 // Note that camera space matches OpenGL convention: camera's forward is the negative Z axis.
@@ -165,10 +161,11 @@ namespace UnityEditor.Recorder
 
 #if HDRP_14_0_2_AVAILABLE
                         // Shadowmap rotation
-                        foreach (var lightData in FindObjectsHelper.FindObjectsByTypeWrapper<HDAdditionalLightData>())
+                        foreach (var lightData in FindObjectsByType<HDAdditionalLightData>(FindObjectsSortMode.None))
                         {
-                            // Shadowmap rotation only supports spot-light at the moment.
-                            if (lightData.type == HDLightType.Spot)
+                            // Shadowmap rotation only supports cone shaped spot-light at the moment.
+                            var light = lightData.GetComponent<Light>();
+                            if (light.type == LightType.Spot)
                             {
                                 m_SpotLightViewCallbacks.Add(new CustomViewCallbackWrapper(lightData));
                             }

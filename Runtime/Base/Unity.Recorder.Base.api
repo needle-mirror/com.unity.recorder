@@ -9,8 +9,8 @@ namespace Unity.Media
         public T Target { get; set; }
         public RefHandle() {}
         public RefHandle(T target) {}
-        public virtual void Dispose();
+        public void Dispose();
         public void Dispose(bool disposing);
-        protected virtual void Finalize();
+        protected override void Finalize();
     }
 }

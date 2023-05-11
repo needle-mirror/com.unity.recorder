@@ -3,19 +3,19 @@
 // make sure the XML doc file is present and located next to the scraped dll
 namespace UnityEngine.Recorder.Examples
 {
-    public class CaptureScreenShotExample : UnityEngine.MonoBehaviour
+    public class CaptureScreenShotExample : MonoBehaviour
     {
         public CaptureScreenShotExample() {}
     }
 
-    public class MovieRecorderExample : UnityEngine.MonoBehaviour
+    public class MovieRecorderExample : MonoBehaviour
     {
-        public bool m_RecordAudio;
+        public bool m_RecordAudio = true;
         public System.IO.FileInfo OutputFile { get; }
         public MovieRecorderExample() {}
     }
 
-    public class MultipleRecordingsExample : UnityEngine.MonoBehaviour
+    public class MultipleRecordingsExample : MonoBehaviour
     {
         public MultipleRecordingsExample() {}
     }

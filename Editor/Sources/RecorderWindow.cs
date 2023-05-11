@@ -39,7 +39,6 @@ namespace UnityEditor.Recorder
         private static string s_PackageShortVersionNumber = "1.0";
         private static ListRequest s_Request;
         private static bool s_NeedToResetView = false;
-        private static bool s_ShouldMarkDirtyAndSaveAsset;
 
 
         private static bool HasFocus()
@@ -781,10 +780,10 @@ namespace UnityEditor.Recorder
 
         void CheckRecordersIncompatibility()
         {
-            var activeRecordersThatCanRun = m_ControllerSettings.RecorderSettings.Where(r => r.Enabled && !r.HasErrors()).ToArray();
+            var activeRecorders = m_ControllerSettings.RecorderSettings.Where(r => r.Enabled).ToArray();
 
-            if (HasDuplicateOutputNames(activeRecordersThatCanRun)) return;
-            HasDifferentResolutions(activeRecordersThatCanRun);
+            HasDuplicateOutputNames(activeRecorders);
+            HasDifferentResolutions(activeRecorders);
 
             // Refresh the state of all items in the window
             foreach (var recorderItem in m_RecordingListItem.items)
@@ -809,6 +808,8 @@ namespace UnityEditor.Recorder
                 // There were accumulation errors but now the context has been fixed. Return to idle state.
                 m_State = State.Idle;
             }
+
+            var activeRecordersThatCanRun = activeRecorders.Where(r => r.Enabled && !r.HasErrors()).ToArray();
 
             if (activeRecordersThatCanRun.Length > 0)
             {
@@ -1045,7 +1046,7 @@ namespace UnityEditor.Recorder
                             {
                                 PresetHelper.ShowPresetSelectorWrapper(settings, null, Repaint, () =>
                                 {
-                                    s_ShouldMarkDirtyAndSaveAsset = true;
+                                    EditorUtility.SetDirty(settings);
                                 });
                             }
                         }
@@ -1061,9 +1062,8 @@ namespace UnityEditor.Recorder
                         editor.OnInspectorGUI();
                         RecorderEditor.FromRecorderWindow = prevValue;
 
-                        if (EditorGUI.EndChangeCheck() || s_ShouldMarkDirtyAndSaveAsset)
+                        if (EditorGUI.EndChangeCheck() || EditorUtility.IsDirty(m_SelectedRecorderItem.settings))
                         {
-                            s_ShouldMarkDirtyAndSaveAsset = false;
                             m_ControllerSettings.Save();
                             m_SelectedRecorderItem.UpdateState();
                             UIElementHelper.SetDirty(m_RecorderSettingPanel);

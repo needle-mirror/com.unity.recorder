@@ -94,6 +94,10 @@ namespace UnityEditor.Recorder.Input
                     }
                 }
             }
+            else if (Source == ImageSource.MainCamera && Camera.main == null)
+            {
+                errors.Add("There is no MainCamera in the project");
+            }
         }
     }
 }

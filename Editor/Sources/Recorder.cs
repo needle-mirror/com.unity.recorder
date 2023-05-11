@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using UnityEditor.Media;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -24,6 +23,10 @@ namespace UnityEditor.Recorder
     {
         static int sm_CaptureFrameRateCount;
         bool m_ModifiedCaptureFR;
+        double m_FrameInterval;
+        bool m_TimePadDisabled;
+        float m_SessionStartTime;
+        double m_FramePadTime = 0; // Time padding seconds to fix JIRA REC-1105
 
         private static bool s_asyncShaderCompileSetting;
         private static bool s_asyncShaderCompileAlreadyRestored = false; // have we already restored the value of the setting?
@@ -106,14 +109,28 @@ namespace UnityEditor.Recorder
             if (fixedRate > 0)
             {
                 var toComparePeriodSeconds = 1.0f / fixedRate; // Hz -> secs
-                if (Time.captureFramerate != 0 && Math.Abs(toComparePeriodSeconds - Time.captureDeltaTime) > float.Epsilon)
+
+#if RECORDER_DISABLE_FRAME_TIME_PADDING
+                m_FramePadTime = 0;
+#else
+                m_FramePadTime = 1e-7; // Need to add some time to the Time.captureDeltaTime to prevent double frame capture (REC-1105)
+#endif
+
+                if (Time.captureFramerate != 0 && Math.Abs(toComparePeriodSeconds - Time.captureDeltaTime) > (float.Epsilon + m_FramePadTime))
                     ConsoleLogMessage($"Recorder {GetType().Name} is set to record at a fixed rate and another component has already set a conflicting value for [Time.captureFramerate], new value being applied : {fixedRate}!", LogType.Error);
                 else if (Time.captureFramerate == 0 && RecorderOptions.VerboseMode)
                     ConsoleLogMessage($"Frame recorder set fixed frame rate to {fixedRate}", LogType.Log);
                 // Note that Time.captureDeltaTime will be modified by HDRP SubFrameManager
                 // to implement the accumulation motion blur/path tracer support.
 
-                Time.captureDeltaTime = 1.0f / fixedRate;
+                m_SessionStartTime = Time.time;
+                m_FrameInterval = (1.0d / (double)fixedRate); // Store the expected frame interval
+
+#if RECORDER_DISABLE_FRAME_TIME_PADDING
+                Time.captureDeltaTime = (float)(m_FrameInterval); // Do not use the "time padding" workaround (REC-1105)
+#else
+                Time.captureDeltaTime = (float)(m_FrameInterval + m_FramePadTime); // Need to add some time to the Time.captureDeltaTime to prevent double frame capture (REC-1105)
+#endif
 
                 sm_CaptureFrameRateCount++;
                 m_ModifiedCaptureFR = true;
@@ -221,13 +238,38 @@ namespace UnityEditor.Recorder
         /// <param name="ctx">The current recording session.</param>
         protected internal abstract void RecordFrame(RecordingSession ctx);
 
-
         /// <summary>
         /// Prepares a frame before recording it. Callback is invoked for every frame during the recording session, before RecordFrame.
         /// </summary>
         /// <param name="ctx">The current recording session.</param>
         protected internal virtual void PrepareNewFrame(RecordingSession ctx)
         {
+#if !RECORDER_DISABLE_FRAME_TIME_PADDING
+            ResetDeltaTime();
+#endif
+        }
+
+        /// <summary>
+        /// To prevent capturing frames too early (resulting in double frames captured),  due to
+        /// Time.captureDeltaTime rounding errors, Time.captureDeltaTime must be padded a bit
+        /// to ensure the sample is taken on the right side of the frame time boundary. This only
+        /// needs to be done on the first 2 frames it seems, after that reset Time.captureDeltaTime
+        /// back to the frame time interval. This addresses Jira issue REC-1105.
+        /// Use define symbol RECORDER_DISABLE_FRAME_TIME_PADDING to disable this.
+        /// </summary>
+        internal void ResetDeltaTime()
+        {
+            if (m_TimePadDisabled && Time.captureDeltaTime >= (float)m_FrameInterval)
+            {
+                // Time Padding is disabled
+                Time.captureDeltaTime = (float)m_FrameInterval; // Set captureDeltaTime back to the frame interval without any padding since this workaround is only needed for the first few frames
+                m_FramePadTime = 0;
+            }
+            else
+            {
+                // Time Padding is enabled
+                m_TimePadDisabled = (Time.time - m_SessionStartTime > 0f) ? true : false; // Disable padding this after we get past time 0
+            }
         }
 
         internal virtual void RecordSubFrame(RecordingSession ctx)
