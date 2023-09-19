@@ -89,3 +89,9 @@ Limitations to path tracing in HDRP also apply to path tracing in Accumulation. 
 **Limitation:** Recording accumulation while anti-aliasing is enabled in HDRP may have unintended effects on image quality.
 
 **Workaround:** Disable anti-aliasing in HDRP before recording with Accumulation. Enable **Anti-aliasing** in Accumulation instead.
+
+#### Progress bar is visible on frames when Accumulation is enabled
+
+**Known issue:** The Accumulation progress bar is sometimes visible at the bottom of a frame.
+
+**Workaround:** Leave the [Game View visible](RecordingAccumulation.md#game-view-visibility) at all times for the whole duration of the recording.

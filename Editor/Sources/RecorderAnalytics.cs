@@ -7,6 +7,7 @@ using System.Text;
 using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
+using UnityEngine.Analytics;
 using UnityEngine.Rendering;
 [assembly: InternalsVisibleTo("Unity.Recorder.Tests")]
 
@@ -27,8 +28,31 @@ namespace UnityEditor.Recorder
 
         const int startEventVersion = 2;
         const int completeEventVersion = 1;
+
+#if UNITY_2023_2_OR_NEWER
+
+        [AnalyticInfo(eventName: startEventName, vendorKey: vendorKey, version: startEventVersion)]
+        internal class SessionStartAnalytic : IAnalytic
+        {
+            private RecorderSessionStartEvent? data = null;
+            public SessionStartAnalytic(RecorderSessionStartEvent data)
+            {
+                this.data = data;
+            }
+
+            public bool TryGatherData(out IAnalytic.IData data, out Exception error)
+            {
+                error = null;
+                data = this.data;
+                return data != null;
+            }
+        }
         [Serializable]
+
+        internal struct RecorderSessionStartEvent : IAnalytic.IData
+#else
         internal struct RecorderSessionStartEvent
+#endif
         {
             public string recorder_session_guid;
             public bool exit_play_mode;
@@ -45,8 +69,29 @@ namespace UnityEditor.Recorder
             public List<MovieRecorderInfo> movie_recorder_info;
         }
 
+#if UNITY_2023_2_OR_NEWER
+
+        [AnalyticInfo(eventName: completeEventName, vendorKey: vendorKey, version: completeEventVersion)]
+        internal class SessionEndAnalytic : IAnalytic
+        {
+            private RecorderSessionEndEvent? data = null;
+            public SessionEndAnalytic(RecorderSessionEndEvent data)
+            {
+                this.data = data;
+            }
+
+            public bool TryGatherData(out IAnalytic.IData data, out Exception error)
+            {
+                error = null;
+                data = this.data;
+                return data != null;
+            }
+        }
         [Serializable]
+        internal struct RecorderSessionEndEvent : IAnalytic.IData
+#else
         internal struct RecorderSessionEndEvent
+#endif
         {
             public string recorder_session_guid;
             public string outcome;
@@ -242,22 +287,27 @@ namespace UnityEditor.Recorder
         {
             if (!EditorAnalytics.enabled)
                 return;
-
+#if UNITY_2023_2_OR_NEWER
+            EditorAnalytics.SendAnalytic(new SessionStartAnalytic(CreateSessionStartEvent(controller)));
+#else
             EditorAnalytics.RegisterEventWithLimit(startEventName, maxEventsPerHour, maxNumberOfElements, vendorKey, startEventVersion);
-
             var data = CreateSessionStartEvent(controller);
             EditorAnalytics.SendEventWithLimit(startEventName, data, startEventVersion);
+#endif
         }
 
         public static void SendStopEvent(RecorderController controller, bool error)
         {
             if (!EditorAnalytics.enabled)
                 return;
-
+#if UNITY_2023_2_OR_NEWER
+            EditorAnalytics.SendAnalytic(new SessionEndAnalytic(CreateStopEvent(controller, error)));
+#else
             EditorAnalytics.RegisterEventWithLimit(completeEventName, maxEventsPerHour, maxNumberOfElements, vendorKey, completeEventVersion);
 
             var data = CreateStopEvent(controller, error);
             EditorAnalytics.SendEventWithLimit(completeEventName, data, completeEventVersion);
+#endif
         }
 
         // Used by the Timeline
@@ -265,24 +315,30 @@ namespace UnityEditor.Recorder
         {
             if (!EditorAnalytics.enabled)
                 return;
-
+#if UNITY_2023_2_OR_NEWER
+            EditorAnalytics.SendAnalytic(new SessionStartAnalytic(CreateSessionStartEvent(session)));
+#else
             EditorAnalytics.RegisterEventWithLimit(startEventName, maxEventsPerHour, maxNumberOfElements, vendorKey, startEventVersion);
             var data = CreateSessionStartEvent(session);
             // Send the data to the database
             EditorAnalytics.SendEventWithLimit(startEventName, data, startEventVersion);
+#endif
         }
 
         public static void SendStopEvent(RecordingSession session, bool error, bool complete)
         {
             if (!EditorAnalytics.enabled)
                 return;
-
+#if UNITY_2023_2_OR_NEWER
+            EditorAnalytics.SendAnalytic(new SessionEndAnalytic(CreateStopEvent(session, error, complete)));
+#else
             EditorAnalytics.RegisterEventWithLimit(completeEventName, maxEventsPerHour, maxNumberOfElements, vendorKey, completeEventVersion);
 
             var data = CreateStopEvent(session, error, complete);
 
             // Send the data to the database
             EditorAnalytics.SendEventWithLimit(completeEventName, data, completeEventVersion);
+#endif
         }
 
         internal static RecorderSessionEndEvent CreateStopEvent(RecorderController controller, bool error)

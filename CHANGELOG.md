@@ -4,6 +4,18 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2023-09-19
+### Added
+- Tutorial in documentation to set up a Unity project with API scripting for starting recordings via a command line.  
+
+### Changed
+- Removed resolution automatic rounding to the nearest even number when Movie Recorder uses MP4 codec and "Match Window Size" output resolution.
+
+### Fixed
+- Prevent video output from being corrupted when generated via a Recorder Clip run through a Scene loaded in Play mode.
+- Ensure the project uses the right RenderPipeline settings at all time: quality RenderPipeline settings or default RenderPipeline settings.
+- Ensure that the status messages at the bottom of the Recorder window are always readable even if the window is small.
+
 ## [5.0.0-pre.1] - 2023-05-11
 ### Changed
 - Updated minimum required Unity Editor version to 2023.1.

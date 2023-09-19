@@ -17,11 +17,19 @@ Accumulation automatically applies a filter to reduce artifacts in spotlight sha
 
 The use of the **Accumulation** feature is subject to very specific conditions:
 * Your project must use [High Definition Render Pipeline (HDRP)](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest).
+* The **Game View** must be always visible during the recording.
 * The Accumulation feature is available only for **Movie** or **Image Sequence** recorders.
 * You can only select **Game View** or **Targeted Camera** as the **Source** for the recording.
 * You can only use one active Recorder at a time when you record accumulation.
 
 In addition to the requirements above, path-tracing accumulation requires DX12.
+
+## Game View must be visible
+When the Game View is hidden, for example, behind a Scene View, Unity can't reach [`WaitForEndOfFrame`](https://docs.unity3d.com/ScriptReference/WaitForEndOfFrame.html). If this happens during a recording, the Recorder stays in a waiting state but the simulation keeps moving forward, and so does the game clock.
+
+As a result:
+* As soon as and as long as the Game View is hidden, the Recorder can't record any frames of the simulation being played.
+* If you temporarily hide the Game View during accumulation, [a progress bar becomes visible in the recorded frames](KnownIssues.md#progress-bar-is-visible-on-frames-when-accumulation-is-enabled) due to sub-frame synchronization issue between Recorder and HDRP.
 
 ## Accumulation disables concurrent recording
 
@@ -40,6 +48,10 @@ You must disable (deselect) all other recorders before starting a recorder with 
 Ensure that no other Recorder Clips are active during the Start and End times of a Recorder Clip with Accumulation. Enabling Accumulation in a Recorder Clip disables all the Recorder Clips that are active at the same time, including the Recorder Clip with Accumulation.
 
 ## Limitations
+
+### Game View visibility
+
+[Progress bar is visible on frames when Accumulation is enabled](KnownIssues.md#progress-bar-is-visible-on-frames-when-accumulation-is-enabled). This happens if you temporarily hide the Game View.
 
 ### Motion blur
 

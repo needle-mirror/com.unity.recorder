@@ -118,6 +118,7 @@ PanelSplitter {
     padding-bottom: 5px;
     padding-left: 5px;
     padding-right: 5px;
+    flex-shrink: 0;
 }
 
 #recordButton {

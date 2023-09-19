@@ -19,7 +19,6 @@ namespace UnityEditor.Recorder.Timeline
             if (session != null)
             {
                 // does not support multiple starts...
-                session.SessionCreated();
                 m_PlayState = PlayState.Paused;
             }
         }
@@ -43,6 +42,15 @@ namespace UnityEditor.Recorder.Timeline
         {
             if (session == null)
                 return;
+
+            if (session.recorder == null)
+            {
+                // REC-1344 - On scene change in Timeline, the recorder component gets removed between CreatePlayable and OnBehaviourPlay
+                // As a result, we sometimes have to recreate the recorder
+                session.RecreateRecorder();
+            }
+
+            session.SessionCreated();
             m_PlayState = PlayState.Playing;
 
             if (session != null)

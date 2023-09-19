@@ -138,6 +138,14 @@ namespace UnityEditor.Recorder
             }
         }
 
+        internal void RecreateRecorder()
+        {
+            if (settings != null && recorder == null)
+            {
+                recorder = RecordersInventory.CreateDefaultRecorder(settings);
+            }
+        }
+
         internal bool BeginRecording()
         {
             try

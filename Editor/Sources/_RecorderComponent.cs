@@ -76,8 +76,8 @@ namespace UnityEditor.Recorder
                         RecorderPlayableBehaviour.recordingWithoutAccumulation = true;
                     }
                 }
-            }
 #endif
+            }
             if (fail)
             {
                 DestroyImmediate(this);
@@ -152,7 +152,7 @@ namespace UnityEditor.Recorder
                 case RecordMode.TimeInterval:
                 {
                     var expectedFrames = (session.settings.EndTime - session.settings.StartTime) *
-                                         session.settings.FrameRate;
+                        session.settings.FrameRate;
                     if (session.settings.FrameRatePlayback == FrameRatePlayback.Variable)
                     {
                         expectedFrames /= session.settings.captureEveryNthFrame;

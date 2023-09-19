@@ -43,20 +43,18 @@ namespace UnityEditor.Recorder.Input
         [SerializeField]
         OutputResolution m_OutputResolution = new OutputResolution();
 
-        internal bool forceEvenSize;
-
         /// <inheritdoc />
         public override int OutputWidth
         {
-            get { return ForceEvenIfNecessary(m_OutputResolution.GetWidth()); }
-            set { m_OutputResolution.SetWidth(ForceEvenIfNecessary(value)); }
+            get => m_OutputResolution.GetWidth();
+            set => m_OutputResolution.SetWidth(value);
         }
 
         /// <inheritdoc />
         public override int OutputHeight
         {
-            get { return ForceEvenIfNecessary(m_OutputResolution.GetHeight()); }
-            set { m_OutputResolution.SetHeight(ForceEvenIfNecessary(value)); }
+            get => m_OutputResolution.GetHeight();
+            set => m_OutputResolution.SetHeight(value);
         }
 
         internal ImageHeight outputImageHeight
@@ -69,14 +67,6 @@ namespace UnityEditor.Recorder.Input
         {
             get { return m_OutputResolution.maxSupportedHeight; }
             set { m_OutputResolution.maxSupportedHeight = value; }
-        }
-
-        int ForceEvenIfNecessary(int v)
-        {
-            if (forceEvenSize && outputImageHeight != ImageHeight.Custom)
-                return (v + 1) & ~1;
-
-            return v;
         }
 
         protected internal override void CheckForWarnings(List<string> warnings)

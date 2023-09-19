@@ -484,7 +484,7 @@ namespace UnityEditor.Recorder.Encoder
         public EncoderCoordinateConvention CoordinateConvention { get; }
         public string Extension { get; }
         public UnityEngine.TextureFormat GetTextureFormat(bool inputContainsAlpha);
-        public bool RequiresEvenResolution();
+        [System.Obsolete(@"RequiresEvenResolution() is no longer used.")] public bool RequiresEvenResolution();
         public bool SupportsCurrentPlatform();
         public void ValidateRecording(RecordingContext ctx, System.Collections.Generic.List<string> errors, System.Collections.Generic.List<string> warnings);
     }

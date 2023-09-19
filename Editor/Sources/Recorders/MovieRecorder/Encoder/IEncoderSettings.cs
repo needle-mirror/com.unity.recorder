@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -62,6 +63,7 @@ namespace UnityEditor.Recorder.Encoder
         /// Indicates whether this encoder requires the width and height of the image to both be even numbers or not.
         /// </summary>
         /// <returns>True if this encoder requires even dimensions, False otherwise.</returns>
+        [Obsolete("RequiresEvenResolution() is no longer used.")]
         public bool RequiresEvenResolution()
         {
             return false;

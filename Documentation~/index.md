@@ -15,6 +15,8 @@ You can set up and launch recordings in two ways:
 
 - Through a [Recorder Clip](RecordingTimelineTrack.md) within a [Timeline](https://docs.unity3d.com/Packages/com.unity.timeline@latest) track.
 
+You can also use the Recorder API for multiple use cases, such as [launching recordings from the command line](CommandLineRecorder.md).
+
 ## Available recorder types
 
 ### Default recorders

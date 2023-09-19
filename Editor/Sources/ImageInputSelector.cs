@@ -63,12 +63,6 @@ namespace UnityEditor.Recorder
                 }
             }
         }
-
-        internal void ForceEvenResolution(bool value)
-        {
-            gameViewInputSettings.forceEvenSize = value;
-            cameraInputSettings.forceEvenSize = value;
-        }
     }
 
     [Serializable]

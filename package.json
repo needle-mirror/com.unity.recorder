@@ -1,7 +1,7 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Recorder",
-  "version": "5.0.0-pre.1",
+  "version": "5.0.0",
   "unity": "2023.1",
   "unityRelease": "1f1",
   "dependencies": {
@@ -22,19 +22,19 @@
     "layer"
   ],
   "relatedPackages": {
-    "com.unity.recorder.tests": "5.0.0-pre.1"
+    "com.unity.recorder.tests": "5.0.0"
   },
   "_upm": {
-    "changelog": "### Changed\n- Updated minimum required Unity Editor version to 2023.1.\n- Removed obsolete warnings about spot lights when recording accumulation in 2023.2. \n- Removed AOV recorder.\n\n### Fixed\n- An exception no longer occurs when deleting all but one recorder when the deleted recorders' outputs were incompatible with, or names conflicted with, the remaining recorder.\n- An error message is now displayed and the Recorder is prevented from starting if MainCamera is selected while the main camera is missing from the project.\n- Prevent the Recorder from capturing audio if there are more than two audio channels because only mono or stereo recording is supported.\n- To fix a compression issue, the VP8 target bitrate is now converted to bits per second (bps) instead of kilobits per second (kbps).\n- The Physical Camera property now stays enabled when recording with accumulation anti-aliasing."
+    "changelog": "### Added\n- Tutorial in documentation to set up a Unity project with API scripting for starting recordings via a command line.  \n\n### Changed\n- Removed resolution automatic rounding to the nearest even number when Movie Recorder uses MP4 codec and \"Match Window Size\" output resolution.\n\n### Fixed\n- Prevent video output from being corrupted when generated via a Recorder Clip run through a Scene loaded in Play mode.\n- Ensure the project uses the right RenderPipeline settings at all time: quality RenderPipeline settings or default RenderPipeline settings.\n- Ensure that the status messages at the bottom of the Recorder window are always readable even if the window is small."
   },
   "upmCi": {
-    "footprint": "87b49d3bf5b19eb6bd7db6fc1f178838ad027f24"
+    "footprint": "eef599842769f1b2303d4a05d12cb70e19663200"
   },
   "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.recorder@5.0/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.recorder.git",
     "type": "git",
-    "revision": "3feb599fdaea65475852c322372d74515c72fb7e"
+    "revision": "cd750a66bf75ef56d93106b65f5ff599a8eb0016"
   },
   "samples": [
     {
