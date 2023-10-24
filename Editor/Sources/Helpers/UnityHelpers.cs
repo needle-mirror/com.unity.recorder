@@ -169,7 +169,7 @@ namespace UnityEditor.Recorder
         /// <returns>bool</returns>
         internal static bool UsingHDRP()
         {
-            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
+            var pipelineAsset = GraphicsSettings.currentRenderPipeline;
             var usingHDRP = pipelineAsset != null && pipelineAsset.GetType().FullName.Contains("High");
             return usingHDRP;
         }
@@ -180,7 +180,7 @@ namespace UnityEditor.Recorder
         /// <returns>bool</returns>
         internal static bool UsingURP()
         {
-            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
+            var pipelineAsset = GraphicsSettings.currentRenderPipeline;
             var usingURP = pipelineAsset != null &&
                 (pipelineAsset.GetType().FullName.Contains("Universal") ||
                     pipelineAsset.GetType().FullName.Contains("Lightweight"));
@@ -193,7 +193,7 @@ namespace UnityEditor.Recorder
         /// <returns>bool</returns>
         internal static bool UsingLegacyRP()
         {
-            var pipelineAsset = GraphicsSettings.renderPipelineAsset;
+            var pipelineAsset = GraphicsSettings.currentRenderPipeline;
             return pipelineAsset == null;
         }
 

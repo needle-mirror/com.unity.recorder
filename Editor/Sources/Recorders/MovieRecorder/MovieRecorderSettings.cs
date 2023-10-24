@@ -111,10 +111,6 @@ namespace UnityEditor.Recorder
             var iis = m_ImageInputSelector.Selected as StandardImageInputSettings;
             if (iis != null)
                 iis.maxSupportedSize = ImageHeight.x2160p_4K;
-
-            // Force even resolution in GameView and Target Cam if required
-            if (EncoderSettings != null && EncoderSettings.RequiresEvenResolution())
-                m_ImageInputSelector.ForceEvenResolution(true);
         }
 
         /// <summary>

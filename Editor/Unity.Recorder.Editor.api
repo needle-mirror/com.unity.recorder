@@ -553,7 +553,7 @@ namespace UnityEditor.Recorder.Encoder
         public virtual UnityEditor.Recorder.Encoder.EncoderCoordinateConvention CoordinateConvention { get; }
         public abstract string Extension { get; }
         public abstract UnityEngine.TextureFormat GetTextureFormat(bool inputContainsAlpha);
-        public virtual bool RequiresEvenResolution();
+        [System.Obsolete(@"RequiresEvenResolution() is no longer used.")] public virtual bool RequiresEvenResolution();
         public abstract bool SupportsCurrentPlatform();
         public abstract void ValidateRecording(UnityEditor.Recorder.Encoder.RecordingContext ctx, System.Collections.Generic.List<string> errors, System.Collections.Generic.List<string> warnings);
     }

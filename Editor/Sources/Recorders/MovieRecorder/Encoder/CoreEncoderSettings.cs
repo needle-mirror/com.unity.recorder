@@ -286,14 +286,6 @@ namespace UnityEditor.Recorder.Encoder
         }
 
         /// <inheritdoc/>
-        bool IEncoderSettings.RequiresEvenResolution()
-        {
-            if (Codec == OutputCodec.MP4)
-                return true;
-            return false;
-        }
-
-        /// <inheritdoc/>
         public bool SupportsCurrentPlatform()
         {
             return true;
