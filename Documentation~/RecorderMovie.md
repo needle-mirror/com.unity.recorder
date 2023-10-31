@@ -4,7 +4,8 @@ The **Movie Recorder** generates videos in the H.264 MP4, VP8 WebM, or ProRes Qu
 
 This page covers all properties specific to the Movie Recorder type.
 
-> **Note:** To fully configure any Recorder, you must also set the general recording properties according to the recording interface you are using: the [Recorder window](RecorderWindowRecordingProperties.md) or a [Recorder Clip](RecordingTimelineTrack.md#recorder-clip-properties).
+>[!NOTE]
+>To fully configure any Recorder, you must also set the general recording properties according to the recording interface you are using: the [Recorder window](RecorderWindowRecordingProperties.md) or a [Recorder Clip](RecordingTimelineTrack.md#recorder-clip-properties).
 
 ![](Images/RecorderMovie.png)
 
@@ -75,7 +76,8 @@ Use this section to set up the media format you need to save the recorded images
 | **Encoding Profile**<br />(H.264 MP4 only) | Custom encoding profile: choose **H.264 Baseline**, **H.264 Main**, or **H.264 High**. Each [encoding profile](https://en.wikipedia.org/wiki/Advanced_Video_Coding#Profiles) defines a different set of capabilities and constraints on which decoders rely. |
 | **B-Frames**<br />(H.264 MP4 only) | Custom value for the number of bidirectional predicted frames ([B-frames](https://en.wikipedia.org/wiki/Video_compression_picture_types)). |
 
->**Tip:** See Youtube's [Recommended upload encoding settings](https://support.google.com/youtube/answer/1722171?hl=en#zippy=%2Ccontainer-mp%2Cvideo-codec-h%2Cframe-rate%2Cbitrate) for H.264 MP4.
+>[!TIP]
+>See Youtube's [Recommended upload encoding settings](https://support.google.com/youtube/answer/1722171?hl=en#zippy=%2Ccontainer-mp%2Cvideo-codec-h%2Cframe-rate%2Cbitrate) for H.264 MP4.
 
 ### GIF Encoder properties
 
@@ -94,4 +96,5 @@ Use this section to set up the media format you need to save the recorded images
 
 Use this section to specify the output **Path** and **File Name** pattern to save the recorded movie file.
 
-> **Note:** [Output File properties](OutputFileProperties.md) work the same for all types of recorders.
+>[!NOTE]
+>[Output File properties](OutputFileProperties.md) work the same for all types of recorders.

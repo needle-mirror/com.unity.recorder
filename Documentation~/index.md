@@ -1,64 +1,34 @@
-# About Recorder
+# Recorder package
 
 ![Recorder](Images/RecorderSplash.png)
 
-Use the Recorder package to capture and save data during [Play mode](https://docs.unity3d.com/Manual/GameView.html). For example, you can capture gameplay or a cinematic and save it as a video file.
-
 >[!NOTE]
->You can use the Recorder in the Unity Editor only. It does not work in standalone Unity Players or builds.
+>To use the Recorder package, you must install it separately from the Unity Editor. For detailed information about package requirements and installation instructions, refer to [Installation](installation.md).
 
-## Recording
+Use the Recorder package to capture and save data from your Unity project in **[Play mode](https://docs.unity3d.com/Manual/GameView.html)**:
 
-You can set up and launch recordings in two ways:
+* Capture gameplay or a cinematic and save it as a video file, as an animated GIF, or as a sequence of separate image files.
 
-- From the [Recorder window](RecordingRecorderWindow.md).
+* Capture accumulated sub-frames to get motion blur effect or path tracing convergence on the final recorded frames.
 
-- Through a [Recorder Clip](RecordingTimelineTrack.md) within a [Timeline](https://docs.unity3d.com/Packages/com.unity.timeline@latest) track.
+* Capture AOV render pass data from your Scene and save it as multi-part EXR files for further image compositing.
 
-You can also use the Recorder API for multiple use cases, such as [launching recordings from the command line](CommandLineRecorder.md).
+* Capture the movements of a targeted character or camera from your Scene and record them as an animation file.
 
-## Available recorder types
+* Capture audio from Play mode to save it as a separate WAV audio file.
 
-### Default recorders
+>[!WARNING]
+>The Recorder is designed to work only in the Unity Editor in Play mode. It does not work in standalone Unity Players or builds.
 
-The Recorder includes the following recorder types by default:
-
-* **Animation Clip Recorder:** generates an animation clip in Unity Animation format (.anim extension).
-
-* **Movie Recorder:** generates a video in H.264 MP4, VP8 WebM, or ProRes QuickTime format.
-
-* **Image Sequence Recorder:** generates a sequence of image files in JPEG, PNG, or EXR (OpenEXR) format.
-
-* **Audio Recorder:** generates an audio clip in WAV format.
-
-### Additional recorders
-
-You can also benefit from additional Recorder types if you install specific packages along with the Recorder:
-
-* The [Alembic for Unity](https://docs.unity3d.com/Packages/com.unity.formats.alembic@latest) package includes an **Alembic Clip Recorder**, which allows you to record and export GameObjects to an Alembic file.
-
-* The [FBX Exporter](https://docs.unity3d.com/Packages/com.unity.formats.fbx@latest) package includes an **FBX Recorder**, which allows you to record and export animations directly to FBX files.
-
-
-## Samples
-
-Various [samples](samples.md) are available with the Recorder package to help you experiment with some specific features and use cases.
-
-One of them allows you to [integrate FFmpeg as a custom command line encoder](samples-custom-encoder.md) in the Movie Recorder.
-
-
-## Package technical details
-
-### Installation
-
-To install this package, follow the instructions in the [Package Manager documentation](https://docs.unity3d.com/Manual/upm-ui-install.html).
-
-### Requirements
-
-This version of the Recorder is compatible with the following versions of the Unity Editor:
-
-* 2023.1 and later (recommended)
-
-### Known issues and limitations
-
-See the list of current [known issues and limitations](KnownIssues.md) that you might experience with the Recorder, and their workarounds.
+| Section | Description |
+| :--- | :--- |
+| [Installation](installation.md) | Install the Recorder package. |
+| [Recorder concepts and features](concepts-and-features.md) | Learn about the types of recording workflows you can use with the Recorder package, get a description of all recorder types available by default in this package and the ones available in conjunction with other packages, and see how you can extend the package functionality via its scripting API. |
+| [Get started](get-started.md) | Set up and launch recordings according to the workflow that best suits your needs: single recording session with multiple simultaneous recorders, or multiple independent recordings triggered from Timeline. |
+| [Record videos and image sequences](RecordingExamplesofUse.md) | Get instructions and recommendations to achieve different use cases provided as examples for video and image sequence recording: video in Full HD MP4, animated GIF, or image sequence with linear sRGB color space. |
+| [Record with Accumulation](RecordingAccumulation.md) | Get concepts and recommendations about sub-frame accumulation recording, and record with accumulation to produce motion blur effect or path tracing convergence. |
+| [Record AOVs](aov-concepts.md) | Get concepts about AOV recording and use cases for further compositing. |
+| [Launch recordings from the command line](CommandLineRecorder.md) | Set up your Unity project to launch recordings from the command line. Use this setup to enable batch recording via a job queue of many command lines targeting different recordings.  |
+| [Recorder types and properties](RecorderProperties.md) | Get the description of all Recorder properties: recording session properties, input and output properties for all available types of recorders. |
+| [Samples](samples.md) | Use the samples provided with the Recorder package to experiment with some specific features and use cases. For example, integrate FFmpeg as a custom command line encoder in the Movie Recorder. |
+| [Known issues and troubleshooting](troubleshooting.md) | Get information about the Recorder package known issues and limitations and enable tools to help you debug recorders. |

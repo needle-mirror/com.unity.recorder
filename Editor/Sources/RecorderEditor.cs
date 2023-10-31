@@ -137,6 +137,7 @@ namespace UnityEditor.Recorder
                 if (showInput)
                 {
                     EditorGUILayout.Separator();
+                    CustomGUI();
                     ImageRenderOptionsGUI();
                     ExtraOptionsGUI();
                     if (UnityHelpers.UsingHDRP())
@@ -295,6 +296,13 @@ namespace UnityEditor.Recorder
         /// Displays properties related to the encoding of the file.
         /// </summary>
         protected virtual void OnEncodingGui()
+        {
+        }
+
+        /// <summary>
+        /// Override this function to add custom UI at the top of the Input section.
+        /// </summary>
+        internal virtual void CustomGUI()
         {
         }
 

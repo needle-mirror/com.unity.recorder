@@ -2,7 +2,7 @@
 
 When Accumulation is enabled, the image that is rendered on each frame is based on the sub frames accumulated during the recording. The Samples and Shutter Interval properties define the sub frames to accumulate. The Shutter Profile property defines the weight applied to each sub frame in the rendered image.
 
->**Notes:**
+>[!NOTE]
 >* Sub frames that precede the first frame, as defined by the Start Frame property, are not captured on the first frame. Accumulation begins in the interval before the second frame.<br/>
 
 >* The number of samples (sub frames) in the diagram below is for illustration only. Hundreds of samples may be needed to produce a smooth motion-blur trail; thousands of path-tracing samples may be needed to converge on a clean image.

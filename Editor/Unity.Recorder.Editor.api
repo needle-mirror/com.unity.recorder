@@ -37,6 +37,47 @@ namespace UnityEditor.Recorder
         public override void OnAfterDuplicate();
     }
 
+    [RecorderSettings(typeof(AOVRecorder), @"AOV Image Sequence", @"aovimagesequence_16")] public class AOVRecorderSettings : RecorderSettings
+    {
+        [System.Obsolete(@"Use Get/SetAOVSelection to choose the AOVs")] public AOVType AOVSelection { get; set; }
+        public bool CaptureHDR { get; }
+        public CompressionUtility.EXRCompressionType EXRCompression { get; set; }
+        public int EXRCompressionLevel { get; set; }
+        protected override string Extension { get; }
+        public Input.ImageInputSettings imageInputSettings { get; set; }
+        public override System.Collections.Generic.IEnumerable<RecorderInputSettings> InputsSettings { get; }
+        public bool IsMultiPartEXR { get; set; }
+        protected override int LatestVersion { get; }
+        public ImageRecorderSettings.ColorSpaceType OutputColorSpace { get; set; }
+        public ImageRecorderSettings.ImageRecorderOutputFormat OutputFormat { get; set; }
+        protected override int Version { get; set; }
+        public AOVRecorderSettings() {}
+        public AOVType[] GetAOVSelection();
+        protected override void GetErrors(System.Collections.Generic.List<string> errors);
+        protected override void OnUpgradeFromVersion();
+        public void SetAOVSelection(params AOVType[] value);
+    }
+
+    public enum AOVType
+    {
+        Albedo = 1,
+        Alpha = 7,
+        AmbientOcclusion = 4,
+        Beauty = 0,
+        Depth = 15,
+        DirectDiffuse = 8,
+        DirectSpecular = 9,
+        Emissive = 13,
+        IndirectDiffuse = 10,
+        Metal = 5,
+        MotionVectors = 14,
+        Normal = 2,
+        Reflection = 11,
+        Refraction = 12,
+        Smoothness = 3,
+        Specular = 6,
+    }
+
     [RecorderSettings(typeof(AudioRecorder), @"Audio")] public class AudioRecorderSettings : RecorderSettings
     {
         protected override string Extension { get; }
@@ -50,7 +91,7 @@ namespace UnityEditor.Recorder
         public int OutputHeight { get; protected set; }
         protected UnityEngine.RenderTexture OutputRenderTexture { get; set; }
         public int OutputWidth { get; protected set; }
-        protected UnityEngine.Texture2D ReadbackTexture { get; set; }
+        [System.Obsolete] protected UnityEngine.Texture2D ReadbackTexture { get; set; }
         protected BaseRenderTextureInput() {}
         protected override void Dispose(bool disposing);
         protected void ReleaseBuffer();
@@ -75,6 +116,22 @@ namespace UnityEditor.Recorder
         public static void Duplicate(string id, string newId);
         public static UnityEngine.Object Get(string id);
         public static void Set(string id, UnityEngine.Object obj);
+    }
+
+    public static class CompressionUtility
+    {
+        public enum EXRCompressionType
+        {
+            B44 = 5,
+            B44a = 6,
+            DWAA = 7,
+            DWAB = 8,
+            None = 0,
+            PIZ = 3,
+            RLE = 1,
+            Zip = 2,
+            Zips = 4,
+        }
     }
 
     public static class DefaultWildcard
@@ -138,7 +195,7 @@ namespace UnityEditor.Recorder
         public AccumulationSettings AccumulationSettings { get; set; }
         public bool CaptureAlpha { get; set; }
         public bool CaptureHDR { get; }
-        public ImageRecorderSettings.EXRCompressionType EXRCompression { get; set; }
+        public CompressionUtility.EXRCompressionType EXRCompression { get; set; }
         protected override string Extension { get; }
         public Input.ImageInputSettings imageInputSettings { get; set; }
         public override System.Collections.Generic.IEnumerable<RecorderInputSettings> InputsSettings { get; }
@@ -156,7 +213,7 @@ namespace UnityEditor.Recorder
             sRGB_sRGB = 0,
             Unclamped_linear_sRGB = 1,
         }
-        public enum EXRCompressionType
+        [System.Obsolete(@"Use CompressionUtility.EXRCompressionType instead.")] public enum EXRCompressionType
         {
             None = 0,
             PIZ = 3,
@@ -195,7 +252,9 @@ namespace UnityEditor.Recorder
         protected override string Extension { get; }
         public Input.ImageInputSettings ImageInputSettings { get; set; }
         public override System.Collections.Generic.IEnumerable<RecorderInputSettings> InputsSettings { get; }
+        protected override int LatestVersion { get; }
         [System.Obsolete(@"Please use the EncoderSettings API to set/get the format/codec of each Encoder.")] public MovieRecorderSettings.VideoRecorderOutputFormat OutputFormat { get; set; }
+        protected override int Version { get; set; }
         [System.Obsolete(@"Please use the EncoderSettings API to set/get the bitrate/encoding quality of each Encoder.")] public VideoBitrateMode VideoBitRateMode { get; set; }
         public MovieRecorderSettings() {}
         public AccumulationSettings GetAccumulationSettings();
@@ -203,6 +262,7 @@ namespace UnityEditor.Recorder
         protected override void GetWarnings(System.Collections.Generic.List<string> warnings);
         protected override bool HasErrors();
         public override bool IsAccumulationSupported();
+        protected override void OnUpgradeFromVersion();
         [System.Obsolete(@"Please use the EncoderSettings API to access the encoding quality of each Encoder.")] public enum VideoEncodingQuality
         {
             High = 2,
@@ -341,11 +401,13 @@ namespace UnityEditor.Recorder
         public FrameRatePlayback FrameRatePlayback { get; set; }
         public abstract System.Collections.Generic.IEnumerable<RecorderInputSettings> InputsSettings { get; }
         public virtual bool IsPlatformSupported { get; }
+        protected virtual int LatestVersion { get; }
         public string OutputFile { get; set; }
         public RecordMode RecordMode { get; set; }
         public int StartFrame { get; set; }
         public float StartTime { get; set; }
         public int Take { get; set; }
+        protected virtual int Version { get; set; }
         protected RecorderSettings() {}
         protected virtual void GetErrors(System.Collections.Generic.List<string> errors);
         protected virtual void GetWarnings(System.Collections.Generic.List<string> warnings);
@@ -354,6 +416,7 @@ namespace UnityEditor.Recorder
         protected virtual void OnAfterDeserialize();
         public virtual void OnAfterDuplicate();
         protected virtual void OnBeforeSerialize();
+        protected virtual void OnUpgradeFromVersion();
         [System.Obsolete(@"Please use methods GetErrors() and GetWarnings()")] protected virtual bool ValidityCheck(System.Collections.Generic.List<string> errors);
     }
 
@@ -561,6 +624,12 @@ namespace UnityEditor.Recorder.Input
             Lossless = 1,
             Lossy = 0,
         }
+    }
+
+    public class AOVCameraInputSettings : CameraInputSettings
+    {
+        protected override System.Type InputType { get; }
+        public AOVCameraInputSettings() {}
     }
 
     public class AudioInput : RecorderInput

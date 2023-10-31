@@ -1,12 +1,6 @@
-# Recorder properties
+# Recorder types and properties
 
 The way to set up the properties of a Recorder is the same whether you do it for a Recorder selected in the list of the [Recorder window](RecordingRecorderWindow.md) or in the Inspector of a [Timeline Recorder Clip](RecordingTimelineTrack.md).
-
-## Generic properties
-
-All types of Recorders have [**Output File properties**](OutputFileProperties.md).
-
-These specify the name, path, and other data for the files the Recorder outputs.
 
 ## Recorder-specific properties
 
@@ -19,6 +13,14 @@ Each type of Recorder has specific **Input** and **Output Format** properties yo
 - [**Image Sequence Recorder properties**](RecorderImage.md)
 
 - [**Audio Recorder properties**](RecorderAudio.md)
+
+- [**AOV Image Sequence Recorder properties**](aov-recorder-properties.md)
+
+## Output File properties
+
+All types of Recorders have [**Output File properties**](OutputFileProperties.md).
+
+These specify the name, path, and other data for the files the Recorder outputs.
 
 ## Recorder Presets
 

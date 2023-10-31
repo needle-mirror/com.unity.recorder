@@ -1,6 +1,6 @@
 These properties appear when you set **Source** to **Game View**.
 
->**Note:**
+>[!NOTE]
 >* If you have multiple Game Views in your project, the Recorder captures only the last one you selected in the Editor.
 >* If you are using more than one Recorder to capture Game View, they must all use the same resolution settings.
 >* If the Output Resolution and/or Aspect Ratio in the Recorder is different than the Game view resolution, the Recorder switches the Game view to the Recorder's resolution before starting the recording. After the recording ends, the Game view does not automatically revert to its previous resolution.

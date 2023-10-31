@@ -2,6 +2,10 @@
 
 This page lists some known issues and limitations that you might experience with the Recorder. It also gives basic instructions to help you work around them.
 
+#### Recorder doesn't work when running the Editor in batch mode
+
+**Limitation:** When you launch the Unity Editor from the [command line](https://docs.unity3d.com/Manual/EditorCommandLineArguments.html) with the `-batchmode` argument, the graphics pipeline is not initialized. In that context, the Recorder cannot capture frames properly and the recording never starts.
+
 #### Recording slowdown with concurrent Movie Recorders
 
 **Limitation:** The Unity Editor playback process might substantially slow down if you perform concurrent recordings with multiple Movie Recorders, particularly with large image resolutions (full HD or higher).
@@ -10,9 +14,9 @@ This page lists some known issues and limitations that you might experience with
 
 #### ActiveCamera recording not available with SRPs
 
-**Limitation:** The use of a Scriptable Render Pipeline ([SRP](https://docs.unity3d.com/Manual/ScriptableRenderPipeline.html)) in your project prevents you from setting ActiveCamera as the source of the recording in the [Movie Recorder](RecorderMovie.md#targeted-camera-source-properties) and the [Image Sequence Recorder](RecorderImage.md#targeted-camera-source-properties). This render pipeline limitation applies to all SRPs including Unity's High Definition Render Pipeline ([HDRP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest)) and Universal Render Pipeline ([URP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest)).
+**Limitation:** The use of a Scriptable Render Pipeline ([SRP](https://docs.unity3d.com/Manual/ScriptableRenderPipeline.html)) in your project prevents you from setting ActiveCamera as the source of the recording in the [Movie Recorder](RecorderMovie.md#targeted-camera-source-properties) and the [Image Sequence Recorder](RecorderImage.md#targeted-camera-source-properties). This render pipeline limitation applies to all SRPs including Unity's High Definition Render Pipeline ([HDRP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest)) and Universal Render Pipeline ([URP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest)). For the same reason, the [AOV Recorder](aov-recorder-properties.md#camera), which requires HDRP, doesn't include the ActiveCamera option by design.
 
-**Workaround:** You can use a Tagged Camera for the recording. In your project, add a [Tag](https://docs.unity3d.com/Manual/Tags.html) to the camera you want to record through, and then in the Recorder Settings, select TaggedCamera and specify your camera's Tag.
+**Workaround:** You can use a Tagged Camera for the recording. In your project, add a [Tag](https://docs.unity3d.com/Manual/Tags.html) to the camera you want to record through. Then, in the Recorder Settings, select TaggedCamera and specify your camera's Tag.
 
 #### Audio recording limited support
 
@@ -28,11 +32,21 @@ This page lists some known issues and limitations that you might experience with
 
 **Limitation:** The Movie Recorder doesn't support H.264 MP4 and ProRes QuickTime encoding on Linux.
 
+#### Limited support of AA/TAA in AOVs
+
+**Limitation:** The Beauty AOV is the only AOV that you can currently record with Anti-Aliasing (AA) / Temporal Anti-Aliasing (TAA) enabled on your recording camera.
+
+#### Color artifacts in AOV recordings when TAA is enabled
+
+**Known issue:** If you record multiple AOVs while the recording camera has Temporal Anti-Aliasing (TAA) enabled, the recorded outputs might contain unexpected color artifacts. For example, some areas of a Beauty pass might include artificial colors coming from the data recorded for a Normal pass.
+
+**Workaround:** If you need to record a Beauty pass with TAA enabled on your recording camera, you should record it through its own recording session, separately from any other AOVs.
+
 #### Recording discontinuous animations results in continuous animation curve
 
 **Limitation:** When you use a single recorder to record an animation sequence that includes discontinuities (for example, camera cuts), the Recorder interpolates and smoothens all discontinuities in the resulting animation curve, as it is by design in Unity. However, this process alters the expected discontinuities in the recorded animation.
 
-**Workaround:** To keep discontinuities while recording animations, you need to perform several recordings between the cuts. For example, you could set up several Recorder clips in Timeline, relative to the source animations you need to record.
+**Workaround:** To keep discontinuities while recording animations, you need to perform several recordings between the cuts. For example, you could set up several Recorder Clips in Timeline, relative to the source animations you need to record.
 
 #### UNC paths not supported as output locations
 
@@ -95,3 +109,14 @@ Limitations to path tracing in HDRP also apply to path tracing in Accumulation. 
 **Known issue:** The Accumulation progress bar is sometimes visible at the bottom of a frame.
 
 **Workaround:** Leave the [Game View visible](RecordingAccumulation.md#game-view-visibility) at all times for the whole duration of the recording.
+
+#### Jagged edges when rendering alpha with DLSS enabled
+
+**Known issue:** Nvidia Deep Learning Super Sampling (DLSS) does not support alpha channels. Thus, if you enable DLSS in HDRP Project Settings and you record a movie or image sequence through a camera set up for transparent background rendering, you might get jagged edges at the transparent area in the output images.
+
+**Workaround for upscaling:** To upscale an image with a transparent background, use [Temporal Anti-Aliasing (TAA) Upscale](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Dynamic-Resolution.html#Choosing_Upscale_Filter).
+
+**Workaround for anti-aliasing:** To apply [anti-aliasing](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Anti-Aliasing.html) on an image with a transparent background, several options are available depending on your context and needs:
+* Disable Temporal Anti-Aliasing (TAA) in your Project Settings and set up your Recorder for [accumulation](RecorderAccumulationProperties.md) with **Anti-aliasing** enabled, or
+* Enable Subpixel Morphological Anti-Aliasing (SMAA) in your Project Settings, or
+* Render at a higher resolution and use a shader to downsample with a filter (Bicubic, Lanczos, etc).

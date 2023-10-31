@@ -4,22 +4,35 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.0.0] - 2023-09-19
+## [5.1.0-pre.1] - 2023-10-31
 ### Added
-- Tutorial in documentation to set up a Unity project with API scripting for starting recordings via a command line.  
+- Added error message in UI if full output file path exceeds 259 characters.
+- The AOV Image Recorder now supports recording multiple AOVs at once and writes multi-part EXR files.
+  - Added the option to export AOVs of each frame to a single multi-part EXR file or to multiple EXR files.
+  - On upgrade, AOV Recorder settings seamlessly translate the former single AOV drop-down selection into the corresponding new AOV checkbox.
+  - Added categories to AOV selection UI for improved conceptual grouping and multi-selection.
+  - Revised all AOV labels and added tooltips for each AOV and category.
+- The AOV Image Recorder supports additional compression options: Zips, B44, B44a, DWAA and DWAB.
+- Added a tutorial in documentation to set up a Unity project with API scripting for starting recordings via a command line.
 
 ### Changed
 - Removed resolution automatic rounding to the nearest even number when Movie Recorder uses MP4 codec and "Match Window Size" output resolution.
+- Removed JPEG export option from the AOV Recorder.
+- The Ambient Occlusion AOV was outputting the contents of the occlusion material map. Now, the AOV outputs the result of the Screen Space Ambient Occlusion post-processing pass.
+- Removed two unnecessary composited Lighting AOVs (Diffuse Lighting and Specular Lighting) from the exportable AOVs.
+- Refactored the documentation around the two recording frameworks available and the different use cases provided as examples.
+- Updated the documentation architecture overall to improve navigation and findability.
 
 ### Fixed
 - Prevent video output from being corrupted when generated via a Recorder Clip run through a Scene loaded in Play mode.
 - Ensure the project uses the right RenderPipeline settings at all time: quality RenderPipeline settings or default RenderPipeline settings.
 - Ensure that the status messages at the bottom of the Recorder window are always readable even if the window is small.
+- Fix the visibility of the Preset icon in Light mode.
 
 ## [5.0.0-pre.1] - 2023-05-11
 ### Changed
 - Updated minimum required Unity Editor version to 2023.1.
-- Removed obsolete warnings about spot lights when recording accumulation in 2023.2. 
+- Removed obsolete warnings about spot lights when recording accumulation in 2023.2.
 - Removed AOV recorder.
 
 ### Fixed

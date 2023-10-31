@@ -75,6 +75,10 @@ namespace UnityEditor.Recorder
     {
         private static string s_OutputFileErrorMessage = "Recorder output file cannot be empty";
 
+        //  Use the Windows value of 259 (260-1 for the NUL terminator)
+        // (https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation)
+        private int m_MaxPathLength = 259;
+
         /// <summary>
         /// Stores the path this Recorder will use to generate the output file.
         /// It can be either an absolute or a relative path.
@@ -269,6 +273,11 @@ namespace UnityEditor.Recorder
             {
                 errors.Add("Conflicting resolution detected. All active Recorders must have the same output resolution.");
             }
+
+            if (fileNameGenerator.BuildAbsolutePath(null).Length > m_MaxPathLength)
+            {
+                errors.Add($"File path length exceeds {m_MaxPathLength} characters.");
+            }
         }
 
         /// <summary>
@@ -361,19 +370,19 @@ namespace UnityEditor.Recorder
             return false;
         }
 
-        // Obsolete and asset upgrade stuff. Should be moved to a new file (Trunk bug prevents it for now)
+        ///<summary>
+        /// Indicates the latest version of the recorder.
+        /// This is used during the asset upgrade process to determine if the asset needs to be upgraded.
+        /// Derived classes should override this property to provide their own latest version.
+        /// </summary>
+        protected virtual int LatestVersion { get => 0; }
 
-        internal enum Versions
-        {
-            Initial = 0,
-            MovieEncoders = 1,
-        }
-
-        internal const int k_LatestVersion = (int)Versions.MovieEncoders;
-
-        [SerializeField, HideInInspector] int m_Version = 0;
-
-        internal int Version => m_Version;
+        /// <summary>
+        /// Indicates the current version of this recorder.
+        /// This is used during the asset upgrade process to determine if the asset needs to be upgraded.
+        /// Derived classes should override this property to provide their own version.
+        /// </summary>
+        protected virtual int Version { get; set; } = 0;
 
         /// <summary>
         /// Unity calls this method before serializing the object.
@@ -388,9 +397,9 @@ namespace UnityEditor.Recorder
         /// </summary>
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
-            if (m_Version < k_LatestVersion)
+            if (Version < LatestVersion)
             {
-                OnUpgradeFromVersion((Versions)m_Version); //upgrade derived classes
+                OnUpgradeFromVersion(); //upgrade derived classes
             }
 
             OnAfterDeserialize();
@@ -403,7 +412,7 @@ namespace UnityEditor.Recorder
 
         void OnValidateUpgrade()
         {
-            m_Version = k_LatestVersion;
+            Version = LatestVersion;
         }
 
         /// <summary>
@@ -416,8 +425,15 @@ namespace UnityEditor.Recorder
         /// </summary>
         protected virtual void OnAfterDeserialize() {} // Do not clean up since users can only override this
 
-        internal virtual void OnUpgradeFromVersion(Versions oldVersion) {}
+        /// <summary>
+        /// Defines how to handle the upgrade of Recorder Settings created in a previous version according to their type.
+        /// Unity automatically calls this method when loading a Recorder Setting (after deserialization) if its version is older than the current project version.
+        /// </summary>
+        protected virtual void OnUpgradeFromVersion() {}
 
+        /// <summary>
+        /// An interface used for classes that include Resolution information
+        /// </summary>
         internal interface IResolutionUser
         {
             internal bool IsOutputResolutionContradictory

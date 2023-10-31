@@ -70,7 +70,7 @@ Set up your project to support recording through a script:
    
    [!code-csharp[](CommandLineRecorder.cs#L23-L50)]
 
-4. Create a function that starts the recording with your start frame, end frame, and Recorder Settings Preset as parameters. This function uses the [RecorderController](../api/UnityEditor.Recorder.RecorderController.html) to prepare and start the recording session.
+4. Create a function that starts the recording with your start frame, end frame, and Recorder Settings Preset as parameters. This function uses the [RecorderController](xref:UnityEditor.Recorder.RecorderController) to prepare and start the recording session.
 
    [!code-csharp[](CommandLineRecorder.cs#L52-L68)]
 

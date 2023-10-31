@@ -4,7 +4,8 @@ The **Image Sequence Recorder** generates a sequence of image files in the JPEG,
 
 This page covers all properties specific to the Image Sequence Recorder type.
 
-> **Note:** To fully configure any Recorder, you must also set the general recording properties according to the recording interface you are using: the [Recorder window](RecorderWindowRecordingProperties.md) or a [Recorder Clip](RecordingTimelineTrack.md#recorder-clip-properties).
+>[!NOTE]
+>To fully configure any Recorder, you must also set the general recording properties according to the recording interface you are using: the [Recorder window](RecorderWindowRecordingProperties.md) or a [Recorder Clip](RecordingTimelineTrack.md#recorder-clip-properties).
 
 ![](Images/RecorderImage.png)
 
@@ -76,4 +77,5 @@ Use this section to set up the media format you need to save the recorded images
 
 Use this section to specify the output **Path** and **File Name** pattern to save the recorded image files.
 
-> **Note:** [Output File properties](OutputFileProperties.md) work the same for all types of recorders.
+>[!NOTE]
+>[Output File properties](OutputFileProperties.md) work the same for all types of recorders.

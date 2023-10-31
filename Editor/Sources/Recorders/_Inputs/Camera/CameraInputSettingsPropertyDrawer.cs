@@ -72,7 +72,11 @@ namespace UnityEditor.Recorder.Input
                 EditorGUILayout.PropertyField(m_IncludeUI, Styles.IncludeUILabel);
             }
 
-            EditorGUILayout.PropertyField(m_FlipFinalOutput, Styles.FlipVerticalLabel);
+            if (target.SupportsFlipVertical)
+            {
+                EditorGUILayout.PropertyField(m_FlipFinalOutput, Styles.FlipVerticalLabel);
+            }
+
             ++EditorGUI.indentLevel;
         }
     }

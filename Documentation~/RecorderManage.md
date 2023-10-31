@@ -1,4 +1,4 @@
-# Recorder list
+# Recorder list management
 
 Use the Recorder list to create and manage your list of Recorders in the [Recorder window](RecordingRecorderWindow.md). You can use more than one Recorder at the same time to capture Play mode data. Each Recorder controls a single recording, and its properties depend on the type of data to record and the type of output to generate.
 

@@ -13,8 +13,7 @@ namespace UnityEditor.Recorder
     public class RecorderController
     {
         static HashSet<Type> resolutionUserType = new HashSet<Type>
-        { typeof(GameViewInputSettings), typeof(CameraInputSettings), typeof(RenderTextureSamplerSettings)};
-
+        { typeof(GameViewInputSettings), typeof(CameraInputSettings), typeof(RenderTextureSamplerSettings), typeof(AOVCameraInputSettings) };
         readonly SceneHook m_SceneHook;
 
         internal List<RecordingSession> m_RecordingSessions;

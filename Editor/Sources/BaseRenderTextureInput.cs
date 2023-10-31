@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -9,14 +10,14 @@ namespace UnityEditor.Recorder
     {
         /// <summary>
         /// Enables asynchronous readback of GPU resources if the platform supports it.
-        /// Set this property to a valid instance and ensure that ReadbackTexture is not set.
+        /// Set this property to a valid instance.
         /// </summary>
         protected internal RenderTexture OutputRenderTexture { get; set; }
 
         /// <summary>
         /// Indicates the synchronous GPU readback destination.
         /// </summary>
-        protected internal Texture2D ReadbackTexture { get; set; }
+        [Obsolete] protected internal Texture2D ReadbackTexture { get; set; }
 
         /// <summary>
         /// Indicates whether or not the texture needs to be flipped vertically after being grabbed.

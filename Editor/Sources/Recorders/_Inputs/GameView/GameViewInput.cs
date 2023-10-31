@@ -104,11 +104,5 @@ namespace UnityEditor.Recorder.Input
             RenderTexture.ReleaseTemporary(m_TempCaptureTextureOpaque);
             NeedToFlipVertically = null; // This variable is not valid anymore
         }
-
-        protected internal override void FrameDone(RecordingSession session)
-        {
-            UnityHelpers.Destroy(ReadbackTexture);
-            ReadbackTexture = null;
-        }
     }
 }

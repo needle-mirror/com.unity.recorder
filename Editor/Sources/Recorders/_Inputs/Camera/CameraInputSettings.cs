@@ -57,6 +57,11 @@ namespace UnityEditor.Recorder.Input
         [SerializeField] private bool captureUI;
 
         /// <summary>
+        /// Use this property to hide the Flip Vertical checkbox.
+        /// </summary>
+        internal virtual bool SupportsFlipVertical => true;
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         public CameraInputSettings()

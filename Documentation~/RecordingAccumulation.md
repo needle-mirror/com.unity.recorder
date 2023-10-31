@@ -1,4 +1,4 @@
-# Recording Accumulation
+# Record with Accumulation
 
 Accumulation captures information from [multiple subframes](RecorderAccumulationUnderstandSubFrameCapture.md) and combines the information to render a final "converged" frame.
 
@@ -9,7 +9,7 @@ Use Accumulation to:
 
 Accumulation automatically applies a filter to reduce artifacts in spotlight shadows. This filter requires HDRP 14.0.2 or later.
 
->**Notes:**
+>[!NOTE]
 * Recording Accumulation while anti-aliasing is enabled in HDRP may have unintended effects on image quality. Disabling anti-aliasing in HDRP before recording is recommended. Enable Anti-aliasing in Accumulation instead.
 * Similarly, before you record motion blur using Accumulation, disable motion blur in HDRP.
 
@@ -33,7 +33,7 @@ As a result:
 
 ## Accumulation disables concurrent recording
 
-A recorder with Accumulation cannot be run at the same time as any other recorders. The rules are similar for Recorder window recorders and recorder clips in the Timeline.
+A recorder with Accumulation cannot be run at the same time as any other recorders. The rules are similar for Recorder window recorders and Recorder Clips in Timeline.
 
 ### Recorder window
 
@@ -41,7 +41,8 @@ If other recorders are enabled, enabling a recorder with Accumulation disables t
 
 You must disable (deselect) all other recorders before starting a recorder with Accumulation. Likewise, you must disable recorders with Accumulation before starting other recorders.
 
->**Note:** Ensure that there are no Recorder Clips in the timeline that are active at the same time as the recorder with Accumulation.
+>[!NOTE]
+>Ensure that there are no Recorder Clips in Timeline that are active at the same time as the recorder with Accumulation.
 
 ### Timeline Recorder Clips
 

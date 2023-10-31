@@ -14,7 +14,7 @@ namespace UnityEditor.Recorder
             get
             {
                 if (s_PresetIcon == null)
-                    s_PresetIcon = (Texture2D)EditorGUIUtility.Load(EditorGUIUtility.isProSkin ? "d_Preset.Context@2x" : "Preset@2x.Context");
+                    s_PresetIcon = (Texture2D)EditorGUIUtility.Load(EditorGUIUtility.isProSkin ? "d_Preset.Context@2x" : "Preset.Context@2x");
 
                 return s_PresetIcon;
             }

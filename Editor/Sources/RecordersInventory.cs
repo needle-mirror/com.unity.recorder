@@ -85,6 +85,9 @@ namespace UnityEditor.Recorder
                         s_Recorders[typeof(AnimationRecorderSettings)],
                         s_Recorders[typeof(MovieRecorderSettings)],
                         s_Recorders[typeof(ImageRecorderSettings)],
+#if HDRP_AVAILABLE
+                        s_Recorders[typeof(AOVRecorderSettings)],
+#endif
                         s_Recorders[typeof(AudioRecorderSettings)]
                     };
                 }
@@ -139,7 +142,13 @@ namespace UnityEditor.Recorder
             {
                 Init();
                 var custom = s_Recorders.Values.Where(r => !s_BuiltInRecorderInfos.Contains(r) && !s_LegacyRecorderInfos.Contains(r));
+#if HDRP_AVAILABLE
                 return custom;
+#else
+                // Remove AOV Recorder from list of custom because it will be inserted in the above catch-all other logic
+                var result = custom.Where(c => c.recorderType != typeof(AOVRecorder));
+                return result;
+#endif
             }
         }
 

@@ -1,4 +1,5 @@
-using UnityEditor.Recorder.Input;
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace UnityEditor.Recorder
@@ -11,6 +12,14 @@ namespace UnityEditor.Recorder
         SerializedProperty m_ColorSpace;
         SerializedProperty m_EXRCompression;
         SerializedProperty m_JpegQuality;
+
+        static readonly string[] k_ListOfColorspaces = new[] { "sRGB, sRGB", "Linear, sRGB (unclamped)" };
+        private static readonly string[] k_ListOfCompressionOptions =
+            ((CompressionUtility.EXRCompressionType[])Enum.GetValues(
+                typeof(CompressionUtility.EXRCompressionType)))
+                .Where(ImageRecorderSettings.IsAvailableForImageSequence) // Get only those available for ImageSequence
+                .Select(type => type.ToString()) // Convert to string
+                .ToArray();
 
         static class Styles
         {
@@ -47,25 +56,33 @@ namespace UnityEditor.Recorder
                 }
             }
 
-            string[] list_of_colorspaces = new[] {"sRGB, sRGB", "Linear, sRGB (unclamped)"};
-
             if (imageSettings.CanCaptureHDRFrames())
             {
                 m_ColorSpace.intValue =
-                    EditorGUILayout.Popup(Styles.ColorSpace, m_ColorSpace.intValue, list_of_colorspaces);
+                    EditorGUILayout.Popup(Styles.ColorSpace, m_ColorSpace.intValue, k_ListOfColorspaces);
             }
             else
             {
                 // Disable the dropdown but show sRGB
                 using (new EditorGUI.DisabledScope(!imageSettings.CanCaptureHDRFrames()))
-                    EditorGUILayout.Popup(Styles.ColorSpace, 0, list_of_colorspaces);
+                    EditorGUILayout.Popup(Styles.ColorSpace, 0, k_ListOfColorspaces);
             }
 
             if ((ImageRecorderSettings.ImageRecorderOutputFormat)m_OutputFormat.enumValueIndex ==
                 ImageRecorderSettings.ImageRecorderOutputFormat.EXR)
             {
-                EditorGUILayout.PropertyField(m_EXRCompression, Styles.CLabel);
+                using (var scope = new EditorGUI.ChangeCheckScope())
+                {
+                    m_EXRCompression.intValue =
+                        EditorGUILayout.Popup(Styles.CLabel, m_EXRCompression.intValue, k_ListOfCompressionOptions);
+
+                    if (scope.changed)
+                    {
+                        EditorUtility.SetDirty(target);
+                    }
+                }
             }
+
             if ((ImageRecorderSettings.ImageRecorderOutputFormat)m_OutputFormat.enumValueIndex ==
                 ImageRecorderSettings.ImageRecorderOutputFormat.JPEG)
             {

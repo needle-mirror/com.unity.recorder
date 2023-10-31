@@ -10,7 +10,7 @@ HDRP and Recorder accumulate samples differently:
 
 You can configure Recorder to accumulate [path tracing and motion blur](RecordingAccumulationPathTracing.md#configure-path-tracing-accumulation-with-motion-blur) or to accumulate [path tracing without motion blur](RecordingAccumulationPathTracing.md#configure-path-tracing-accumulation-without-motion-blur).
 
->**Notes:**
+>[!NOTE]
 * If a scene contains an “Exposure” post-process in an automatic mode and Adaptation is set to Progressive, the resulting image may be too bright when path tracing is accumulated. For more information, see [Overexposed frames when accumulating path tracing](KnownIssues.md#overexposed-frames-when-accumulating-path-tracing).<br/><br/>
 * Limitations to path tracing in HDRP also apply to path tracing in Accumulation. See Path tracing [limitations](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Ray-Tracing-Path-Tracing.html%23limitations).
 
@@ -26,6 +26,16 @@ To set up path tracing for Accumulation:
 
 2. Add a [path tracing override](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Ray-Tracing-Path-Tracing.html?q=Path%23adding-path-tracing-to-a-scene) to your scene.
 
+## Choose a recording method
+
+Choose the recording method that corresponds to your expected recording workflow:
+* [A centralized recording session with one or multiple recorders (via the Recorder window)](get-started-recorder-window.md), OR
+* [One or multiple recordings triggered from Timeline (via Recorder Clips)](get-started-timeline-track.md).
+
+## Select the recorder type
+
+To record accumulation, use either a **Movie Recorder** or an **Image Sequence Recorder**.
+
 ## Configure path-tracing accumulation with motion blur
 
 If path tracing is set up for Accumulation, accumulating motion blur also accumulates path tracing. Follow the steps in [Accumulate motion blur](RecordingAccumulationMotionBlur.md) to configure path-tracing accumulation with motion blur.
@@ -36,7 +46,8 @@ To accumulate path tracing and motion blur, the value specified for Shutter Inte
 
 If the positions of objects change from sub frame to sub frame in the Shutter Interval, motion blur will be visible in the converged image.
 
->**Tip:** If the converged images produced by Accumulation are too noisy, you can increase the number of sub frames in the Shutter Interval by increasing the value of the Samples property.
+>[!TIP]
+>If the converged images produced by Accumulation are too noisy, you can increase the number of sub frames in the Shutter Interval by increasing the value of the Samples property.
 
 ## Configure path-tracing accumulation without motion blur
 
@@ -46,11 +57,10 @@ When the Shutter Interval is 0, time does not advance between one sub frame and 
 
 To access Accumulation properties:
 
-* Open the [Recorder window](RecordingRecorderWindow.md), and select or add a **Movie Recorder** or an **Image Sequence Recorder**.
-* Add or select a [Recorder Clip](RecordingTimelineTrack.md). In the Inspector, ensure the **Selected Recorder** is set to **Movie** or **Image Sequence**.
-
 1. For **Source**, select **Game View** or **Targeted Camera**.
+
 2. Expand **Input**.
+
 3. Enable **Accumulation**.
 
 To configure path tracing without motion blur:

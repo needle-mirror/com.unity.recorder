@@ -4,7 +4,8 @@ The **Animation Clip Recorder** generates an animation clip in Unity Animation f
 
 This page covers all properties specific to the Animation Clip Recorder type.
 
-> **Note:** To fully configure any Recorder, you must also set the general recording properties according to the recording interface you are using: the [Recorder window](RecorderWindowRecordingProperties.md) or a [Recorder Clip](RecordingTimelineTrack.md#recorder-clip-properties).
+>[!NOTE]
+>To fully configure any Recorder, you must also set the general recording properties according to the recording interface you are using: the [Recorder window](RecorderWindowRecordingProperties.md) or a [Recorder Clip](RecordingTimelineTrack.md#recorder-clip-properties).
 
 ![](Images/RecorderAnimation.png)
 
@@ -41,4 +42,5 @@ The Animation Clip Recorder always generates an animation clip in the .anim file
 
 Use this section to specify the output **Path** and **File Name** pattern to save the recorded animation clip.
 
-> **Note:** [Output File properties](OutputFileProperties.md) work the same for all types of recorders.
+>[!NOTE]
+>[Output File properties](OutputFileProperties.md) work the same for all types of recorders.

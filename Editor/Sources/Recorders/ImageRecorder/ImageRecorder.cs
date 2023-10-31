@@ -57,7 +57,7 @@ namespace UnityEditor.Recorder
                         bytes = tex.EncodeToJPG(Settings.JpegQuality);
                         break;
                     case ImageRecorderSettings.ImageRecorderOutputFormat.EXR:
-                        bytes = tex.EncodeToEXR(ImageRecorderSettings.ToNativeType(Settings.EXRCompression));
+                        bytes = tex.EncodeToEXR(CompressionUtility.ToNativeType(Settings.EXRCompression));
                         break;
                     default:
                         Profiler.EndSample();

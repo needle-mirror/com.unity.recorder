@@ -40,7 +40,6 @@ namespace UnityEditor.Recorder
         private static ListRequest s_Request;
         private static bool s_NeedToResetView = false;
 
-
         private static bool HasFocus()
         {
             return (focusedWindow != null && focusedWindow.GetType() == typeof(RecorderWindow));

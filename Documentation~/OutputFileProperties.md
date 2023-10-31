@@ -26,12 +26,13 @@ You can combine multiple placeholders in the same string. For example, the date 
 
 The **+Wildcards** menu helps you quickly append them to the file name string, but you can also manually type them anywhere in the string. To use placeholders in the path string, you must type them manually.
 
-**Notes:** 
-* Make sure that you include the \< \> brackets with the placeholder name. Also note that the placeholder names are case sensitive.
-* Some placeholders might not be available depending on the Recorder type you are using.
+>[!NOTE]
+>* Make sure that you include the \< \> brackets with the placeholder name. Also note that the placeholder names are case sensitive.
+>* Some placeholders might not be available depending on the Recorder type you are using.
 
 | Placeholder | Description | Resolved value example |
 |--|--|--|
+| `<AOV>` | The name of the [**Arbitrary Output Variable (AOV)** selected for recording](aov-recorder-properties.md#input).<br />If you select multiple AOVs and enable the **Multi-part file** option, the value resolves to `multiAOV`. | `Beauty` |
 | `<Date>` | The date the recording is generated. Uses the `yyyy-MM-dd` format. | `2020-11-03` |
 | `<Extension>` | The file extension of the output format (without the period). | `png` |
 | `<Frame>` | The current frame number. Uses the `0000` format.<br/><br/>This is useful for Image Sequence Recorders which output each frame as a separate file. | `0154` |
@@ -39,10 +40,8 @@ The **+Wildcards** menu helps you quickly append them to the file name string, b
 | `<GameObjectScene>` | The name of the Scene containing the [**GameObject** targeted for recording](RecorderAnimation.md#input). | `My Scene` |
 | `<Product>` | The value of the [Product Name](https://docs.unity3d.com/Manual/class-PlayerSettings.html#ProductName) field from Unity's Player General Settings. | `My Product` |
 | `<Project>` | The name of the current Unity Project.  | `My Project` |
-| `<Recorder>` | • In Recorder window: the Recorder name from the Recorder list.<br />• In Timeline track: the name of the Recorder clip. | `My Recorder` |
+| `<Recorder>` | • In Recorder window: the Recorder name from the Recorder list.<br />• In Timeline track: the name of the Recorder Clip. | `My Recorder` |
 | `<Resolution>` | The output image dimensions (width by height) in pixels. Uses the `WxH` format. | `1920x1080` |
 | `<Scene>` | The name of the current Unity Scene. | `My Scene` |
 | `<Take>` | The **Take Number** value. Uses the `000` format.  | `002` |
 | `<Time>` | The time the recording is generated. Uses the `00h00m` format. | `16h52m` |
-
-

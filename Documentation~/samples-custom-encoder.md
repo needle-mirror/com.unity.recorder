@@ -5,7 +5,8 @@ This sample provides an example for integrating a custom command line encoder su
 ## Requirements
 
 To use this sample, you must provide your own FFmpeg executable.
->**Note:** For reference, Unity tested the functionality of this sample with FFmpeg 5.0.1.
+>[!NOTE]
+>For reference, Unity tested the functionality of this sample with FFmpeg 5.0.1.
 
 ## Getting the sample
 

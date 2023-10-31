@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using UnityEditor.Recorder.Input;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 
 namespace UnityEditor.Recorder
 {
@@ -36,6 +34,7 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Compression type for EXR files.
         /// </summary>
+        [Obsolete("Use CompressionUtility.EXRCompressionType instead.")]
         public enum EXRCompressionType
         {
             /// <summary>
@@ -56,28 +55,18 @@ namespace UnityEditor.Recorder
             PIZ,
         }
 
-        static internal Texture2D.EXRFlags ToNativeType(EXRCompressionType type)
+        internal static bool IsAvailableForImageSequence(CompressionUtility.EXRCompressionType compressionType)
         {
-            Texture2D.EXRFlags nativeType = Texture2D.EXRFlags.None;
-            switch (type)
+            switch (compressionType)
             {
-                case ImageRecorderSettings.EXRCompressionType.RLE:
-                    nativeType = Texture2D.EXRFlags.CompressRLE;
-                    break;
-                case ImageRecorderSettings.EXRCompressionType.Zip:
-                    nativeType = Texture2D.EXRFlags.CompressZIP;
-                    break;
-                case ImageRecorderSettings.EXRCompressionType.PIZ:
-                    nativeType = Texture2D.EXRFlags.CompressPIZ;
-                    break;
-                case ImageRecorderSettings.EXRCompressionType.None:
-                    nativeType = Texture2D.EXRFlags.None;
-                    break;
+                case CompressionUtility.EXRCompressionType.None:
+                case CompressionUtility.EXRCompressionType.RLE:
+                case CompressionUtility.EXRCompressionType.Zip:
+                case CompressionUtility.EXRCompressionType.PIZ:
+                    return true;
                 default:
-                    throw new InvalidEnumArgumentException($"Unexpected compression type '{type}'.");
+                    return false;
             }
-
-            return nativeType;
         }
 
         /// <summary>
@@ -145,7 +134,7 @@ namespace UnityEditor.Recorder
 
 
         [SerializeField] ImageInputSelector m_ImageInputSelector = new ImageInputSelector();
-        [SerializeField] internal ImageRecorderSettings.EXRCompressionType m_EXRCompression = ImageRecorderSettings.EXRCompressionType.Zip;
+        [SerializeField] internal CompressionUtility.EXRCompressionType m_EXRCompression = CompressionUtility.EXRCompressionType.Zip;
         [SerializeField] internal ColorSpaceType m_ColorSpace = ColorSpaceType.Unclamped_linear_sRGB;
         /// <summary>
         /// Default constructor.
@@ -177,7 +166,7 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Stores the data compression method to use to encode image files in the EXR format.
         /// </summary>
-        public EXRCompressionType EXRCompression
+        public CompressionUtility.EXRCompressionType EXRCompression
         {
             get => m_EXRCompression;
             set => m_EXRCompression = value;

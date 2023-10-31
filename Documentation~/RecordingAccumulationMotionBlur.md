@@ -5,22 +5,31 @@ You can configure Accumulation to simulate the blur effect that occurs in a real
 To accumulate motion blur, the value specified for Shutter Interval must be greater than 0.
 When the Shutter Interval is greater than 0, sub frames are incremental points in time between one frame and the next.
 
->**Notes:**
+>[!NOTE]
 * Before you record motion-blur accumulation, disable **Motion Blur** post-processes in [HDRP Global Settings](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Default-Settings-Window.html) (**Edit > Project Settings > Graphics**, and then, in the sidebar, click **HDRP Global Settings**).<br/><br/>  
 * If path tracing is configured in your scene: The Accumulation properties (Shutter Interval, Shutter Profile, and Samples) also apply to path-tracing accumulation. Path-tracing samples are accumulated only for the sub frames within the Shutter Interval, and the Shutter Profile is applied. If the converged images are too noisy, you can increase the number of sub frames in the Shutter Interval by increasing the value of the Samples property. <br/>Alternatively, You may want to disable path tracing overrides on volumes in your scene. See [Adding path tracing to a scene](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Ray-Tracing-Path-Tracing.html%23adding-path-tracing-to-a-scene)
 
 ## Requirements
 A number of specific conditions must be met to use motion-blur and path-tracing accumulation in your recording. See [Requirements](RecordingAccumulation.md#requirements).
 
+## Choose a recording method
+
+Choose the recording method that corresponds to your expected recording workflow:
+* [A centralized recording session with one or multiple recorders (via the Recorder window)](get-started-recorder-window.md), OR
+* [One or multiple recordings triggered from Timeline (via Recorder Clips)](get-started-timeline-track.md).
+
+## Select the recorder type
+
+To record accumulation, use either a **Movie Recorder** or an **Image Sequence Recorder**.
+
 ## Configure motion-blur accumulation
 
 To access Accumulation properties:  
 
-* Open the [Recorder window](RecordingRecorderWindow.md), and select or add a **Movie Recorder** or an **Image Sequence Recorder**.
-* Add or select a [Recorder Clip](RecordingTimelineTrack.md). In the Inspector,  ensure the **Selected Recorder** is set to **Movie** or **Image Sequence**.
-
 1. For **Source**, select **Game View** or **Targeted Camera**.
+
 2. Expand **Input**
+
 3. Enable **Accumulation**.
 
 To configure Accumulation to produce motion blur:

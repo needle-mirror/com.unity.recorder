@@ -9,8 +9,8 @@
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.HighDefinition.Runtime",
         "Unity.RenderPipelines.HighDefinition.Editor",
-        "Unity.OpenImageIO",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Unity.Bindings.OpenImageIO.Editor"
     ],
     "includePlatforms": [
         "Editor"

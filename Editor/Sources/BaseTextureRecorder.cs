@@ -27,7 +27,7 @@ namespace UnityEditor.Recorder
         /// </summary>
         internal bool accumulationInitialized;
 
-        private PooledBufferAsyncGPUReadback asyncReadback;
+        PooledBufferAsyncGPUReadback asyncReadback;
 #if HDRP_AVAILABLE
         bool m_AccumulationIsActive;
         int m_SubFrameIndex;
@@ -93,12 +93,15 @@ namespace UnityEditor.Recorder
         Texture2D m_ReadbackTexture;
         readonly Queue<float> m_AsyncReadbackTimeStamps = new Queue<float>();
 
-
-        internal void EnqueueTimeStamp(float time)
+        void EnqueueTimeStamp(float time)
         {
             m_AsyncReadbackTimeStamps.Enqueue(time);
         }
 
+        /// <summary>
+        /// Return a TimeStamp from the Queue
+        /// </summary>
+        /// <returns>A float representing the timestamp being returned</returns>
         internal float DequeueTimeStamp()
         {
             if (m_AsyncReadbackTimeStamps.Count == 0)
@@ -205,13 +208,18 @@ namespace UnityEditor.Recorder
         /// <inheritdoc/>
         protected internal override void RecordFrame(RecordingSession session)
         {
-            EnqueueTimeStamp(session.recorderTime);
-
             var input = (BaseRenderTextureInput)m_Inputs[0];
 
-            if (input.ReadbackTexture != null)
+            EnqueueTimeStamp(session.recorderTime);
+
+            if (UseAsyncGPUReadback)
             {
-                WriteFrame(input.ReadbackTexture);
+                if (WriteGPUTextureFrame(input.OutputRenderTexture))
+                {
+                    return;
+                }
+
+                asyncReadback.RequestGPUReadBack(input.OutputRenderTexture, GraphicsFormatUtility.GetGraphicsFormat(ReadbackTextureFormat, false), ReadbackDone);
                 return;
             }
 
@@ -223,16 +231,6 @@ namespace UnityEditor.Recorder
                 return;
             }
 
-            if (UseAsyncGPUReadback)
-            {
-                if (WriteGPUTextureFrame(renderTexture)) // Recorder might want ot
-                {
-                    return;
-                }
-
-                asyncReadback.RequestGPUReadBack(renderTexture, GraphicsFormatUtility.GetGraphicsFormat(ReadbackTextureFormat, false), ReadbackDone);
-                return;
-            }
 
             var width = renderTexture.width;
             var height = renderTexture.height;
@@ -248,6 +246,11 @@ namespace UnityEditor.Recorder
             WriteFrame(m_ReadbackTexture);
         }
 
+        /// <summary>
+        /// Write out a single frame texture from the GPU
+        /// </summary>
+        /// <param name="tex">Texture to output</param>
+        /// <returns>True if successful</returns>
         internal virtual bool WriteGPUTextureFrame(RenderTexture tex)
         {
             return false;
@@ -330,7 +333,7 @@ namespace UnityEditor.Recorder
             DisposeEncoder();
         }
 
-        private Texture2D CreateReadbackTexture(int width, int height)
+        Texture2D CreateReadbackTexture(int width, int height)
         {
             return new Texture2D(width, height, ReadbackTextureFormat, false);
         }

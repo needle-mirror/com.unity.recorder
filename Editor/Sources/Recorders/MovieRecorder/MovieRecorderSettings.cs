@@ -504,29 +504,45 @@ namespace UnityEditor.Recorder
             }
         }
 
-        internal override void OnUpgradeFromVersion(Versions oldVersion)
+        internal enum MovieRecorderVersions
         {
-            if (oldVersion < Versions.MovieEncoders)
-            {
-                IEncoderSettings settings;
-                if (outputFormat == VideoRecorderOutputFormat.MOV)
-                {
-                    settings = new ProResEncoderSettings
-                    {
-                        Format = (ProResEncoderSettings.OutputFormat)(encoderPresetSelected)
-                    };
-                }
-                else
-                {
-                    settings = new CoreEncoderSettings
-                    {
-                        Codec = outputFormat == VideoRecorderOutputFormat.MP4 ? CoreEncoderSettings.OutputCodec.MP4 : CoreEncoderSettings.OutputCodec.WEBM,
-                        EncodingQuality = (CoreEncoderSettings.VideoEncodingQuality)encodingQuality,
-                    };
-                }
+            Initial = 0,
+            MovieEncoders = 1,
+        }
 
-                EncoderSettings = settings;
+        [SerializeField, HideInInspector] internal int m_MovieRecorderVersion = 0;
+
+        /// <inheritdoc />
+        protected override int Version
+        {
+            get => m_MovieRecorderVersion;
+            set => m_MovieRecorderVersion = value;
+        }
+
+        /// <inheritdoc />
+        protected override int LatestVersion => (int)MovieRecorderVersions.MovieEncoders;
+
+        /// <inheritdoc />
+        protected override void OnUpgradeFromVersion()
+        {
+            IEncoderSettings settings;
+            if (outputFormat == VideoRecorderOutputFormat.MOV)
+            {
+                settings = new ProResEncoderSettings
+                {
+                    Format = (ProResEncoderSettings.OutputFormat)(encoderPresetSelected)
+                };
             }
+            else
+            {
+                settings = new CoreEncoderSettings
+                {
+                    Codec = outputFormat == VideoRecorderOutputFormat.MP4 ? CoreEncoderSettings.OutputCodec.MP4 : CoreEncoderSettings.OutputCodec.WEBM,
+                    EncodingQuality = (CoreEncoderSettings.VideoEncodingQuality)encodingQuality,
+                };
+            }
+
+            EncoderSettings = settings;
         }
 
         bool HasDefaultCoreEncoderSettings()
