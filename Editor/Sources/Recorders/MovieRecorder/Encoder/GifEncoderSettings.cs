@@ -64,7 +64,7 @@ namespace UnityEditor.Recorder.Encoder
         }
 
         /// <inheritdoc/>
-        bool IEncoderSettings.SupportsCurrentPlatform()
+        public bool SupportsCurrentPlatform()
         {
             return true;
         }

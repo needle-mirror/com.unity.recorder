@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace UnityEditor.Recorder.Encoder
@@ -137,6 +137,8 @@ namespace UnityEditor.Recorder.Encoder
         {
 #if UNITY_EDITOR_LINUX
             return false;
+#elif UNITY_EDITOR_WIN
+            return RuntimeInformation.ProcessArchitecture != Architecture.Arm64;
 #else
             return true;
 #endif

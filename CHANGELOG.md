@@ -4,6 +4,13 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2024-03-14
+### Added
+- Added support for Windows Arm64.
+
+### Fixed
+- Show an error in the Recorder Window when the encoder selected in a Movie Recorder is not available on the current platform.
+
 ## [5.1.0-pre.1] - 2023-10-31
 ### Added
 - Added error message in UI if full output file path exceeds 259 characters.

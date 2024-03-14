@@ -213,7 +213,7 @@ namespace UnityEditor.Recorder
             sRGB_sRGB = 0,
             Unclamped_linear_sRGB = 1,
         }
-        [System.Obsolete(@"Use CompressionUtility.EXRCompressionType instead.")] public enum EXRCompressionType
+        [System.Obsolete(@"Use CompressionUtility.EXRCompressionType instead. (UnityUpgradable) -> UnityEditor.Recorder.CompressionUtility/EXRCompressionType")] public enum EXRCompressionType
         {
             None = 0,
             PIZ = 3,
@@ -523,6 +523,7 @@ namespace UnityEditor.Recorder.Encoder
         public GifEncoderSettings() {}
         public override bool Equals(object obj);
         public override int GetHashCode();
+        public bool SupportsCurrentPlatform();
     }
 
     public interface IEncoder

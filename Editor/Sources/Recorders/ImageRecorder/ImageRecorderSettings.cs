@@ -34,7 +34,7 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Compression type for EXR files.
         /// </summary>
-        [Obsolete("Use CompressionUtility.EXRCompressionType instead.")]
+        [Obsolete("Use CompressionUtility.EXRCompressionType instead. (UnityUpgradable) -> UnityEditor.Recorder.CompressionUtility/EXRCompressionType")]
         public enum EXRCompressionType
         {
             /// <summary>

@@ -18,6 +18,8 @@ namespace UnityEditor.Recorder
     [RecorderSettings(typeof(MovieRecorder), "Movie", "movie_16")]
     public class MovieRecorderSettings : RecorderSettings, IAccumulation, RecorderSettings.IResolutionUser
     {
+        internal const string k_UnsupportedPlatformError = "This encoder is not supported on this platform.";
+
         /// <summary>
         /// Use this property to define the encoder used by the Recorder.
         /// </summary>
@@ -161,6 +163,9 @@ namespace UnityEditor.Recorder
         {
             if (encoderSettings != null)
             {
+                if (!encoderSettings.SupportsCurrentPlatform())
+                    errors.Add(k_UnsupportedPlatformError);
+
                 encoderSettings.ValidateRecording(ctx, errors, warnings);
             }
             else

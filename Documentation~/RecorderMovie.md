@@ -90,7 +90,7 @@ Use this section to set up the media format you need to save the recorded images
 
 | Property | Function |
 |:---|:---|
-| **Codec** | The video codec to use to encode the output file.<br /><br />The **ProRes Encoder** includes a variety of [Apple ProRes](https://en.wikipedia.org/wiki/Apple_ProRes) codecs: **ProRes 4444 XQ**, **ProRes 4444**, **ProRes 422 HQ**, **ProRes 422**, **ProRes 422 LT** or **ProRes 422 Proxy**.<br /><br />**Notes:**<br /><ul><li>Encoding with ProRes codecs is not supported on Linux.</li><li> The ProRes encoder does not support variable frame rate recording.</li></ul> |
+| **Codec** | The video codec to use to encode the output file.<br /><br />The **ProRes Encoder** includes a variety of [Apple ProRes](https://en.wikipedia.org/wiki/Apple_ProRes) codecs: **ProRes 4444 XQ**, **ProRes 4444**, **ProRes 422 HQ**, **ProRes 422**, **ProRes 422 LT** or **ProRes 422 Proxy**.<br /><br />**Notes:**<br /><ul><li>Encoding with ProRes codecs is not supported on Linux and Windows Arm64.</li><li> The ProRes encoder does not support variable frame rate recording.</li></ul> |
 
 ## Output File
 

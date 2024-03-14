@@ -28,6 +28,10 @@ This page lists some known issues and limitations that you might experience with
 
 **Workaround:** In **Project Settings** > **Audio** > **Default Speaker Mode**, select **Mono** or **Stereo** depending on what the encoder specified for the recording supports.
 
+#### ProRes encoding not supported on Windows Arm64.
+
+**Limitation:** The Movie Recorder doesn't support ProRes QuickTime encoding on Windows Arm64.
+
 #### MP4 and ProRes encoding not supported on Linux
 
 **Limitation:** The Movie Recorder doesn't support H.264 MP4 and ProRes QuickTime encoding on Linux.
