@@ -355,5 +355,15 @@ namespace UnityEditor.Recorder
                 UnityHelpers.Destroy(recorder);
             }
         }
+
+        public void Pause()
+        {
+            recorder.Pause();
+        }
+
+        public void Resume()
+        {
+            recorder.Resume();
+        }
     }
 }

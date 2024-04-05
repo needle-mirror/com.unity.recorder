@@ -41,7 +41,7 @@ namespace UnityEditor.Recorder
                 onSelectionClosed?.Invoke();
             };
 
-            PresetSelector.ShowSelector(new UnityEngine.Object[] { settings }, currentSelection, true, OnSelectionChangedIgnoreParams, OnSelectionClosedIgnoreParams);
+            // PresetSelector.ShowSelector(new UnityEngine.Object[] { settings }, currentSelection, true, OnSelectionChangedIgnoreParams, OnSelectionClosedIgnoreParams);
         }
     }
 }
