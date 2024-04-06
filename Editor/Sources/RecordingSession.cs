@@ -259,7 +259,7 @@ namespace UnityEditor.Recorder
 
                         // Do the rest of the wait using a busy loop to maximize chances of keeping the main thread running
                         // on the CPU.
-                        while (Time.realtimeSinceStartup < endWaitTime) ;
+                        while (Time.realtimeSinceStartup < endWaitTime);
                     }
                     else if (sleepSec < -frameLen)
                     {
@@ -364,6 +364,12 @@ namespace UnityEditor.Recorder
         public void Resume()
         {
             recorder.Resume();
+            
+            m_FPSNextTimeStart = Time.unscaledTime;
+            m_FPSNextFrameCount = Time.renderedFrameCount;
+            
+            m_FPSTimeStart = m_FPSNextTimeStart;
+            m_InitialFrame = m_FPSNextFrameCount;
         }
     }
 }
