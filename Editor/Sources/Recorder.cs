@@ -414,5 +414,15 @@ namespace UnityEditor.Recorder
         {
             RestoreAsynchronousShaderCompilation();
         }
+
+        public void Pause()
+        {
+            Recording = false;
+        }
+
+        public void Resume()
+        {
+            Recording = true;
+        }
     }
 }
