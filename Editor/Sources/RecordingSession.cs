@@ -259,7 +259,7 @@ namespace UnityEditor.Recorder
 
                         // Do the rest of the wait using a busy loop to maximize chances of keeping the main thread running
                         // on the CPU.
-                        while (Time.realtimeSinceStartup < endWaitTime);
+                        while (Time.realtimeSinceStartup < endWaitTime) ;
                     }
                     else if (sleepSec < -frameLen)
                     {
