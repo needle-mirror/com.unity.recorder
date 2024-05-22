@@ -24,14 +24,17 @@ Input properties define the source of the recording and its visual parameters.
 
 3. For **Aspect Ratio**, select **16:9 (1.7778)**.
 
+>[!NOTE]
+>If the Output Resolution and/or Aspect Ratio in the Recorder is different than the Game view resolution, the Recorder switches the Game view to the Recorder's resolution before starting the recording. After the recording ends, the Game view does not automatically revert to its previous resolution. If you need to revert this change afterward, use the **Aspect ratio** dropdown menu in the [Game view control bar](https://docs.unity3d.com/Manual/GameView.html).
+
 ## Configure the Output Format properties
 
 The Output Format properties define the media format to save the recorded frames in.
 
 >[!NOTE]
 >* The alpha channel is available for some encoders subject to the following conditions:
-  * The render pipeline is High Definition Render Pipeline (HDRP) or Built-in render pipeline.
-  * The source is not Game View. The other sources can support alpha.
+>   * The render pipeline is High Definition Render Pipeline (HDRP) or Built-in render pipeline.
+>   * The source is not Game View. The other sources can support alpha.
 >* To enable recording when Include Audio is selected, in **Project Settings** > **Audio** > **Default Speaker Mode**, ensure that **Mono** or **Stereo** is selected.
 
 In H.264 MP4, you can include audio, but alpha is not available.

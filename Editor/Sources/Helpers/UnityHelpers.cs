@@ -14,6 +14,9 @@ using UnityEngine.SceneManagement;
 #if HDRP_AVAILABLE
 using UnityEngine.Rendering.HighDefinition;
 #endif
+#if URP_AVAILABLE
+using UnityEngine.Rendering.Universal;
+#endif
 using UnityObject = UnityEngine.Object;
 
 namespace UnityEditor.Recorder
@@ -185,6 +188,31 @@ namespace UnityEditor.Recorder
                 (pipelineAsset.GetType().FullName.Contains("Universal") ||
                     pipelineAsset.GetType().FullName.Contains("Lightweight"));
             return usingURP;
+        }
+
+        internal static bool UsingURP2DRenderer()
+        {
+#if URP_AVAILABLE && UNITY_2023_2_OR_NEWER
+            var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+
+            if (urp == null)
+                return false;
+
+            foreach (var renderer in urp.renderers)
+            {
+                if (renderer == null)
+                    continue;
+
+                if (renderer.GetType().FullName.Contains("Renderer2D"))
+                    return true;
+            }
+            return false;
+#elif URP_AVAILABLE && !UNITY_2023_2_OR_NEWER
+            var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+            return urp.scriptableRenderer.GetType().FullName.Contains("Renderer2D");
+#else
+            return false;
+#endif
         }
 
         /// <summary>

@@ -30,9 +30,9 @@ Common inherent material properties of the surfaces in view. This includes data 
 | AOV | Recorded data | Pixel value |
 |:---|:---|:---|
 | **Albedo** | The overall perceived colors of the surfaces in view, with no lighting calculation and no shadows. | RGB color. |
-| **Alpha** | The opacity of the surfaces in view. | Grayscale:<br/>• Black (value of 0) = transparent<br/>• White (value of 1) = opaque |
-| **Metal** | The metallic aspect of the surfaces in view. | Grayscale:<br/>• Black (value of 0) = non-metal<br/>• White (value of 1) = metal |
-| **Smoothness** | The smoothness of the surfaces in view. | Grayscale:<br/>• Black (value of 0) = rough<br/>• White (value of 1) = glossy |
+| **Alpha** | The opacity of the surfaces in view. | Grayscale:<li>  Black (value of 0) = transparent<li> White (value of 1) = opaque |
+| **Metal** | The metallic aspect of the surfaces in view. | Grayscale:<li>  Black (value of 0) = non-metal<li>  White (value of 1) = metal |
+| **Smoothness** | The smoothness of the surfaces in view. | Grayscale:<li>  Black (value of 0) = rough<li>  White (value of 1) = glossy |
 | **Specular** | The specular colors of the surfaces in view. | RGB color. |
 
 #### Lighting
@@ -54,9 +54,9 @@ Various data computed from the Scene.
 
 | AOV | Recorded data | Pixel value |
 |:---|:---|:---|
-|**Ambient Occlusion**|The data resulting from ambient occlusion post-process of the Scene.| Grayscale:<br/>• Black (value of 0) = fully occluded<br/>• White (value of 1) = not occluded |
-|**Depth**|The relative distances of the Scene elements in view between the Far Plane and the Near Plane of the recording Camera.|Grayscale:<br/>• Black (value of 0) = at Far Plane<br/>• White (value of 1) = at Near Plane |
-|**Motion Vectors**|The 2D vectors representing the movements in the Scene relative to the recording Camera.|R and G channels only:<br/>• The values of the R and G channels respectively represent the horizontal and vertical coordinates of the vectors in the image plane.<br/>• The range of values is between -1 and 1, normalized to the **Output Resolution** you selected for the recording. |
+|**Ambient Occlusion**|The data resulting from ambient occlusion post-process of the Scene.| Grayscale:<li> Black (value of 0) = fully occluded<li> White (value of 1) = not occluded |
+|**Depth**|The relative distances of the Scene elements in view between the Far Plane and the Near Plane of the recording Camera.|Grayscale:<li> Black (value of 0) = at Far Plane<li> White (value of 1) = at Near Plane |
+|**Motion Vectors**|The 2D vectors representing the movements in the Scene relative to the recording Camera.|R and G channels only:<li> The values of the R and G channels respectively represent the horizontal and vertical coordinates of the vectors in the image plane.<li> The range of values is between -1 and 1, normalized to the **Output Resolution** you selected for the recording. |
 |**Normal**|The data resulting from geometric normals and normal maps of the surfaces in view.|R, G and B channels:<br/>The values of the R,G,B channels respectively represent the X,Y,Z vector coordinates of the normals in World Space. |
 
 ### Camera
@@ -98,8 +98,8 @@ Use this section to set up the media format you want to save the recorded images
 ||**Multi-part file**|Export all selected AOVs to a single multi-part file instead of exporting each AOV to a separate file. This only applies to EXR files.|
 | **Color Space** | | The color space (gamma curve and gamut) to use in the output images. |
 |  | sRGB, sRGB | Uses sRGB curve and sRGB primaries. |
-|  | Linear, sRGB (unclamped) | Uses linear curve and sRGB primaries.<br/>This option is only available when you set the **Format** to **EXR**.<br/><br/>**Important:** To get the expected unclamped values in the output images, you must:<br/><br/>• Disable any Tonemapping post-processing effects in your Scene (menu: **Edit > Project Settings > HDRP Default Settings** and deselect **Tonemapping**) and in any Volume that includes a Tonemapping override (select the Volume, navigate in the Inspector and deselect **Tonemapping** if present).<br/><br/>• Disable **Dithering** on the Camera selected for the capture (in the Inspector, navigate to **General** and deselect **Dithering**). |
-| **Compression** | | The [EXR compression method](https://en.wikipedia.org/wiki/OpenEXR#Compression_methods) to apply when saving the data.<br />This property is only available when you set the **Format** to **EXR**.<br /><br />• Available _lossless_ compression types: **RLE**, **Zip** (default), **Zips**, **PIZ**.<br />• Available _lossy_ compression types: **B44**, **B44a**, **DWAA**, **DWAB**.<br />• Choose **None** to disable compression. |
+|  | Linear, sRGB (unclamped) | Uses linear curve and sRGB primaries.<br/>This option is only available when you set the **Format** to **EXR**.<br/><br/>**Important:** To get the expected unclamped values in the output images, you must:<ul><li> Disable any Tonemapping post-processing effects in your Scene (menu: **Edit > Project Settings > HDRP Default Settings** and deselect **Tonemapping**) and in any Volume that includes a Tonemapping override (select the Volume, navigate in the Inspector and deselect **Tonemapping** if present).<li> Disable **Dithering** on the Camera selected for the capture (in the Inspector, navigate to **General** and deselect **Dithering**).</ul> |
+| **Compression** | | The [EXR compression method](https://en.wikipedia.org/wiki/OpenEXR#Compression_methods) to apply when saving the data.<br />This property is only available when you set the **Format** to **EXR**.<li> Available _lossless_ compression types: **RLE**, **Zip** (default), **Zips**, **PIZ**.<li> Available _lossy_ compression types: **B44**, **B44a**, **DWAA**, **DWAB**.<li> Choose **None** to disable compression. |
 | **Compression Level** |  | Adjustable compression level for DWAA and DWAB compression types.<br />Higher values reduce the file size but introduce increasing color distortion. |
 
 ## Output File

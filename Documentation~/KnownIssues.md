@@ -12,6 +12,11 @@ This page lists some known issues and limitations that you might experience with
 
 **Workaround:** The recommended use case is to limit yourself to one Movie recording at a time. Ensure that you have only one active Movie Recorder in the Recorder window and no Movie Recorder Clips in Timeline, or vice-versa. If you need to keep concurrent recordings for some reason, you can still set up lower resolutions or try different encoders.
 
+#### Targeted Camera recording is not available with URP 2D Renderer
+ **Limitation:** Recorder cannot capture images from a Targeted Camera in URP 2D projects. A capture pass that Recorder requires is missing in the renderer.
+
+ **Workaround:** As an alternative, you can capture from the Game View or from a Render Texture Asset.
+
 #### ActiveCamera recording not available with SRPs
 
 **Limitation:** The use of a Scriptable Render Pipeline ([SRP](https://docs.unity3d.com/Manual/ScriptableRenderPipeline.html)) in your project prevents you from setting ActiveCamera as the source of the recording in the [Movie Recorder](RecorderMovie.md#targeted-camera-source-properties) and the [Image Sequence Recorder](RecorderImage.md#targeted-camera-source-properties). This render pipeline limitation applies to all SRPs including Unity's High Definition Render Pipeline ([HDRP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest)) and Universal Render Pipeline ([URP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@latest)). For the same reason, the [AOV Recorder](aov-recorder-properties.md#camera), which requires HDRP, doesn't include the ActiveCamera option by design.
@@ -63,6 +68,14 @@ This page lists some known issues and limitations that you might experience with
 **Known issue:** When you build a project that includes Recorder tracks in Timeline, Unity throws an error in the Console. Recorder tracks are not supported in standalone builds, but Unity can't disable them at build time.
 
 **Workaround:** Before building a project, make sure to delete or disable any Recorder tracks present in Timeline.
+
+#### Recorder does not capture any custom cursors
+
+**Known issue:** When you record a video where you use a custom cursor set with [Cursor.SetCursor](https://docs.unity3d.com/ScriptReference/Cursor.SetCursor.html), the cursor doesn't appear in the recordings.
+
+**Workaround:** To make sure that the Recorder captures your custom cursor, you have to:
+- Set the **Input Source** to **GameView**.
+- Call `Cursor.SetCursor` with [`CursorMode.ForceSoftware`](https://docs.unity3d.com/ScriptReference/CursorMode.ForceSoftware.html).
 
 #### Simulator view recording not supported
 
@@ -124,3 +137,16 @@ Limitations to path tracing in HDRP also apply to path tracing in Accumulation. 
 * Disable Temporal Anti-Aliasing (TAA) in your Project Settings and set up your Recorder for [accumulation](RecorderAccumulationProperties.md) with **Anti-aliasing** enabled, or
 * Enable Subpixel Morphological Anti-Aliasing (SMAA) in your Project Settings, or
 * Render at a higher resolution and use a shader to downsample with a filter (Bicubic, Lanczos, etc).
+
+#### Different Cameras with different Display targets lead to black output
+
+**Known issue:** Certain camera outputs are black when cameras have different TargetDisplays. This occurs when you set up recorders with **Targeted Camera** as the **Input Source**.
+The Game view triggers the render loop of all cameras that target the same Display number. If no Game view is configured for a specific Display number that is set on a Camera, it does not render.
+
+**Workaround:** Open another Game view and set it to the Display number that you need to capture.
+
+#### Impossible to capture multiple Game views at the same time
+
+**Known issue:** Recorder does not handle a configuration with mutiple Game views as **Input Source**. Recorder assumes that there is only one Game view and gets the one that has the focus at the moment the Editor enters the Play Mode.
+
+**Workaround:** Set the **Input Source** to **Targeted Camera** or **Render Texture Asset**.

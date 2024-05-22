@@ -3,8 +3,29 @@
         {
             "ValidationTest": "API Validation",
             "ExceptionMessage": "Breaking changes require a new major version.",
-            "PackageVersion": "5.1.0"
+            "PackageVersion": "5.1.1"
         }
     ],
-    "WarningExceptions": []
+    "WarningExceptions": [
+		{
+			"ValidationTest": "Restricted File Type Validation",
+			"ExceptionMessage": "/Plugins/Windows/GIFWrapper.dll should not be included in packages unless absolutely necessary. Please confirm that its inclusion is deliberate and intentional.",
+            "PackageVersion": "5.1.1"
+		},
+        {
+			"ValidationTest": "Restricted File Type Validation",
+			"ExceptionMessage": "/Plugins/Windows/ProResToolbox.dll should not be included in packages unless absolutely necessary. Please confirm that its inclusion is deliberate and intentional.",
+            "PackageVersion": "5.1.1"
+		},
+        {
+			"ValidationTest": "Restricted File Type Validation",
+			"ExceptionMessage": "/Plugins/Windows/ProResWrapper.dll should not be included in packages unless absolutely necessary. Please confirm that its inclusion is deliberate and intentional.",
+            "PackageVersion": "5.1.1"
+		},
+        {
+			"ValidationTest": "Restricted File Type Validation",
+			"ExceptionMessage": "/Plugins/Windows/ARM64/GIFWrapper.dll should not be included in packages unless absolutely necessary. Please confirm that its inclusion is deliberate and intentional.",
+            "PackageVersion": "5.1.1"
+		}
+	]
 }

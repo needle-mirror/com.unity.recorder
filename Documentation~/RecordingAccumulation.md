@@ -10,8 +10,8 @@ Use Accumulation to:
 Accumulation automatically applies a filter to reduce artifacts in spotlight shadows. This filter requires HDRP 14.0.2 or later.
 
 >[!NOTE]
-* Recording Accumulation while anti-aliasing is enabled in HDRP may have unintended effects on image quality. Disabling anti-aliasing in HDRP before recording is recommended. Enable Anti-aliasing in Accumulation instead.
-* Similarly, before you record motion blur using Accumulation, disable motion blur in HDRP.
+>* Recording Accumulation while anti-aliasing is enabled in HDRP may have unintended effects on image quality. Disabling anti-aliasing in HDRP before recording is recommended. Enable Anti-aliasing in Accumulation instead.
+>* Similarly, before you record motion blur using Accumulation, disable motion blur in HDRP.
 
 ## Requirements
 

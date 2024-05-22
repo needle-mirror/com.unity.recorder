@@ -7,7 +7,6 @@ using System.IO;
 using System.Threading;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace UnityEditor.Recorder.Examples
@@ -69,6 +68,7 @@ namespace UnityEditor.Recorder.Examples
             // Start copy/pipe subthreads.
             _copyThread = new Thread(CopyThread);
             _pipeThread = new Thread(PipeThread);
+            _cancellationToken = new CancellationTokenSource();
             _copyThread.Start();
             _pipeThread.Start();
         }
@@ -100,14 +100,13 @@ namespace UnityEditor.Recorder.Examples
 
         internal void SyncFrameData()
         {
-            int nbRetries = 0;
             // Wait for the copy queue to get emptied using pong
             // notification signals sent from the copy thread.
             while (_copyQueue.Count > 0)
             {
                 if (!_copyPong.WaitOne(_timeoutValue))
                 {
-                    if (nbRetries++ > _maxRetries)
+                    if (_cancellationToken.IsCancellationRequested)
                     {
                         Log("SyncFrameData timeout for ffmpeg pipe of " +
                             _name + "_copyQueue.Count = " + _copyQueue.Count);
@@ -117,7 +116,6 @@ namespace UnityEditor.Recorder.Examples
                 }
             }
 
-            nbRetries = 0;
             // When using a slower codec (e.g. HEVC, ProRes), frames may be
             // queued too much, and it may end up with an out-of-memory error.
             // To avoid this problem, we wait for pipe queue entries to be
@@ -127,7 +125,7 @@ namespace UnityEditor.Recorder.Examples
                 Log("Sync WaitOne pipe " + _name);
                 if (!_pipePong.WaitOne(_timeoutValue))
                 {
-                    if (nbRetries++ > _maxRetries)
+                    if (_cancellationToken.IsCancellationRequested)
                     {
                         Log("SyncFrameData timeout for ffmpeg pipe of  " +
                             _name + "_pipeQueue.Count = " + _pipeQueue.Count);
@@ -141,6 +139,7 @@ namespace UnityEditor.Recorder.Examples
         internal string CloseAndGetOutput()
         {
             // Terminate the subthreads.
+            _cancellationToken.Cancel();
             _terminate = true;
 
             _copyPing.Set();
@@ -156,6 +155,7 @@ namespace UnityEditor.Recorder.Examples
             _subprocess.Close();
             _subprocess.Dispose();
 
+            _cancellationToken.Dispose();
 
             // Nullify members (just for ease of debugging).
             _subprocess = null;
@@ -164,6 +164,7 @@ namespace UnityEditor.Recorder.Examples
 
             _copyQueue = null;
             _pipeQueue = _freeBuffer = null;
+
             return "";
         }
 
@@ -198,6 +199,7 @@ namespace UnityEditor.Recorder.Examples
         AutoResetEvent _copyPong = new AutoResetEvent(false);
         AutoResetEvent _pipePing = new AutoResetEvent(false);
         AutoResetEvent _pipePong = new AutoResetEvent(false);
+        CancellationTokenSource _cancellationToken;
         bool _terminate;
         string _name;
         int videoFrameCount;
@@ -207,7 +209,6 @@ namespace UnityEditor.Recorder.Examples
         Queue<byte[]> _pipeQueue = new Queue<byte[]>();
         Queue<byte[]> _freeBuffer = new Queue<byte[]>();
         int _timeoutValue = 500; // .5 sec
-        int _maxRetries = 2;
         string _arguments;
 
         internal static string ExecutablePath => _executablePath;
@@ -229,21 +230,10 @@ namespace UnityEditor.Recorder.Examples
         // have to be buffered by end-of-frame.
         void CopyThread()
         {
-            int nbTries = 0;
-            while (!_terminate)
+            while (!_cancellationToken.IsCancellationRequested)
             {
                 // Wait for ping from the main thread.
-                if (!_copyPing.WaitOne(_timeoutValue))
-                {
-                    nbTries++;
-                    if (nbTries > _maxRetries)
-                    {
-                        Log("CopyThread timeout for ffmpeg pipe of file " +
-                            _name + "_copyQueue.Count = " + _copyQueue.Count);
-                        _terminate = true;
-                        return;
-                    }
-                }
+                _copyPing.WaitOne(_timeoutValue);
 
                 // Process all entries in the copy queue.
                 while (_copyQueue.Count > 0)
@@ -280,24 +270,12 @@ namespace UnityEditor.Recorder.Examples
         // them into the FFmpeg pipe.
         void PipeThread()
         {
-            int nbTries = 0;
-
             var pipe = _subprocess.StandardInput.BaseStream;
 
-            while (!_terminate)
+            while (!_cancellationToken.IsCancellationRequested)
             {
                 // Wait for the ping from the copy thread.
-                if (!_pipePing.WaitOne(_timeoutValue))
-                {
-                    nbTries++;
-                    if (nbTries > _maxRetries)
-                    {
-                        Log("PipeThread for ffmpeg pipe of file " +
-                            _name + "_pipeQueue.Count = " + _pipeQueue.Count);
-                        _terminate = true;
-                        return;
-                    }
-                }
+                _pipePing.WaitOne(_timeoutValue);
 
                 // Process all entries in the pipe queue.
                 while (_pipeQueue.Count > 0)

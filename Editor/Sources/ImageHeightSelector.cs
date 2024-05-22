@@ -25,7 +25,7 @@ namespace UnityEditor.Recorder
             { ImageHeight.x720p_HD, "HD - 720p" },
             { ImageHeight.x480p, "SD - 480p" },
             { ImageHeight.x240p, "240p" },
-            { ImageHeight.Window, "Match Window Size" },
+            { ImageHeight.Window, "Use Game View Resolution" },
             { ImageHeight.Custom, "Custom" }
         };
 
@@ -57,7 +57,13 @@ namespace UnityEditor.Recorder
             for (int i = 0; i < count; ++i)
             {
                 var e = ordered[i];
-                m_ToName[i] = s_HeightToName[e];
+                if (e == ImageHeight.Window)
+                {
+                    Input.GameViewSize.GetGameRenderSize(out uint w, out uint h);
+                    m_ToName[i] = s_HeightToName[e] + $" ({w}x{h}) ";
+                }
+                else
+                    m_ToName[i] = s_HeightToName[e];
                 m_ToEnumValue[i] = (int)e;
                 m_ToIndex[e] = i;
             }

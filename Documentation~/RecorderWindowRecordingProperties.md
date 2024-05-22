@@ -22,10 +22,10 @@ Use the Recording session properties to simultaneously start or stop recordings 
 | **Recording Mode** || Allows you to specify the frames or time interval to record. |
 ||_Manual_ | Start or stop recording when you manually click **Start Recording** or **Stop Recording**, respectively. |
 || _Single Frame_ | Record a single frame. Use the **Target Frame** property to specify this frame. |
-|| _Frame Interval_ | Record a set of consecutive frames during Play mode. Use the **Start** and **End** properties to specify when to start and stop. |
+|| _Frame Interval_ | Record a set of consecutive frames during Play mode. Use the **Start** and **End** properties to specify when to start and stop.<br/><br/>**Important**: if you set **Start** to a value greater than zero, the Editor still plays all the frames from the beginning when entering Play Mode before starting to record the specified frame range. The Editor needs to compute and render all these frames to ensure determinism, for example when the playback involves physics simulation or procedural noise. Notice the _skipped frames_ mention during the playback of the non-recorded frames. |
 || _Time Interval_ | Record a specific duration, in seconds, during Play mode. Use the **Start** and **End** properties to specify when to start and stop. |
 | **Target Frame** || Specifies the number of the frame to capture when in **Single Frame** mode. |
-| **Start**/ <br/> **End** || • In **Frame Interval** mode, these values specify the range of frames to capture.<br/>• In **Time Interval** mode, these values specify the time, in seconds, to start and stop recording. |
+| **Start**/ <br/> **End** || <li> In **Frame Interval** mode, these values specify the range of frames to capture. <li> In **Time Interval** mode, these values specify the time, in seconds, to start and stop recording. |
 
 ## Frame Rate properties
 

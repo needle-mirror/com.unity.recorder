@@ -9,7 +9,7 @@ Use these properties to define file output options for any type of Recorder.
 | **File Name** || The name of the output file. |
 |   | _[TEXT FIELD]_ | Type the file name here.<br /><br />**Tip:** You can use [placeholders](#available-placeholders) to include auto-generated text in the file name: use the **+Wildcards** drop-down menu or insert them manually. |
 |   | **+Wildcards** menu | Allows you to quickly select [placeholders](#available-placeholders) for auto-generated text to append them to the **File Name** string. |
-| **Path** ||Use these controls to configure the path to the folder where the Recorder saves output files.<br/><br/>**Note:**<br/>• UNC paths are [not supported](KnownIssues.md#unc-paths-not-supported-as-output-locations).<br/>• The [Animation Clip Recorder](RecorderAnimation.md) can only output to a location within the Assets folder because the output format is only usable in Unity. |
+| **Path** ||Use these controls to configure the path to the folder where the Recorder saves output files.<br/><br/>**Note:**<ul><li> UNC paths are [not supported](KnownIssues.md#unc-paths-not-supported-as-output-locations).<li> The [Animation Clip Recorder](RecorderAnimation.md) can only output to a location within the Assets folder because the output format is only usable in Unity.</ul> |
 |   | _[DROP-DOWN]_ |  Choose one of several pre-defined Unity folders, or choose **Absolute** to specify a custom path. |
 |   | _[TEXT FIELD]_ | If you choose a predefined path from the drop-down menu, the Recorder appends anything you enter here to that path.<br/><br/>If you choose **Absolute** from the drop-down menu, you can enter the custom output path here. <br/><br/>**Note:** If you click the Output Location button (**...**) to choose an absolute path from the Unity file browser, the path you choose overwrites anything in this field.<br /><br />**Tip:** You can manually insert [placeholders](#available-placeholders) to include auto-generated text in the path string. |
 |   | Output Location button (**...**) | Opens a Unity file browser where you can choose a custom output path. When you choose a path this way, the Recorder automatically sets the drop-down menu to **Absolute**. |
@@ -40,7 +40,7 @@ The **+Wildcards** menu helps you quickly append them to the file name string, b
 | `<GameObjectScene>` | The name of the Scene containing the [**GameObject** targeted for recording](RecorderAnimation.md#input). | `My Scene` |
 | `<Product>` | The value of the [Product Name](https://docs.unity3d.com/Manual/class-PlayerSettings.html#ProductName) field from Unity's Player General Settings. | `My Product` |
 | `<Project>` | The name of the current Unity Project.  | `My Project` |
-| `<Recorder>` | • In Recorder window: the Recorder name from the Recorder list.<br />• In Timeline track: the name of the Recorder Clip. | `My Recorder` |
+| `<Recorder>` | <li> In Recorder window: the Recorder name from the Recorder list.<li> In Timeline track: the name of the Recorder Clip. | `My Recorder` |
 | `<Resolution>` | The output image dimensions (width by height) in pixels. Uses the `WxH` format. | `1920x1080` |
 | `<Scene>` | The name of the current Unity Scene. | `My Scene` |
 | `<Take>` | The **Take Number** value. Uses the `000` format.  | `002` |
