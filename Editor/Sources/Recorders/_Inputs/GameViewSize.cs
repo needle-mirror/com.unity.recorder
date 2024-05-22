@@ -1,11 +1,15 @@
 #if UNITY_2022_2_OR_NEWER
 using System.Runtime.CompilerServices;
-
+#if HDRP_AVAILABLE
+using System;
+using UnityEngine;
+using UnityEngine.Rendering.HighDefinition;
+#endif
 [assembly: InternalsVisibleTo("Unity.Recorder.Editor.Tests")]
 
 namespace UnityEditor.Recorder.Input
 {
-    static class GameViewSize
+    static partial class GameViewSize
     {
         public static bool IsMainPlayViewGameView()
         {
@@ -30,11 +34,50 @@ namespace UnityEditor.Recorder.Input
             PlayModeWindow.GetRenderingResolution(out width, out height);
         }
 
+        /// <summary>
+        /// Set the GameView to a custom resolution when the passed parameters are different from the current resolution.
+        /// A width or height of 0 will be ignored.
+        /// In HDRP, this will reset the history data so cameras adapt to the change of resolution.
+        /// </summary>
         public static void SetCustomSize(int width, int height)
         {
+            if (width == 0 || height == 0)
+                return;
+
+            GetGameRenderSize(out uint currentWidth, out uint currentHeight);
+            if (width == currentWidth && height == currentHeight)
+                return;
+
             PlayModeWindow.SetCustomRenderingResolution((uint)width, (uint)height, "Recording Resolution");
+
+#if HDRP_AVAILABLE
+            // Reset history data so cameras adapt to the change of resolution.
+            if (UnityHelpers.UsingHDRP())
+            {
+                Camera[] cams = Camera.allCameras;
+                foreach (var c in cams)
+                {
+                    HDCamera hdcam = HDCamera.GetOrCreate(c);
+                    HDAdditionalCameraData hdCameraData = c.GetComponent<HDAdditionalCameraData>();
+                    if (hdcam != null && hdCameraData != null && hdCameraData.antialiasing == HDAdditionalCameraData.AntialiasingMode.TemporalAntialiasing)
+                    {
+                        hdcam.Reset();
+                    }
+                }
+                onHDCameraReset?.Invoke();
+            }
+#endif
         }
     }
+
+#if HDRP_AVAILABLE
+    // Made for tests
+    static partial class GameViewSize
+    {
+        // Used in tests to check if HDCamera.Reset was called.
+        internal static event Action onHDCameraReset;
+    }
+#endif
 }
 #else
 

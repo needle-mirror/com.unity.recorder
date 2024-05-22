@@ -40,11 +40,17 @@ namespace UnityEditor.Recorder.Input
         {
             --EditorGUI.indentLevel;
             Initialize(property);
-            if (UnityHelpers.UsingHDRP())
+            if (!UnityHelpers.UsingLegacyRP())
             {
                 m_SupportedSources = ImageSource.MainCamera | ImageSource.TaggedCamera;
             }
 
+
+            if (UnityHelpers.UsingURP2DRenderer())
+            {
+                // Disable the controls if project is using URP 2D Renderer.
+                GUI.enabled = false;
+            }
 
             using (var check = new EditorGUI.ChangeCheckScope())
             {
@@ -82,6 +88,8 @@ namespace UnityEditor.Recorder.Input
                 EditorGUILayout.PropertyField(m_FlipFinalOutput, Styles.FlipVerticalLabel);
             }
             ++EditorGUI.indentLevel;
+
+            GUI.enabled = true;
         }
     }
 }

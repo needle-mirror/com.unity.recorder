@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityObject = UnityEngine.Object;
 
 namespace UnityEditor.Recorder.Input
 {
@@ -217,10 +216,7 @@ namespace UnityEditor.Recorder.Input
                     OutputWidth = cbSettings.OutputWidth;
                     OutputHeight = cbSettings.OutputHeight;
 
-                    if (cbSettings.outputImageHeight != ImageHeight.Window)
-                    {
-                        GameViewSize.SetCustomSize(OutputWidth, OutputHeight);
-                    }
+                    GameViewSize.SetCustomSize(OutputWidth, OutputHeight);
                     break;
                 }
                 default:

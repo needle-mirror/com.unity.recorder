@@ -10,7 +10,8 @@
         "Unity.RenderPipelines.HighDefinition.Runtime",
         "Unity.RenderPipelines.HighDefinition.Editor",
         "Unity.OpenImageIO",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
     "includePlatforms": [
         "Editor"
@@ -36,6 +37,11 @@
             "name": "com.unity.render-pipelines.high-definition",
             "expression": "14.0.2",
             "define": "HDRP_14_0_2_AVAILABLE"
+        },
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "12.0.0",
+            "define": "URP_AVAILABLE"
         }
     ],
     "noEngineReferences": false

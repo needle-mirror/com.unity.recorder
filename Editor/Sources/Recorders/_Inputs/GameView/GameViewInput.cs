@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -72,11 +71,7 @@ namespace UnityEditor.Recorder.Input
             if (OutputWidth <= 0 || OutputHeight <= 0)
                 return; // error will be handled by ImageInputSettings.CheckForErrors. Otherwise we get a failure at RenderTexture.GetTemporary()
 
-            GameViewSize.GetGameRenderSize(out var w, out var h);
-            if (w != OutputWidth || h != OutputHeight)
-            {
-                GameViewSize.SetCustomSize(OutputWidth, OutputHeight);
-            }
+            GameViewSize.SetCustomSize(OutputWidth, OutputHeight);
 
             // Initialize the temporary texture for forcing opacity
             m_TempCaptureTextureOpaque = RenderTexture.GetTemporary(OutputWidth, OutputHeight);

@@ -117,7 +117,8 @@ namespace UnityEditor.Recorder.Input
             }
             else
             {
-                targetCamera.RenderToCubemap(m_Cubemap1, 63, Camera.MonoOrStereoscopicEye.Mono);
+                targetCamera.stereoSeparation = 0;
+                targetCamera.RenderToCubemap(m_Cubemap1, 63, Camera.MonoOrStereoscopicEye.Left);
                 m_Cubemap1.ConvertToEquirect(OutputRenderTexture);
             }
 

@@ -4,7 +4,6 @@ When Accumulation is enabled, the image that is rendered on each frame is based 
 
 >**Notes:**
 >* Sub frames that precede the first frame, as defined by the Start Frame property, are not captured on the first frame. Accumulation begins in the interval before the second frame.<br/>
-
 >* The number of samples (sub frames) in the diagram below is for illustration only. Hundreds of samples may be needed to produce a smooth motion-blur trail; thousands of path-tracing samples may be needed to converge on a clean image.
 
 ![Image shows that the interval between one frame and the next is divided into sub frames, shutter interval starts immediately after the last frame and contains a number of the sub frames; the shutter profile is fully contained in the interval, and the sub frames in the interval are recorded on the following frame.](Images/recorder-accumulate-properties.png)

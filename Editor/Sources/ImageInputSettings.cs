@@ -40,6 +40,16 @@ namespace UnityEditor.Recorder.Input
     [Serializable]
     public abstract class StandardImageInputSettings : ImageInputSettings
     {
+        /// <summary>
+        /// Goes with 4 parameters
+        /// 0-1 = GameView's resolution
+        /// 2-3 = Requested resolution
+        /// </summary>
+        internal const string k_GameViewResolutionMismatchErrorFormat =
+            "The Game view resolution ({0}x{1}) does not match the requested resolution ({2}x{3}). "
+            + "Recorder needs to force the Game View resolution to the requested one for the recording.\n"
+            + "After the recording, use the Game View control bar to restore the resolution to your preferred value.";
+
         [SerializeField]
         OutputResolution m_OutputResolution = new OutputResolution();
 
@@ -75,6 +85,10 @@ namespace UnityEditor.Recorder.Input
 
             if (OutputHeight > (int)maxSupportedSize)
                 warnings.Add($"The image size exceeds the recommended maximum height of {(int)maxSupportedSize} px: {OutputHeight}");
+
+            GameViewSize.GetGameRenderSize(out var w, out var h);
+            if (w != m_OutputResolution.GetWidth() || h != m_OutputResolution.GetHeight())
+                warnings.Add(String.Format(k_GameViewResolutionMismatchErrorFormat, w, h, m_OutputResolution.GetWidth(), m_OutputResolution.GetHeight()));
         }
 
         protected internal override void CheckForErrors(List<string> errors)

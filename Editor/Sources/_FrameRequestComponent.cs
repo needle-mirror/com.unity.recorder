@@ -1,8 +1,5 @@
 using System.Collections;
 using UnityEngine;
-#if HDRP_AVAILABLE
-using UnityEngine.Rendering.HighDefinition;
-#endif
 
 namespace UnityEditor.Recorder
 {
@@ -73,19 +70,6 @@ namespace UnityEditor.Recorder
             yield return new WaitForEndOfFrame();
             if (currentState == State.WaitingForFirstFrame)
             {
-                #if HDRP_AVAILABLE
-                if (UnityHelpers.UsingHDRP())
-                {
-                    Camera[] cams = Camera.allCameras;
-                    foreach (var c in cams)
-                    {
-                        HDCamera hdcam =  HDCamera.GetOrCreate(c);
-                        HDAdditionalCameraData hdCameraData = c.GetComponent<HDAdditionalCameraData>();
-                        if (hdcam != null && hdCameraData != null && hdCameraData.antialiasing == HDAdditionalCameraData.AntialiasingMode.TemporalAntialiasing)
-                            hdcam.Reset();
-                    }
-                }
-                #endif
                 // We need to wait one more frame to overcome the GameView resolution change
                 // REC-589
                 yield return new WaitForEndOfFrame();

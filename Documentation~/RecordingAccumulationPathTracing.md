@@ -11,8 +11,8 @@ HDRP and Recorder accumulate samples differently:
 You can configure Recorder to accumulate [path tracing and motion blur](RecordingAccumulationPathTracing.md#configure-path-tracing-accumulation-with-motion-blur) or to accumulate [path tracing without motion blur](RecordingAccumulationPathTracing.md#configure-path-tracing-accumulation-without-motion-blur).
 
 >**Notes:**
-* If a scene contains an “Exposure” post-process in an automatic mode and Adaptation is set to Progressive, the resulting image may be too bright when path tracing is accumulated. For more information, see [Overexposed frames when accumulating path tracing](KnownIssues.md#overexposed-frames-when-accumulating-path-tracing).<br/><br/>
-* Limitations to path tracing in HDRP also apply to path tracing in Accumulation. See Path tracing [limitations](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Ray-Tracing-Path-Tracing.html%23limitations).
+>* If a scene contains an “Exposure” post-process in an automatic mode and Adaptation is set to Progressive, the resulting image may be too bright when path tracing is accumulated. For more information, see [Overexposed frames when accumulating path tracing](KnownIssues.md#overexposed-frames-when-accumulating-path-tracing).<br/><br/>
+>* Limitations to path tracing in HDRP also apply to path tracing in Accumulation. See Path tracing [limitations](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest/index.html?subfolder=/manual/Ray-Tracing-Path-Tracing.html%23limitations).
 
 ## Requirements
 A number of specific conditions must be met to use path-tracing accumulation in your recording. See [Requirements](RecordingAccumulation.md#requirements).

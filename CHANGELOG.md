@@ -4,6 +4,20 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.3] - 2024-05-22
+### Changed
+- Disallow `ActiveCamera` from being selected with SRP-based projects as a camera source.
+- Display an error message and prevent Recorder from starting if MainCamera is selected while the main camera is missing from the project.
+- Display an error when a Recorder is set to capture from a Targeted Camera in a project using URP 2D Renderer.
+- Prevent reset on HDCameras history when there is no change of resolution.
+- Output resolution `Match Window Size` is now labeled `Use Game View resolution` to reflect the associated behavior. It also shows the current resolution of the Game View.
+- Show a warning when the requested `Output Resolution` conflicts with the current Game View resolution as Recorder needs to force change the `Output Resolution` of the Game View for the recording.
+
+### Fixed
+- Ensure that camera's rotation is retained when recording monoscopic 360 views.
+- Ensure an alpha channel is added when the Editor targets a mobile platform.
+- FFmpeg sample: prevent performance issue during a recording when the CPU main thread takes longer than usual to process a frame. This can happen when the Play Mode is paused or when a scene is being loaded.
+
 ## [4.0.2] - 2023-10-24
 ### Changed
 - Removed resolution automatic rounding to the nearest even number when Movie Recorder uses MP4 codec and "Match Window Size" output resolution.
