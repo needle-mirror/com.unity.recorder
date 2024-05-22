@@ -25,6 +25,9 @@ namespace UnityEditor.Recorder.Input
         Material m_accumulateMaterial;
         Material m_normalizeMaterial;
 
+        RenderTextureFormat m_InternalGraphicsFormat;
+        RenderTextureReadWrite m_InternalGraphicsReadWrite;
+
         class HookedCamera
         {
             public Camera camera;
@@ -163,12 +166,23 @@ namespace UnityEditor.Recorder.Input
 
             m_normalizeMaterial = new Material(normalizeShader) { hideFlags = HideFlags.DontSave };
 
-            m_renderRT = new RenderTexture(m_renderWidth, m_renderHeight, 24, RenderTextureFormat.DefaultHDR,
-                RenderTextureReadWrite.Linear) { wrapMode = TextureWrapMode.Clamp };
+            m_InternalGraphicsReadWrite = RenderTextureReadWrite.sRGB;
+            m_InternalGraphicsFormat = RenderTextureFormat.ARGBHalf;
+            ImageRecorderSettings s = session.settings as ImageRecorderSettings;
+            if (s != null && s.CanCaptureHDRFrames() && s.CaptureHDR)
+            {
+                m_InternalGraphicsReadWrite = RenderTextureReadWrite.Linear;
+                m_InternalGraphicsFormat = RenderTextureFormat.DefaultHDR;
+            }
+
+            m_renderRT = new RenderTexture(m_renderWidth, m_renderHeight, 24, m_InternalGraphicsFormat, m_InternalGraphicsReadWrite)
+            {
+                wrapMode = TextureWrapMode.Clamp
+            };
 
             for (int i = 0; i < 2; ++i)
             {
-                m_accumulateRTs[i] = new RenderTexture(m_renderWidth, m_renderHeight, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear)
+                m_accumulateRTs[i] = new RenderTexture(m_renderWidth, m_renderHeight, 0, m_InternalGraphicsFormat, m_InternalGraphicsReadWrite)
                 {
                     wrapMode = TextureWrapMode.Clamp
                 };
@@ -176,7 +190,7 @@ namespace UnityEditor.Recorder.Input
                 m_accumulateRTs[i].Create();
             }
 
-            var rt = new RenderTexture(OutputWidth, OutputHeight, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
+            var rt = new RenderTexture(OutputWidth, OutputHeight, 0, m_InternalGraphicsFormat, m_InternalGraphicsReadWrite);
             rt.Create();
             OutputRenderTexture = rt;
             m_samples = new Vector2[(int)rtsSettings.SuperSampling];
@@ -213,7 +227,7 @@ namespace UnityEditor.Recorder.Input
                             continue;
 
                         hookedCam = new HookedCamera() { camera = cam, textureBackup = cam.targetTexture };
-                        var camRT = new RenderTexture((int)(m_renderWidth * cam.rect.width), (int)(m_renderHeight * cam.rect.height), 24, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
+                        var camRT = new RenderTexture((int)(m_renderWidth * cam.rect.width), (int)(m_renderHeight * cam.rect.height), 24, m_InternalGraphicsFormat, m_InternalGraphicsReadWrite);
                         cam.targetTexture = camRT;
                         m_hookedCameras.Add(hookedCam);
                         sort = true;

@@ -1,7 +1,7 @@
 {
   "name": "com.unity.recorder",
   "displayName": "Recorder",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "unity": "2019.4",
   "unityRelease": "1f1",
   "dependencies": {
@@ -23,15 +23,19 @@
     "layer"
   ],
   "relatedPackages": {
-    "com.unity.recorder.tests": "3.0.3"
+    "com.unity.recorder.tests": "3.0.4"
+  },
+  "_upm": {
+    "changelog": "### Changed\n- Prevent Unity from throwing an exception when using the file explorer to change the output file path in a recorder preset.\n- Disallow `ActiveCamera` from being selected with SRP-based projects as a camera source.\n- Display an error message and prevent Recorder from starting if MainCamera is selected while the main camera is missing from the project.\n- Better handle error messages when using a Tagged Camera while the tag is missing from the project or not assigned to the camera.\n\n### Fixed\n- Ensure that camera's rotation is retained when recording monoscopic 360 views.\n- Ensure an alpha channel is added when the Editor targets a mobile platform."
   },
   "upmCi": {
-    "footprint": "9aa807f7e2d8b874343dfcb9574166ea011e5327"
+    "footprint": "f528a67a783618bb1d186559abc2aef4e9e6bbd5"
   },
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.recorder@3.0/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.recorder.git",
     "type": "git",
-    "revision": "52d2b7e77e6832f279e4de2172226475c5465729"
+    "revision": "4c9f2aee426214deb37c7d9defbdbed235e3f3c1"
   },
   "samples": [
     {

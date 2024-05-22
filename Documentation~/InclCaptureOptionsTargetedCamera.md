@@ -1,5 +1,8 @@
 These properties appear when you set **Source** to **Targeted Camera**.
 
+>[!NOTE]
+>* You can't capture images from a Targeted Camera if you are using a URP 2D Renderer, due to a [known limitation](KnownIssues.md#targeted-camera-recording-is-not-available-with-urp-2d-renderer). As an alternative, you can capture from the Game View or from a Render Texture Asset.
+
 ![](Images/CaptureOptionsTargetedCamera.png)
 
 |Property||Function|

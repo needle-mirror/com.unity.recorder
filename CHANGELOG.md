@@ -4,6 +4,16 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.4] - 2024-05-22
+### Changed
+- Prevent Unity from throwing an exception when using the file explorer to change the output file path in a recorder preset.
+- Disallow `ActiveCamera` from being selected with SRP-based projects as a camera source.
+- Display an error message and prevent Recorder from starting if MainCamera is selected while the main camera is missing from the project.
+- Better handle error messages when using a Tagged Camera while the tag is missing from the project or not assigned to the camera.
+
+### Fixed
+- Ensure that camera's rotation is retained when recording monoscopic 360 views.
+- Ensure an alpha channel is added when the Editor targets a mobile platform.
 
 ## [3.0.3] - 2021-11-08
 ### Added

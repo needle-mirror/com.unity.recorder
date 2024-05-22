@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -13,6 +14,8 @@ namespace UnityEditor.Recorder.Input
     [Serializable]
     public class CameraInputSettings : StandardImageInputSettings
     {
+        internal const string k_UnsupportedCameraSourceError = "ActiveCamera is only compatible with the Legacy Render Pipeline.";
+
         /// <summary>
         /// Indicates the Camera input type.
         /// </summary>
@@ -73,8 +76,35 @@ namespace UnityEditor.Recorder.Input
         protected internal override void CheckForErrors(List<string> errors)
         {
             base.CheckForErrors(errors);
-            if (Source == ImageSource.TaggedCamera && string.IsNullOrEmpty(CameraTag))
-                errors.Add("Missing tag for camera selection");
+
+            if (Source == ImageSource.TaggedCamera)
+            {
+                if (string.IsNullOrEmpty(CameraTag))
+                    errors.Add("Missing tag for camera selection");
+                else
+                {
+                    try
+                    {
+                        var objs = GameObject.FindGameObjectsWithTag(CameraTag);
+                        var cams = objs.Select(obj => obj.GetComponent<Camera>()).Where(c => c != null);
+
+                        if (cams.Count() == 0)
+                            errors.Add("No camera has the requested target tag '" + CameraTag + "'");
+                    }
+                    catch (UnityException)
+                    {
+                        errors.Add("The requested target tag '" + CameraTag + "' does not exist in the project");
+                    }
+                }
+            }
+            else if (Source == ImageSource.MainCamera && Camera.main == null)
+            {
+                errors.Add("There is no MainCamera in the project");
+            }
+            else if (Source == ImageSource.ActiveCamera && !UnityHelpers.UsingLegacyRP())
+            {
+                errors.Add(k_UnsupportedCameraSourceError);
+            }
         }
     }
 }

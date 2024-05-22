@@ -40,7 +40,7 @@ namespace UnityEditor.Recorder.Input
         {
             --EditorGUI.indentLevel;
             Initialize(property);
-            if (UnityHelpers.UsingHDRP())
+            if (!UnityHelpers.UsingLegacyRP())
             {
                 m_SupportedSources = ImageSource.MainCamera | ImageSource.TaggedCamera;
             }
