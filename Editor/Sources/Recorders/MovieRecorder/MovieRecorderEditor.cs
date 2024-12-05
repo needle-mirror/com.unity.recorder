@@ -22,8 +22,8 @@ namespace UnityEditor.Recorder
         {
             internal static readonly GUIContent SourceLabel = new GUIContent("Source", "The input type to use for the recording.");
             internal static readonly GUIContent EncoderLabel = new GUIContent("Encoder", "The encoder to use for the recording.");
-            internal static readonly GUIContent AlphaLabel = new GUIContent("Include alpha", "Whether or not to include the alpha channel.");
-            internal static readonly GUIContent AudioLabel = new GUIContent("Include audio", "Whether or not to include the audio signal.");
+            internal static readonly GUIContent AlphaLabel = new GUIContent("Include Alpha", "Include the alpha channel in the recording.\n\nTo ensure that your project is properly set up for this, refer to 'Recording with alpha' in the Recorder package manual.");
+            internal static readonly GUIContent AudioLabel = new GUIContent("Include Audio", "Whether or not to include the audio signal.");
         }
 
         protected override void OnEnable()
@@ -123,7 +123,7 @@ namespace UnityEditor.Recorder
             if (mrs.EncoderSettings.CanCaptureAudio)
                 mrs.CaptureAudio = EditorGUILayout.Toggle(Styles.AudioLabel, mrs.CaptureAudio);
 
-            if (!UnityHelpers.UsingURP() && mrs.ImageInputSettings.SupportsTransparent && mrs.EncoderSettings.CanCaptureAlpha)
+            if (mrs.ImageInputSettings.SupportsTransparent && mrs.EncoderSettings.CanCaptureAlpha)
                 mrs.CaptureAlpha = EditorGUILayout.Toggle(Styles.AlphaLabel, mrs.CaptureAlpha);
         }
 

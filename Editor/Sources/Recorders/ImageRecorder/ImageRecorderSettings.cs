@@ -233,7 +233,7 @@ namespace UnityEditor.Recorder
             bool formatSupportAlpha = OutputFormat == ImageRecorderOutputFormat.PNG ||
                 OutputFormat == ImageRecorderOutputFormat.EXR;
             bool inputSupportAlpha = imageInputSettings.SupportsTransparent;
-            return (formatSupportAlpha && inputSupportAlpha && !UnityHelpers.UsingURP());
+            return (formatSupportAlpha && inputSupportAlpha);
         }
 
         [SerializeReference] AccumulationSettings _accumulationSettings = new AccumulationSettings();

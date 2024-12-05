@@ -33,7 +33,7 @@ The Output Format properties define the media format to save the recorded frames
 
 >[!NOTE]
 >* The alpha channel is available for some encoders subject to the following conditions:
->   * The render pipeline is High Definition Render Pipeline (HDRP) or Built-in render pipeline.
+>   * The render pipeline used in your project is [properly set up to output alpha](RecordingAlpha.md).
 >   * The source is not Game View. The other sources can support alpha.
 >* To enable recording when Include Audio is selected, in **Project Settings** > **Audio** > **Default Speaker Mode**, ensure that **Mono** or **Stereo** is selected.
 

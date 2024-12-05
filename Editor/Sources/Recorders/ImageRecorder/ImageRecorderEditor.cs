@@ -24,7 +24,7 @@ namespace UnityEditor.Recorder
         static class Styles
         {
             internal static readonly GUIContent FormatLabel = new GUIContent("Media File Format", "The file encoding format of the recorded output.");
-            internal static readonly GUIContent CaptureAlphaLabel = new GUIContent("Include Alpha", "To include the alpha channel in the recording.\n\nIn the High Definition Render Pipeline (HDRP), you need to set the buffer format to R16G16B16A16.");
+            internal static readonly GUIContent CaptureAlphaLabel = new GUIContent("Include Alpha", "Include the alpha channel in the recording.\n\nTo ensure that your project is properly set up for this, refer to 'Recording with alpha' in the Recorder package manual.");
             internal static readonly GUIContent CLabel = new GUIContent("Compression", "The data compression method to apply when using the EXR format.");
             internal static readonly GUIContent JpegQualityLabel = new GUIContent("Quality", "The JPEG encoding quality level.");
             internal static readonly GUIContent ColorSpace = new GUIContent("Color Space", "The color space (gamma curve, gamut) to use in the output images.\n\nIf you select an option to get unclamped values, you must:\n- Use High Definition Render Pipeline (HDRP).\n- Disable any Tonemapping in your Scene.\n- Disable Dithering on the selected Camera.");
@@ -48,12 +48,9 @@ namespace UnityEditor.Recorder
         {
             EditorGUILayout.PropertyField(m_OutputFormat, Styles.FormatLabel);
             var imageSettings = (ImageRecorderSettings)target;
-            if (!UnityHelpers.UsingURP())
+            using (new EditorGUI.DisabledScope(!imageSettings.CanCaptureAlpha()))
             {
-                using (new EditorGUI.DisabledScope(!imageSettings.CanCaptureAlpha()))
-                {
-                    EditorGUILayout.PropertyField(m_CaptureAlpha, Styles.CaptureAlphaLabel);
-                }
+                EditorGUILayout.PropertyField(m_CaptureAlpha, Styles.CaptureAlphaLabel);
             }
 
             if (imageSettings.CanCaptureHDRFrames())

@@ -43,11 +43,11 @@ This page lists some known issues and limitations that you might experience with
 
 #### Limited support of AA/TAA in AOVs
 
-**Limitation:** The Beauty AOV is the only AOV that you can currently record with Anti-Aliasing (AA) / Temporal Anti-Aliasing (TAA) enabled on your recording camera.
+**Limitation:** The "Beauty" Arbitrary Output Variable (AOV) is the only AOV that you can currently record with Anti-Aliasing (AA) / Temporal Anti-Aliasing (TAA) enabled on your recording camera.
 
 #### Color artifacts in AOV recordings when TAA is enabled
 
-**Known issue:** If you record multiple AOVs while the recording camera has Temporal Anti-Aliasing (TAA) enabled, the recorded outputs might contain unexpected color artifacts. For example, some areas of a Beauty pass might include artificial colors coming from the data recorded for a Normal pass.
+**Known issue:** If you record multiple Arbitrary Output Variables (AOVs) while the recording camera has Temporal Anti-Aliasing (TAA) enabled, the recorded outputs might contain unexpected color artifacts. For example, some areas of a Beauty pass might include artificial colors coming from the data recorded for a Normal pass.
 
 **Workaround:** If you need to record a Beauty pass with TAA enabled on your recording camera, you should record it through its own recording session, separately from any other AOVs.
 

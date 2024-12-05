@@ -17,7 +17,7 @@ The Recorder package allows you to [set up a recording session with one or multi
 
 The entry point for this type of scenario is the [Recorder window](RecordingRecorderWindow.md), where you set up a single [recording session](RecorderWindowRecordingProperties.md) and a [recorder list](RecorderManage.md) that can include one or several recorders.
 
-The Recorder list can include recorders of different types or recorders of the same type but with different settings. When using the Recorder window, all recorders of the list share the same recording session properties, which makes all recordings start and stop simultaneously and share the same recording frame rate.
+The Recorder list can include recorders of different types or recorders of the same type but with different settings. When using the Recorder window, all recorders of the list share the same recording session properties, which makes all recordings start and stop synchronously and share the same recording frame rate.
 
 ### Multiple recordings triggered from Timeline
 
@@ -41,7 +41,7 @@ The Recorder package includes the following recorder types by default:
 | [**Movie Recorder**](RecorderMovie.md) | [Generates a video](RecordingVideo.md) in H.264 MP4, VP8 WebM, or ProRes QuickTime format. Also allows to [generate animated GIF files](RecordingAnimatedGIF.md). |
 | [**Image Sequence Recorder**](RecorderImage.md) | Generates a sequence of image files in JPEG, PNG, or EXR (OpenEXR) format. |
 | [**Audio Recorder**](RecorderAudio.md) | Generates an audio clip in WAV format. |
-| [**AOV Image Sequence Recorder**](aov-recorder-properties.md) | Generates a sequence of image files in PNG or EXR (OpenEXR) format to [capture specific render pass data for further compositing](aov-concepts.md) (for example, data related to materials, geometry, depth, motion, or lighting) in projects that use Unity's [HDRP (High Definition Render Pipeline)](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest). |
+| [**AOV Image Sequence Recorder**](aov-recorder-properties.md) | Generates a sequence of image files in PNG or EXR (OpenEXR) format to capture [Arbitrary Output Variable (AOV) render pass data](aov-concepts.md) for further compositing (for example, data related to materials, geometry, depth, motion, or lighting) in projects that use Unity's [HDRP (High Definition Render Pipeline)](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@latest). |
 
 ## Additional recorder types available with other packages
 

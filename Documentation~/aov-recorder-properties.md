@@ -1,6 +1,6 @@
 # AOV Image Sequence Recorder properties
 
-Use the AOV Image Sequence Recorder properties to select an AOV or multiple AOVs to export, choose a source camera, and configure how the AOV passes are recorded and saved.
+Use the AOV Image Sequence Recorder properties to select one or multiple [Arbitrary Output Variables (AOVs) to export](aov-concepts.md), choose a source camera, and configure how the AOV passes are recorded and saved.
 
 ![](Images/aov-recorder-window.png)
 <br />_AOV Image Sequence Recorder properties in the Recorder window context._
@@ -19,6 +19,7 @@ Select the AOVs to record according to your needs.
 The following sections describe the exportable AOVs grouped in categories, including the type of data recorded in each frame and the meaning behind the value of a single pixel for each specific AOV.
 
 #### Beauty
+
 | AOV | Recorded data | Pixel value |
 |:---|:---|:---|
 | **Beauty** | The final rendered view after post-process. | RGB color. |

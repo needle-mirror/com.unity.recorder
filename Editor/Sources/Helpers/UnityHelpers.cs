@@ -159,7 +159,7 @@ namespace UnityEditor.Recorder
             T result = default(T);
             var fullPathInProject = $"Packages/com.unity.recorder/Editor/Assets/{relativeFilePathWithExtension}";
 
-            if (File.Exists(fullPathInProject))
+            if (File.Exists(FileUtil.GetPhysicalPath(fullPathInProject)))
                 result = AssetDatabase.LoadAssetAtPath(fullPathInProject, typeof(T)) as T;
             else if (logError)
                 Debug.LogError($"Local asset file {fullPathInProject} not found.");

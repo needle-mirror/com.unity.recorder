@@ -1,6 +1,6 @@
-# Record AOVs
+# Record Arbitrary Output Variables (AOVs)
 
-AOV recording is a process that extracts specific render pass data from the Scene that a Camera views. This mainly includes render passes related to the material, geometry, depth, motion, and lighting response of the GameObjects in the Scene.
+Arbitrary Output Variable (AOV) recording is a process that extracts specific render pass data from the Scene that a Camera views. This mainly includes render passes related to the material, geometry, depth, motion, and lighting response of the GameObjects in the Scene.
 
 You can use AOV outputs, for example, for further image compositing in an external dedicated tool.
 
