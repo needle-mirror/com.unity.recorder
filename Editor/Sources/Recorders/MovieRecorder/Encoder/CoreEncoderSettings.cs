@@ -116,10 +116,10 @@ namespace UnityEditor.Recorder.Encoder
 
         /// <summary>
         /// The number of consecutive bidirectional predicted pictures (B-frames) for the H.264 codec.
+        /// </summary>
         /// <remarks>
         /// The maximum supported value is 2.
         /// </remarks>
-        /// </summary>
         public uint NumConsecutiveBFrames
         {
             get => numConsecutiveBFrames;

@@ -102,7 +102,7 @@ namespace UnityEditor.Recorder.Input
         /// <summary>
         /// Get the size of the buffer of audio samples (including all channels).
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The size of the buffer.</returns>
         public int GetBufferSize()
         {
             return MainBuffer.Length;

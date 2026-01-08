@@ -84,7 +84,7 @@ namespace UnityEditor.Recorder
         /// It can be either an absolute or a relative path.
         /// The file extension is automatically added.
         /// Wildcards such as <c>DefaultWildcard.Time</c> are supported.
-        /// <seealso cref="DefaultWildcard"/>
+        /// <see cref="DefaultWildcard"/>
         /// </summary>
         public string OutputFile
         {

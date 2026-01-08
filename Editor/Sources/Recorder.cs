@@ -335,7 +335,7 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Tests if there is a recording session currently running.
         /// </summary>
-        /// <returns>True if a recording session is currently active, False otherwise.</returns>
+        /// <value>True if a recording session is currently active, False otherwise.</value>
         public bool Recording { get; protected set; }
 
         internal void SignalInputsOfStage(ERecordingSessionStage stage, RecordingSession session)

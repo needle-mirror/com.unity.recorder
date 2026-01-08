@@ -363,7 +363,7 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Makes the output file path compliant with any OS (replacing any "\" by "/").
         /// </summary>
-        /// <param name="fullPath"></param>
+        /// <param name="fullPath">The full path to sanitize.</param>
         /// <returns>The full path with slashes "/" as file separators.</returns>
         public static string SanitizePath(string fullPath)
         {

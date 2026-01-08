@@ -29,8 +29,8 @@ namespace UnityEditor.Recorder
         /// <summary>
         /// Allows destroying Unity.Objects.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="allowDestroyingAssets"></param>
+        /// <param name="obj">Object to be destroyed.</param>
+        /// <param name="allowDestroyingAssets">Set to true to allow assets to be destroyed.</param>
         public static void Destroy(UnityObject obj, bool allowDestroyingAssets = false)
         {
             if (obj == null)

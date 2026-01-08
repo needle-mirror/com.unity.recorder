@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.4] - 2026-01-08
+### Changed
+- Signed binaries on Windows and Mac
+
 ## [5.1.2] - 2024-12-05
 ### Changed
 - Users can now enable alpha capture from the UI in projects that use URP.

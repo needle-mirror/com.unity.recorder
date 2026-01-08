@@ -39,8 +39,8 @@ namespace UnityEditor.Recorder
         /// Use this property to set and retrieve the input settings of the currently selected image.
         /// Supported input types are: CameraInputSettings, GameViewInputSettings, Camera360InputSettings, RenderTextureInputSettings, RenderTextureSamplerSettings.
         /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentNullException">Thrown when the value is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when the value is not a supported ImageInputSettings type.</exception>
         public ImageInputSettings ImageInputSettings
         {
             get { return (ImageInputSettings)Selected; }

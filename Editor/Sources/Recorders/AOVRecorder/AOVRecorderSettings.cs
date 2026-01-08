@@ -185,7 +185,7 @@ namespace UnityEditor.Recorder
         /// </summary>
         /// <returns>
         /// The array of selected AOVTypes.
-        /// </returns>>
+        /// </returns>
         public AOVType[] GetAOVSelection()
         {
             return m_AOVMultiSelection.ToArray();

@@ -48,7 +48,7 @@ namespace UnityEditor.Recorder.Encoder
         /// Gets the texture format this encoder requires from the Recorder.
         /// </summary>
         /// <param name="inputContainsAlpha">Whether the encoder's input contains an alpha channel or not.</param>
-        /// <returns></returns>
+        /// <returns>The texture format required by the encoder.</returns>
         TextureFormat GetTextureFormat(bool inputContainsAlpha);
 
         /// <summary>
