@@ -4,6 +4,9 @@ using UnityEngine;
 using System.Linq;
 using System.Reflection;
 using UnityEditor.Recorder.FrameCapturer;
+#if UNITY_6000_5_OR_NEWER
+using UnityEngine.Assemblies;
+#endif
 
 namespace UnityEditor.Recorder
 {
@@ -24,7 +27,11 @@ namespace UnityEditor.Recorder
         static IEnumerable<KeyValuePair<Type, object[]>> FindRecorders()
         {
             var attribType = typeof(RecorderSettingsAttribute);
+#if UNITY_6000_5_OR_NEWER
+            foreach (var a in CurrentAssemblies.GetLoadedAssemblies())
+#else
             foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+#endif
             {
                 Type[] types;
                 try
