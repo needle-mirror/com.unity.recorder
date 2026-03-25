@@ -164,7 +164,11 @@ namespace UnityEditor.Recorder
 
 #if HDRP_14_0_2_AVAILABLE
                         // Shadowmap rotation
+#if UNITY_6000_4_OR_NEWER
+                        foreach (var lightData in FindObjectsByType<HDAdditionalLightData>())
+#else
                         foreach (var lightData in FindObjectsByType<HDAdditionalLightData>(FindObjectsSortMode.None))
+#endif
                         {
                             // Shadowmap rotation only supports cone shaped spot-light at the moment.
                             var light = lightData.GetComponent<Light>();

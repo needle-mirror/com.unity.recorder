@@ -133,8 +133,13 @@ public class CommandLineRecorder : MonoBehaviour
 
         // Find the GameObject that has the CommandLineRecorder MonoBehaviour attached
         // to it and set the recording information provided by the command line arguments.
+#if UNITY_6000_4_OR_NEWER
+        var sceneCommandLineRecorder =
+            FindObjectsByType<CommandLineRecorder>().First();
+#else
         var sceneCommandLineRecorder =
             FindObjectsByType<CommandLineRecorder>(FindObjectsSortMode.None).First();
+#endif
 
         sceneCommandLineRecorder.SetRecordingInfo(
             Convert.ToInt32(startFrame),

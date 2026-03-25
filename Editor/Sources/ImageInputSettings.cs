@@ -8,6 +8,7 @@ namespace UnityEditor.Recorder.Input
     /// <summary>
     /// Optional base class for image related inputs.
     /// </summary>
+    [Serializable]
     public abstract class ImageInputSettings : RecorderInputSettings
     {
         /// <summary>

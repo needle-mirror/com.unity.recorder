@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using UnityEditor.Recorder;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -255,7 +256,7 @@ namespace UnityEditor.Recorder.Input
                     if (TargetCamera == null)
                     {
                         var displayGO = new GameObject();
-                        displayGO.name = "CameraHostGO-" + displayGO.GetInstanceID();
+                        displayGO.name = "CameraHostGO-" + UnityHelpers.GetObjectIdString(displayGO);
                         displayGO.transform.parent = session.recorderGameObject.transform;
                         var camera = displayGO.AddComponent<Camera>();
                         camera.clearFlags = CameraClearFlags.Nothing;
@@ -300,7 +301,11 @@ namespace UnityEditor.Recorder.Input
             if (cbSettings.CaptureUI && UnityHelpers.UsingLegacyRP())
             {
                 // Find canvases
+#if UNITY_6000_4_OR_NEWER
+                var canvases = UnityEngine.Object.FindObjectsByType<Canvas>();
+#else
                 var canvases = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+#endif
                 if (m_CanvasBackups == null || m_CanvasBackups.Length != canvases.Length)
                     m_CanvasBackups = new CanvasBackup[canvases.Length];
 

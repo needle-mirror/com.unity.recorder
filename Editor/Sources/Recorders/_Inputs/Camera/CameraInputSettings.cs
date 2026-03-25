@@ -14,7 +14,6 @@ namespace UnityEditor.Recorder.Input
     public class CameraInputSettings : StandardImageInputSettings
     {
         internal const string k_UnsupportedCameraSourceError = "ActiveCamera is only compatible with the Legacy Render Pipeline.";
-        internal const string k_UnsupportedRenderingPipelineError = "Targeted Camera capture is currently not compatible with the URP 2D Renderer. As an alternative, capture from the Game View or from a Render Texture Asset.";
 
         /// <summary>
         /// Indicates the Camera input type.
@@ -81,9 +80,6 @@ namespace UnityEditor.Recorder.Input
         protected internal override void CheckForErrors(List<string> errors)
         {
             base.CheckForErrors(errors);
-
-            if (UnityHelpers.UsingURP() && UnityHelpers.UsingURP2DRenderer())
-                errors.Add(k_UnsupportedRenderingPipelineError);
 
             if (Source == ImageSource.TaggedCamera)
             {

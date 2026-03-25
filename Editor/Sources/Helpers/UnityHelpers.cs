@@ -42,6 +42,15 @@ namespace UnityEditor.Recorder
                 UnityObject.DestroyImmediate(obj, allowDestroyingAssets);
         }
 
+        internal static string GetObjectIdString(UnityObject obj)
+        {
+#if UNITY_6000_4_OR_NEWER
+            return obj.GetEntityId().ToString();
+#else
+            return obj.GetInstanceID().ToString();
+#endif
+        }
+
         internal static bool IsPlaying()
         {
             return EditorApplication.isPlaying;
@@ -62,7 +71,11 @@ namespace UnityEditor.Recorder
                 SetGameObjectVisibility(rc.gameObject, value);
             }
 
+#if UNITY_6000_4_OR_NEWER
+            var rcs = UnityObject.FindObjectsByType<RecorderComponent>();
+#else
             var rcs = UnityObject.FindObjectsByType<RecorderComponent>(FindObjectsSortMode.None);
+#endif
             foreach (var rc in rcs)
             {
                 SetGameObjectVisibility(rc.gameObject, value);

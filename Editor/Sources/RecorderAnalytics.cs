@@ -121,7 +121,7 @@ namespace UnityEditor.Recorder
                 r.GetErrors(errors);
 
                 recorderInfo.type = RecordersInventory.GetRecorderInfo(r.GetType()).recorderType.FullName;
-                recorderInfo.record_guid = r.GetInstanceID().ToString();
+                recorderInfo.record_guid = UnityHelpers.GetObjectIdString(r);
                 recorderInfo.enabled = r.Enabled;
             }
         }
@@ -137,7 +137,7 @@ namespace UnityEditor.Recorder
                 var ret = new AnimationRecorderInfo
                 {
                     type = RecordersInventory.GetRecorderInfo(r.GetType()).recorderType.FullName,
-                    record_guid = r.GetInstanceID().ToString(),
+                    record_guid = UnityHelpers.GetObjectIdString(r),
                     anim_compression =  r.AnimationInputSettings.SimplyCurves.ConvertToString(),
                     record_hierarchy = r.AnimationInputSettings.Recursive,
                     clamped_tangets = r.AnimationInputSettings.ClampedTangents
@@ -165,7 +165,7 @@ namespace UnityEditor.Recorder
                 var ret = new ImageRecorderInfo()
                 {
                     type = RecordersInventory.GetRecorderInfo(r.GetType()).recorderType.FullName,
-                    record_guid = r.GetInstanceID().ToString(),
+                    record_guid = UnityHelpers.GetObjectIdString(r),
                     color_space = r.OutputFormat == ImageRecorderSettings.ImageRecorderOutputFormat.EXR ? r.OutputColorSpace.ConvertToString() : null,
                     media_format = r.OutputFormat.ConvertToString(),
                     output_resolution_h = r.imageInputSettings.OutputHeight,
@@ -201,7 +201,7 @@ namespace UnityEditor.Recorder
                 var ret = new MovieRecorderInfo()
                 {
                     type = RecordersInventory.GetRecorderInfo(r.GetType()).recorderType.FullName,
-                    record_guid = r.GetInstanceID().ToString(),
+                    record_guid = UnityHelpers.GetObjectIdString(r),
                     output_resolution_h = r.ImageInputSettings.OutputHeight,
                     output_resolution_w = r.ImageInputSettings.OutputWidth,
                     source = r.ImageInputSettings.ConvertToString(),
@@ -268,7 +268,7 @@ namespace UnityEditor.Recorder
                 var ret = new AOVImageRecorderInfo()
                 {
                     type = RecordersInventory.GetRecorderInfo(r.GetType()).recorderType.FullName,
-                    record_guid = r.GetInstanceID().ToString(),
+                    record_guid = UnityHelpers.GetObjectIdString(r),
                     color_space = isEXR ? r.OutputColorSpace.ConvertToString() : null,
                     media_format = r.OutputFormat.ConvertToString(),
                     output_resolution_h = r.imageInputSettings.OutputHeight,

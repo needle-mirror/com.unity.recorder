@@ -44,13 +44,6 @@ namespace UnityEditor.Recorder.Input
                 m_SupportedSources = ImageSource.MainCamera | ImageSource.TaggedCamera;
             }
 
-
-            if (UnityHelpers.UsingURP2DRenderer())
-            {
-                // Disable the controls if project is using URP 2D Renderer.
-                GUI.enabled = false;
-            }
-
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 if (m_MaskedSourceNames == null)
