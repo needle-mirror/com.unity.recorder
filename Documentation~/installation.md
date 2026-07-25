@@ -4,7 +4,7 @@ To install the Recorder package, follow the instructions in the [Package Manager
 
 ## Installation requirements
 
-* **Unity Editor 2023.1** or later version (recommended).
+* **Unity Editor 6000.0** or later version (recommended).
 
 ### Legal mention
 

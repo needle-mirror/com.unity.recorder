@@ -1,10 +1,14 @@
 fileFormatVersion: 2
 guid: 7de59e38a5edf344794b4a5cb8baaae0
 ScriptedImporter:
-  fileIDToRecycleName:
-    11400000: stylesheet
+  internalIDToNameTable:
+  - first:
+      114: 11400000
+    second: stylesheet
   externalObjects: {}
+  serializedVersion: 2
   userData: 
   assetBundleName: 
   assetBundleVariant: 
   script: {fileID: 12385, guid: 0000000000000000e000000000000000, type: 0}
+  disableValidation: 0

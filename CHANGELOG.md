@@ -4,6 +4,13 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.7] - 2026-07-25
+### Changed
+- Raised the minimum supported Unity version to 6000.0. Older editor versions (2023.x) are no longer supported.
+
+### Fixed
+- Image sequence frames could be written to the wrong files when a recording session ended with async GPU readbacks still in flight, e.g. at the end of a Timeline Recorder Clip with HDRP accumulation. (UUM-148006)
+
 ## [5.1.6] - 2026-03-25
 ### Changed
 - Update deprecated and obsolete APIs available in Unity 6000.4 and above.

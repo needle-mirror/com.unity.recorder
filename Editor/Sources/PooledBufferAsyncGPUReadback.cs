@@ -12,6 +12,7 @@ namespace UnityEditor.Recorder
     {
         List<Tuple<AsyncGPUReadbackRequest, NativeArray<byte>>> asyncBuffers = new();
         Dictionary<NativeArray<byte>, JobHandle> bufferJobLocks = new();
+        List<AsyncGPUReadbackRequest> requestOrder = new();
 
         public AsyncGPUReadbackRequest RequestGPUReadBack(RenderTexture tex, GraphicsFormat format, Action<AsyncGPUReadbackRequest> cb)
         {
@@ -20,6 +21,7 @@ namespace UnityEditor.Recorder
             var req = AsyncGPUReadback.RequestIntoNativeArray(ref buff, tex, 0, format, cb);
             RegisterAsyncBuffer(req,
                 ref buff); // Associates the buffer with an asyncRequest to make sure it is used only when free.
+            requestOrder.Add(req);
 
             return req;
         }
@@ -87,6 +89,15 @@ namespace UnityEditor.Recorder
 
         public void Dispose()
         {
+            // Force-complete in request order: WaitForCompletion dispatches completion callbacks
+            // synchronously, and pool order diverges from request order once a buffer is reused,
+            // which would mis-pair FIFO consumers (file names, timestamps) downstream.
+            foreach (var request in requestOrder)
+            {
+                request.WaitForCompletion();
+            }
+            requestOrder.Clear();
+
             foreach (var buffer in asyncBuffers)
             {
                 buffer.Item1.WaitForCompletion();
