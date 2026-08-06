@@ -355,5 +355,21 @@ namespace UnityEditor.Recorder
                 UnityHelpers.Destroy(recorder);
             }
         }
+
+        public void Pause()
+        {
+            recorder.Pause();
+        }
+
+        public void Resume()
+        {
+            recorder.Resume();
+            
+            m_FPSNextTimeStart = Time.unscaledTime;
+            m_FPSNextFrameCount = Time.renderedFrameCount;
+            
+            m_FPSTimeStart = m_FPSNextTimeStart;
+            m_InitialFrame = m_FPSNextFrameCount;
+        }
     }
 }

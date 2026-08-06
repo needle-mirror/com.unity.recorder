@@ -195,6 +195,20 @@ namespace UnityEditor.Recorder
                 m_RecordingSessions = null;
             }
         }
+        
+        public void PauseRecording()
+        {
+            if (RecorderOptions.VerboseMode)
+                Debug.Log("Pause Recording.");
+            
+            if (m_RecordingSessions != null)
+            {
+                foreach (var session in m_RecordingSessions)
+                {
+                    session.Pause();
+                }
+            }
+        }
 
         internal IEnumerable<RecordingSession> GetRecordingSessions()
         {
@@ -254,6 +268,20 @@ namespace UnityEditor.Recorder
                     {
                         res.IsOutputResolutionContradictory = false;
                     }
+                }
+            }
+        }
+
+        public void ResumeRecording()
+        {
+            if (RecorderOptions.VerboseMode)
+                Debug.Log("Resume Recording.");
+            
+            if (m_RecordingSessions != null)
+            {
+                foreach (var session in m_RecordingSessions)
+                {
+                    session.Resume();
                 }
             }
         }
