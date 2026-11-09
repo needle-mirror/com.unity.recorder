@@ -31,14 +31,14 @@ namespace UnityEditor.Recorder
 
             protected set
             {
-                foreach (var field in InputSettingFields())
+                foreach (var inputField in InputSettingFields())
                 {
-                    var input = (RecorderInputSettings)field.GetValue(this);
+                    var input = (RecorderInputSettings)inputField.GetValue(this);
 
                     if (input.GetType() == value.GetType())
                     {
-                        field.SetValue(this, value);
-                        m_Selected = field.Name;
+                        inputField.SetValue(this, value);
+                        m_Selected = inputField.Name;
                         m_RecorderInputSettings[m_Selected] = value;
                         break;
                     }

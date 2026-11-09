@@ -16,9 +16,11 @@ struct GIFWrapperInfo
 internal struct GIFWrapper
 {
     [DllImport(GIFWrapperInfo.LibraryPath)]
-    public static extern IntPtr Create(string sFileName, int width, int height, bool loopForever, bool constantFrameRate, bool fast, float fps, int quality);
+    public static extern IntPtr Create([MarshalAs(UnmanagedType.LPUTF8Str)] string sFileName, int width, int height, bool loopForever, bool constantFrameRate, bool fast, float fps, int quality);
     [DllImport(GIFWrapperInfo.LibraryPath)]
+    [return : MarshalAs(UnmanagedType.I1)]
     public static extern unsafe bool AddVideoFrame(IntPtr pEncoder, void* pixels, float timeMilliseconds);
     [DllImport(GIFWrapperInfo.LibraryPath)]
+    [return : MarshalAs(UnmanagedType.I1)]
     public static extern bool Close(IntPtr pEncoder);
 }

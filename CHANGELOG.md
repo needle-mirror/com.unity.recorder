@@ -4,6 +4,13 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.8] - 2026-11-09
+### Fixed
+- The Editor froze when recording a GIF, and ProRes recordings failed, when the output path contained non-ASCII characters on CoreCLR Editors (Unity 7000.x and above). (UUM-157181)
+- Fixed a compilation error with C# 14 caused by `field` becoming a contextual keyword in property accessors. (UUM-155852)
+- Fixed an assertion when an Animation Recorder session ends after the recorded GameObject was destroyed. (UUM-155852)
+- Fixed the GIF and ProRes encoders sometimes reading a wrong success or failure result from their native plugins when running on CoreCLR. (UUM-155852)
+
 ## [5.1.7] - 2026-07-25
 ### Changed
 - Raised the minimum supported Unity version to 6000.0. Older editor versions (2023.x) are no longer supported.

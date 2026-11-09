@@ -18,6 +18,7 @@ struct ProResWrapperHelpers
 {
 #if UNITY_EDITOR_OSX
     [DllImport(ProResWrapperInfo.LibraryPath, CallingConvention = CallingConvention.Cdecl)]
+    [return : MarshalAs(UnmanagedType.I1)]
     public static extern bool SupportsCodecFormat(int codecType, StringBuilder errorMsg, int errorMsgLen);
 #endif
 }
@@ -25,11 +26,14 @@ struct ProResWrapperHelpers
 internal struct ProResWrapper
 {
     [DllImport(ProResWrapperInfo.LibraryPath)]
-    public static extern IntPtr Create(string sMetadata, string sFileName, int width, int height, float fps, bool hasAudio, float fAudioSamplingRate, int codecType, bool hasTransparency, int colorDesc);
+    public static extern IntPtr Create([MarshalAs(UnmanagedType.LPUTF8Str)] string sMetadata, [MarshalAs(UnmanagedType.LPUTF8Str)] string sFileName, int width, int height, float fps, bool hasAudio, float fAudioSamplingRate, int codecType, bool hasTransparency, int colorDesc);
     [DllImport(ProResWrapperInfo.LibraryPath)]
+    [return : MarshalAs(UnmanagedType.I1)]
     public static extern unsafe bool AddVideoFrame(IntPtr pEncoder, void* data, long tickCount, int rateNumerator, int rateDenominator);
     [DllImport(ProResWrapperInfo.LibraryPath)]
+    [return : MarshalAs(UnmanagedType.I1)]
     public static extern unsafe bool AddAudioSamples(IntPtr pEncoder, float* samples, int numSamples);
     [DllImport(ProResWrapperInfo.LibraryPath)]
+    [return : MarshalAs(UnmanagedType.I1)]
     public static extern bool Close(IntPtr pEncoder);
 }

@@ -39,7 +39,7 @@ namespace UnityEditor.Recorder
                 {
                     var aInput = (AnimationInput)input;
 
-                    if (aInput.GameObjectRecorder == null)
+                    if (aInput.GameObjectRecorder == null || aInput.GameObjectRecorder.root == null)
                         continue;
 
                     var clip = new AnimationClip();
